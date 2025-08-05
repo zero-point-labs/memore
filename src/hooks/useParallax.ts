@@ -24,8 +24,13 @@ export function useParallax(strength: number = 1) {
     rotateX: 0,
     rotateY: 0,
   });
+  const isActiveRef = useRef(true);
 
   useEffect(() => {
+    // If strength is 0, don't run any animations
+    if (strength === 0) {
+      return;
+    }
     const handleMouseMove = (e: MouseEvent) => {
       const { clientX, clientY } = e;
       const centerX = window.innerWidth / 2;
@@ -54,6 +59,8 @@ export function useParallax(strength: number = 1) {
     };
 
     const animate = () => {
+      if (!isActiveRef.current) return;
+      
       setParallax((prev) => ({
         x: prev.x + (targetRef.current.x - prev.x) * 0.1,
         y: prev.y + (targetRef.current.y - prev.y) * 0.1,
@@ -64,8 +71,9 @@ export function useParallax(strength: number = 1) {
       requestRef.current = requestAnimationFrame(animate);
     };
 
-    // Check if device supports orientation
-    if (window.DeviceOrientationEvent) {
+    // Disable device orientation on mobile to prevent conflicts
+    const isMobileDevice = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    if (!isMobileDevice && window.DeviceOrientationEvent) {
       window.addEventListener('deviceorientation', handleDeviceOrientation);
     }
 
@@ -73,6 +81,7 @@ export function useParallax(strength: number = 1) {
     requestRef.current = requestAnimationFrame(animate);
 
     return () => {
+      isActiveRef.current = false;
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('deviceorientation', handleDeviceOrientation);
       if (requestRef.current) {

@@ -17,13 +17,15 @@ export function useSwipeGesture(elementRef: React.RefObject<HTMLElement>, handle
     const element = elementRef.current;
     if (!element) return;
 
-    const minSwipeDistance = 50;
+    const minSwipeDistance = 100; // Increased threshold to prevent accidental triggers
+    let touchStartTime = 0;
 
     const handleTouchStart = (e: TouchEvent) => {
       touchStartRef.current = {
         x: e.changedTouches[0].clientX,
         y: e.changedTouches[0].clientY,
       };
+      touchStartTime = Date.now();
     };
 
     const handleTouchEnd = (e: TouchEvent) => {
@@ -38,20 +40,29 @@ export function useSwipeGesture(elementRef: React.RefObject<HTMLElement>, handle
       const deltaY = touchEndRef.current.y - touchStartRef.current.y;
       const absX = Math.abs(deltaX);
       const absY = Math.abs(deltaY);
+      const touchDuration = Date.now() - touchStartTime;
 
-      if (absX > absY && absX > minSwipeDistance) {
-        // Horizontal swipe
-        if (deltaX > 0 && handlers.onSwipeRight) {
-          handlers.onSwipeRight();
-        } else if (deltaX < 0 && handlers.onSwipeLeft) {
-          handlers.onSwipeLeft();
-        }
-      } else if (absY > absX && absY > minSwipeDistance) {
-        // Vertical swipe
-        if (deltaY > 0 && handlers.onSwipeDown) {
-          handlers.onSwipeDown();
-        } else if (deltaY < 0 && handlers.onSwipeUp) {
-          handlers.onSwipeUp();
+      // Only trigger swipe if it was a quick gesture (less than 500ms)
+      // and the distance is significant enough
+      if (touchDuration < 500) {
+        if (absX > absY && absX > minSwipeDistance) {
+          // Horizontal swipe
+          e.preventDefault();
+          if (deltaX > 0 && handlers.onSwipeRight) {
+            handlers.onSwipeRight();
+          } else if (deltaX < 0 && handlers.onSwipeLeft) {
+            handlers.onSwipeLeft();
+          }
+        } else if (absY > absX && absY > minSwipeDistance) {
+          // Vertical swipe - only trigger if it's a very deliberate swipe
+          if (absY > minSwipeDistance * 1.5) {
+            e.preventDefault();
+            if (deltaY > 0 && handlers.onSwipeDown) {
+              handlers.onSwipeDown();
+            } else if (deltaY < 0 && handlers.onSwipeUp) {
+              handlers.onSwipeUp();
+            }
+          }
         }
       }
 

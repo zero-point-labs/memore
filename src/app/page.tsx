@@ -9,6 +9,7 @@ import HypeEnergyMeter from '@/components/hero-elements/HypeEnergyMeter';
 import TestimonialCarousel from '@/components/hero-elements/TestimonialCarousel';
 import { useParallax } from '@/hooks/useParallax';
 import { useSwipeGesture } from '@/hooks/useSwipeGesture';
+import { isMobile } from '@/utils/isMobile';
 
 
 // Memoize VIPCard to prevent re-renders when title changes
@@ -21,50 +22,65 @@ export default function Home() {
 
   const [currentWord, setCurrentWord] = useState(0);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [isMobileDevice, setIsMobileDevice] = useState(false);
   const heroRef = useRef<HTMLDivElement>(null);
-  const parallax = useParallax(0.5);
+  const parallax = useParallax(isMobileDevice ? 0 : 0.5);
 
   useEffect(() => {
     setIsLoaded(true);
+    setIsMobileDevice(isMobile());
+    
     const interval = setInterval(() => {
       setCurrentWord((prev) => (prev + 1) % words.length);
     }, 2000);
     return () => clearInterval(interval);
   }, []);
 
-  // Swipe gesture for mobile
+  // Swipe gesture for desktop only
   useSwipeGesture(heroRef as React.RefObject<HTMLElement>, {
     onSwipeUp: () => {
-      window.scrollTo({ top: window.innerHeight, behavior: 'smooth' });
+      if (!isMobileDevice) {
+        window.scrollTo({ top: window.innerHeight, behavior: 'smooth' });
+      }
     },
   });
 
   return (
-    <div ref={heroRef} className="min-h-screen bg-black relative overflow-x-hidden pt-20">
+    <div ref={heroRef} className="min-h-screen bg-black relative pt-20">
 
       {/* Background Effects */}
       <div className="absolute inset-0">
-        {/* High Saturated Glows */}
-        <motion.div 
-          animate={{ scale: [1, 1.2, 1], opacity: [0.4, 0.6, 0.4] }}
-          transition={{ duration: 4, repeat: Infinity }}
-          className="absolute top-0 left-0 w-[600px] h-[600px] bg-purple-600/50 rounded-full blur-[100px]" 
-        />
-        <motion.div 
-          animate={{ scale: [1, 1.3, 1], opacity: [0.4, 0.7, 0.4] }}
-          transition={{ duration: 5, repeat: Infinity }}
-          className="absolute top-1/2 right-0 w-[500px] h-[500px] bg-pink-600/50 rounded-full blur-[100px]" 
-        />
-        <motion.div 
-          animate={{ scale: [1, 1.1, 1], opacity: [0.3, 0.5, 0.3] }}
-          transition={{ duration: 6, repeat: Infinity }}
-          className="absolute bottom-0 left-1/3 w-[700px] h-[700px] bg-purple-500/40 rounded-full blur-[120px]" 
-        />
-        <motion.div 
-          animate={{ scale: [1, 1.4, 1], opacity: [0.5, 0.8, 0.5] }}
-          transition={{ duration: 4.5, repeat: Infinity }}
-          className="absolute top-1/4 left-1/2 w-[400px] h-[400px] bg-pink-500/60 rounded-full blur-[80px]" 
-        />
+        {/* High Saturated Glows - Simplified on mobile */}
+        {!isMobileDevice ? (
+          <>
+            <motion.div 
+              animate={{ scale: [1, 1.2, 1], opacity: [0.4, 0.6, 0.4] }}
+              transition={{ duration: 4, repeat: Infinity }}
+              className="absolute top-0 left-0 w-[600px] h-[600px] bg-purple-600/50 rounded-full blur-[100px]" 
+            />
+            <motion.div 
+              animate={{ scale: [1, 1.3, 1], opacity: [0.4, 0.7, 0.4] }}
+              transition={{ duration: 5, repeat: Infinity }}
+              className="absolute top-1/2 right-0 w-[500px] h-[500px] bg-pink-600/50 rounded-full blur-[100px]" 
+            />
+            <motion.div 
+              animate={{ scale: [1, 1.1, 1], opacity: [0.3, 0.5, 0.3] }}
+              transition={{ duration: 6, repeat: Infinity }}
+              className="absolute bottom-0 left-1/3 w-[700px] h-[700px] bg-purple-500/40 rounded-full blur-[120px]" 
+            />
+            <motion.div 
+              animate={{ scale: [1, 1.4, 1], opacity: [0.5, 0.8, 0.5] }}
+              transition={{ duration: 4.5, repeat: Infinity }}
+              className="absolute top-1/4 left-1/2 w-[400px] h-[400px] bg-pink-500/60 rounded-full blur-[80px]" 
+            />
+          </>
+        ) : (
+          // Static gradient backgrounds for mobile
+          <>
+            <div className="absolute top-0 left-0 w-[300px] h-[300px] bg-purple-600/30 rounded-full blur-[80px]" />
+            <div className="absolute bottom-0 right-0 w-[300px] h-[300px] bg-pink-600/30 rounded-full blur-[80px]" />
+          </>
+        )}
         
 
         
@@ -87,7 +103,7 @@ export default function Home() {
               animate={isLoaded ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.8 }}
               style={{
-                transform: `translateX(${parallax.x * 0.3}px) translateY(${parallax.y * 0.3}px)`,
+                transform: isMobileDevice ? 'none' : `translateX(${parallax.x * 0.3}px) translateY(${parallax.y * 0.3}px)`,
               }}
               className="space-y-6 sm:space-y-8 text-center max-w-6xl w-full mb-12 sm:mb-16 px-2 sm:px-4">
               {/* Small Label */}
@@ -106,7 +122,7 @@ export default function Home() {
                 <motion.h1 
                   className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-black leading-tight"
                   style={{
-                    transform: `perspective(1000px) rotateX(${parallax.rotateX * 0.5}deg) rotateY(${parallax.rotateY * 0.5}deg)`,
+                    transform: isMobileDevice ? 'none' : `perspective(1000px) rotateX(${parallax.rotateX * 0.5}deg) rotateY(${parallax.rotateY * 0.5}deg)`,
                   }}
                 >
                   <span className="text-white neon-hover">3 DAYS OF</span>{' '}
@@ -252,14 +268,18 @@ export default function Home() {
               className="relative max-w-2xl mx-auto px-4 sm:px-0"
             >
               {/* Card Glow Effect - Extended for proper blur */}
-              <motion.div
-                animate={{
-                  opacity: [0.5, 0.8, 0.5],
-                  scale: [0.95, 1.05, 0.95],
-                }}
-                transition={{ duration: 4, repeat: Infinity }}
-                className="absolute -inset-10 sm:-inset-20 bg-gradient-to-r from-purple-500/20 via-pink-500/20 to-purple-500/20 blur-3xl rounded-3xl pointer-events-none"
-              />
+              {!isMobileDevice ? (
+                <motion.div
+                  animate={{
+                    opacity: [0.5, 0.8, 0.5],
+                    scale: [0.95, 1.05, 0.95],
+                  }}
+                  transition={{ duration: 4, repeat: Infinity }}
+                  className="absolute -inset-10 sm:-inset-20 bg-gradient-to-r from-purple-500/20 via-pink-500/20 to-purple-500/20 blur-3xl rounded-3xl pointer-events-none"
+                />
+              ) : (
+                <div className="absolute -inset-10 bg-gradient-to-r from-purple-500/10 via-pink-500/10 to-purple-500/10 blur-2xl rounded-3xl pointer-events-none" />
+              )}
               
               {/* Floating Particles Around Card */}
               <div className="absolute inset-0 pointer-events-none hidden sm:block">
@@ -292,7 +312,7 @@ export default function Home() {
               {/* VIP Card */}
               <motion.div
                 style={{
-                  transform: `
+                  transform: isMobileDevice ? 'none' : `
                     perspective(1000px) 
                     translateX(${parallax.x * 0.3}px) 
                     translateY(${parallax.y * 0.3}px)
