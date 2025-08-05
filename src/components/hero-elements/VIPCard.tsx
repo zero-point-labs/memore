@@ -23,7 +23,7 @@ export default function VIPCard({ isHovered = false }: VIPCardProps) {
               scale: isHovered ? 1.02 : 1,
             }}
             transition={{ duration: 0.4, ease: "easeOut" }}
-            className="relative w-[340px] sm:w-[380px] md:w-[420px] lg:w-[460px] h-[280px] sm:h-[300px] md:h-[320px] mx-auto"
+            className="relative w-[calc(100vw-2rem)] max-w-[340px] sm:w-[380px] sm:max-w-[380px] md:w-[420px] md:max-w-[420px] lg:w-[460px] lg:max-w-[460px] h-[280px] sm:h-[300px] md:h-[320px] mx-auto"
             style={{ transformStyle: 'preserve-3d' }}
           >
             {/* Glassmorphism Card */}
@@ -36,7 +36,7 @@ export default function VIPCard({ isHovered = false }: VIPCardProps) {
                 <div className="flex items-center justify-between mb-3 sm:mb-4">
                   <div className="flex items-center gap-2">
                     <Crown className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-400/80" />
-                    <h3 className="text-base sm:text-lg md:text-xl font-bold text-white/90">MEMORA PREMIUM</h3>
+                    <h3 className="text-sm sm:text-lg md:text-xl font-bold text-white/90">MEMORA PREMIUM</h3>
                   </div>
                   <span className="text-[10px] sm:text-xs text-white/50 font-mono">EST. 2024</span>
                 </div>
@@ -47,7 +47,7 @@ export default function VIPCard({ isHovered = false }: VIPCardProps) {
                     <User className="w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 text-white/70" />
                   </div>
                   <div className="flex-1">
-                    <h4 className="text-white/90 font-semibold text-base sm:text-lg">YOUR NAME HERE</h4>
+                    <h4 className="text-white/90 font-semibold text-sm sm:text-lg">YOUR NAME HERE</h4>
                     <p className="text-white/60 text-xs sm:text-sm">Member ID: VIP-2024-0847</p>
                     <div className="flex gap-2 mt-1 sm:mt-2">
                       <span className="text-[10px] sm:text-xs px-2 py-0.5 bg-green-500/20 text-green-400 rounded-full">VERIFIED</span>

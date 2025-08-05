@@ -40,7 +40,7 @@ export default function Home() {
   });
 
   return (
-    <div ref={heroRef} className="min-h-screen bg-black relative overflow-hidden pt-20">
+    <div ref={heroRef} className="min-h-screen bg-black relative overflow-x-hidden pt-20">
 
       {/* Background Effects */}
       <div className="absolute inset-0">
@@ -186,7 +186,7 @@ export default function Home() {
         </div>
         
         {/* VIP Card Section with Enhanced Background */}
-        <div className="relative mt-20 pb-20">
+        <div className="relative mt-20 pb-20 overflow-visible">
           {/* Section Background Effects */}
           <div className="absolute inset-0">
             {/* Gradient Orbs */}
@@ -220,7 +220,7 @@ export default function Home() {
           </div>
 
           {/* Content Container */}
-          <div className="relative z-10 container mx-auto px-4">
+          <div className="relative z-10 container mx-auto px-4 overflow-visible">
             {/* Enhanced VIP Card Title */}
             <motion.div
               initial={{ opacity: 0, y: 30 }}
@@ -249,20 +249,20 @@ export default function Home() {
               initial={{ opacity: 0, scale: 0.9, y: 50 }}
               animate={isLoaded ? { opacity: 1, scale: 1, y: 0 } : {}}
               transition={{ duration: 1, delay: 1.2, type: "spring" }}
-              className="relative max-w-2xl mx-auto"
+              className="relative max-w-2xl mx-auto px-4 sm:px-0"
             >
-              {/* Card Glow Effect */}
+              {/* Card Glow Effect - Extended for proper blur */}
               <motion.div
                 animate={{
                   opacity: [0.5, 0.8, 0.5],
                   scale: [0.95, 1.05, 0.95],
                 }}
                 transition={{ duration: 4, repeat: Infinity }}
-                className="absolute inset-0 bg-gradient-to-r from-purple-500/20 via-pink-500/20 to-purple-500/20 blur-3xl rounded-3xl"
+                className="absolute -inset-10 sm:-inset-20 bg-gradient-to-r from-purple-500/20 via-pink-500/20 to-purple-500/20 blur-3xl rounded-3xl pointer-events-none"
               />
               
               {/* Floating Particles Around Card */}
-              <div className="absolute inset-0 pointer-events-none">
+              <div className="absolute inset-0 pointer-events-none hidden sm:block">
                 {[...Array(6)].map((_, i) => (
                   <motion.div
                     key={i}
