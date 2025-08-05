@@ -30,6 +30,18 @@ html, body {
   overflow-x: hidden;
 }
 
+/* Ensure animated elements stay visible on mobile */
+[data-framer-motion] {
+  -webkit-transform: translateZ(0);
+  will-change: auto;
+}
+
+/* Prevent re-rendering of animated elements */
+.motion-safe {
+  -webkit-transform-style: preserve-3d;
+  transform-style: preserve-3d;
+}
+
 /* Glitch Effect */
 @keyframes glitch {
   0% {
@@ -137,12 +149,6 @@ html, body {
   html, body {
     overflow-x: hidden;
     width: 100%;
-  }
-  
-  /* Hardware acceleration for scrolling */
-  * {
-    -webkit-transform: translateZ(0);
-    -webkit-backface-visibility: hidden;
   }
 }
 

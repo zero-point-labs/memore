@@ -2,8 +2,8 @@ import type { Variants } from 'framer-motion';
 
 export const viewportOnce = {
   once: true,
-  amount: 0.3,
-  margin: '0px 0px -100px 0px'
+  amount: 0.1, // Lower threshold for mobile
+  margin: '0px 0px -50px 0px' // Smaller margin for mobile
 };
 
 export const fadeInUp: Variants = {
