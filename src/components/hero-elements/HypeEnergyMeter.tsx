@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { Zap, Flame } from 'lucide-react';
+import { viewportOnce } from '@/utils/animationVariants';
 
 export default function HypeEnergyMeter() {
   const hypeLevel = 82;
@@ -11,7 +12,8 @@ export default function HypeEnergyMeter() {
     <div className="relative w-full max-w-xl mx-auto">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={viewportOnce}
         transition={{ duration: 0.6 }}
         className="space-y-4"
       >
@@ -45,7 +47,8 @@ export default function HypeEnergyMeter() {
             <motion.div
               className="absolute inset-y-0 left-0 bg-gradient-to-r from-purple-500/50 to-pink-500/50 rounded-full"
               initial={{ width: '0%' }}
-              animate={{ width: `${hypeLevel}%` }}
+              whileInView={{ width: `${hypeLevel}%` }}
+              viewport={viewportOnce}
               transition={{ duration: 1.2, ease: 'easeOut' }}
             >
               {/* Shimmer effect */}

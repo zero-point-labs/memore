@@ -10,6 +10,7 @@ import TestimonialCarousel from '@/components/hero-elements/TestimonialCarousel'
 import { useParallax } from '@/hooks/useParallax';
 import { useSwipeGesture } from '@/hooks/useSwipeGesture';
 import { isMobile } from '@/utils/isMobile';
+import { viewportOnce, fadeInUp, fadeIn, scaleIn, slideInFromTop } from '@/utils/animationVariants';
 
 
 // Memoize VIPCard to prevent re-renders when title changes
@@ -21,13 +22,11 @@ const words = ['PARTIES', 'MEMORIES', 'MADNESS'];
 export default function Home() {
 
   const [currentWord, setCurrentWord] = useState(0);
-  const [isLoaded, setIsLoaded] = useState(false);
   const [isMobileDevice, setIsMobileDevice] = useState(false);
   const heroRef = useRef<HTMLDivElement>(null);
   const parallax = useParallax(isMobileDevice ? 0 : 0.5);
 
   useEffect(() => {
-    setIsLoaded(true);
     setIsMobileDevice(isMobile());
     
     const interval = setInterval(() => {
@@ -99,18 +98,20 @@ export default function Home() {
           <div className="flex flex-col items-center">
             {/* Content First */}
             <motion.div
-              initial={{ opacity: 0, y: 50 }}
-              animate={isLoaded ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.8 }}
+              initial="hidden"
+              whileInView="visible"
+              viewport={viewportOnce}
+              variants={fadeInUp}
               style={{
                 transform: isMobileDevice ? 'none' : `translateX(${parallax.x * 0.3}px) translateY(${parallax.y * 0.3}px)`,
               }}
               className="space-y-6 sm:space-y-8 text-center max-w-6xl w-full mb-12 sm:mb-16 px-2 sm:px-4">
               {/* Small Label */}
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
+                initial="hidden"
+                whileInView="visible"
+                viewport={viewportOnce}
+                variants={slideInFromTop}
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-purple-500/30 bg-purple-500/10 mx-auto"
               >
                 <span className="text-lg">🇨🇾</span>
@@ -158,16 +159,23 @@ export default function Home() {
               {/* Features */}
               <motion.div 
                 className="flex flex-wrap gap-3 sm:gap-6 justify-center"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.5, staggerChildren: 0.1 }}
+                initial="hidden"
+                whileInView="visible"
+                viewport={viewportOnce}
+                variants={fadeIn}
+                transition={{ staggerChildren: 0.1 }}
               >
                 {['Instant Booking', 'VIP Access', 'AI Trip Planning'].map((feature, index) => (
                   <motion.div
                     key={feature}
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.5 + index * 0.1 }}
+                    variants={{
+                      hidden: { opacity: 0, scale: 0.8 },
+                      visible: { 
+                        opacity: 1, 
+                        scale: 1,
+                        transition: { delay: index * 0.1 }
+                      }
+                    }}
                     whileHover={{ scale: 1.1, y: -5 }}
                     className="flex items-center gap-2 text-gray-300 hover:text-purple-300 transition-colors cursor-pointer group"
                   >
@@ -179,9 +187,10 @@ export default function Home() {
 
               {/* Social Proof Carousel */}
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.7 }}
+                initial="hidden"
+                whileInView="visible"
+                viewport={viewportOnce}
+                variants={fadeIn}
                 className="pt-4"
               >
                 <TestimonialCarousel />
@@ -189,9 +198,10 @@ export default function Home() {
 
               {/* Hype Energy Meter */}
               <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.8, type: "spring" }}
+                initial="hidden"
+                whileInView="visible"
+                viewport={viewportOnce}
+                variants={scaleIn}
                 className="pt-8"
               >
                 <HypeEnergyMeter />
@@ -239,9 +249,10 @@ export default function Home() {
           <div className="relative z-10 container mx-auto px-4 overflow-visible">
             {/* Enhanced VIP Card Title */}
             <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.9, duration: 0.8 }}
+              initial="hidden"
+              whileInView="visible"
+              viewport={viewportOnce}
+              variants={slideInFromTop}
               className="text-center mb-12"
             >
               <motion.div
@@ -262,9 +273,18 @@ export default function Home() {
 
             {/* VIP Card with Enhanced Container */}
             <motion.div
-              initial={{ opacity: 0, scale: 0.9, y: 50 }}
-              animate={isLoaded ? { opacity: 1, scale: 1, y: 0 } : {}}
-              transition={{ duration: 1, delay: 1.2, type: "spring" }}
+              initial="hidden"
+              whileInView="visible"
+              viewport={viewportOnce}
+              variants={{
+                hidden: { opacity: 0, scale: 0.9, y: 50 },
+                visible: { 
+                  opacity: 1, 
+                  scale: 1, 
+                  y: 0,
+                  transition: { duration: 1, type: "spring" }
+                }
+              }}
               className="relative max-w-2xl mx-auto px-4 sm:px-0"
             >
               {/* Card Glow Effect - Extended for proper blur */}
@@ -329,9 +349,10 @@ export default function Home() {
               
               {/* Call to Action Below Card */}
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 1.5 }}
+                initial="hidden"
+                whileInView="visible"
+                viewport={viewportOnce}
+                variants={fadeIn}
                 className="text-center mt-8"
               >
                 <p className="text-sm text-gray-400 mb-4">
