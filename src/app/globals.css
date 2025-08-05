@@ -1,8 +1,12 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #0a0a0a;
+  --foreground: #ffffff;
+  --purple-glow: #8b5cf6;
+  --yellow-glow: #fbbf24;
+  --blue-glow: #3b82f6;
+  --pink-glow: #ec4899;
 }
 
 @theme inline {
@@ -12,15 +16,128 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  overflow-x: hidden;
+}
+
+/* Glitch Effect */
+@keyframes glitch {
+  0% {
+    transform: translate(0);
+    text-shadow: -2px 3px 0 red, 2px -3px 0 blue;
+  }
+  20% {
+    transform: translate(-2px, 2px);
+    text-shadow: 2px -3px 0 red, -2px 3px 0 blue;
+  }
+  40% {
+    transform: translate(-2px, -2px);
+    text-shadow: 2px 3px 0 red, -2px -3px 0 blue;
+  }
+  60% {
+    transform: translate(2px, 2px);
+    text-shadow: -2px -3px 0 red, 2px 3px 0 blue;
+  }
+  80% {
+    transform: translate(2px, -2px);
+    text-shadow: -2px 3px 0 red, 2px -3px 0 blue;
+  }
+  100% {
+    transform: translate(0);
+    text-shadow: -2px 3px 0 red, 2px -3px 0 blue;
+  }
+}
+
+.glitch {
+  animation: glitch 2s infinite;
+}
+
+.glitch-hover:hover {
+  animation: glitch 0.3s infinite;
+}
+
+/* Neon Glow */
+.neon-purple {
+  color: #fff;
+  text-shadow: 0 0 10px var(--purple-glow), 0 0 20px var(--purple-glow), 0 0 30px var(--purple-glow);
+}
+
+.neon-yellow {
+  color: #fff;
+  text-shadow: 0 0 10px var(--yellow-glow), 0 0 20px var(--yellow-glow), 0 0 30px var(--yellow-glow);
+}
+
+.neon-blue {
+  color: #fff;
+  text-shadow: 0 0 10px var(--blue-glow), 0 0 20px var(--blue-glow), 0 0 30px var(--blue-glow);
+}
+
+/* Cyber Grid Background */
+.cyber-grid {
+  background-image: 
+    linear-gradient(rgba(139, 92, 246, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(139, 92, 246, 0.1) 1px, transparent 1px);
+  background-size: 50px 50px;
+  animation: grid-move 20s linear infinite;
+}
+
+@keyframes grid-move {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(50px, 50px); }
+}
+
+/* Slide Animation for Energy Meter */
+@keyframes slide {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(100px); }
+}
+
+/* Pulse Animation */
+@keyframes pulse-glow {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* Gradient Text */
+.gradient-text {
+  background: linear-gradient(to right, var(--purple-glow), var(--yellow-glow), var(--blue-glow));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom selection color */
+::selection {
+  background-color: rgba(139, 92, 246, 0.3);
+  color: white;
+}
+
+/* Hide scrollbar but keep functionality */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(139, 92, 246, 0.1);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(139, 92, 246, 0.5);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(139, 92, 246, 0.7);
 }
