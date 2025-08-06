@@ -68,61 +68,102 @@ export default function FAQSection() {
       </div>
       
       {/* FAQ Content Section */}
-      <div className="relative py-32 overflow-hidden">
+      <div className="relative py-32 overflow-hidden bg-black">
         {/* Subtle fade from black */}
         <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-black to-transparent z-20 pointer-events-none" />
         
-        {/* Video Background */}
+        {/* Playful Textured Background */}
         <div className="absolute inset-0 z-0">
-          <video
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="absolute inset-0 w-full h-full object-cover"
-          >
-            <source src="/0806.mov" type="video/mp4" />
-          </video>
-          
-          {/* Dark Overlay - reduced for more video visibility */}
-          <div className="absolute inset-0 bg-black/60" />
-        
-        {/* Gradient Overlays */}
-        <div className="absolute inset-0">
-          <div className="absolute top-0 left-0 w-[800px] h-[800px] bg-purple-600/20 rounded-full blur-[150px]" />
-          <div className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-pink-600/20 rounded-full blur-[150px]" />
-        </div>
-        
-        {/* Cyber Grid */}
-        <div className="absolute inset-0 opacity-20">
-          <div className="absolute inset-0" style={{
-            backgroundImage: `linear-gradient(purple 1px, transparent 1px), linear-gradient(90deg, purple 1px, transparent 1px)`,
-            backgroundSize: '50px 50px',
-          }} />
-        </div>
-        
-        {/* Animated Lines */}
-        <div className="absolute inset-0 overflow-hidden">
-          {[...Array(3)].map((_, i) => (
-            <motion.div
-              key={i}
-              className="absolute h-px bg-gradient-to-r from-transparent via-purple-500 to-transparent"
-              style={{
-                top: `${30 + i * 20}%`,
-                width: '100%',
-              }}
-              animate={{
-                x: ['-100%', '100%'],
-              }}
-              transition={{
-                duration: 8 + i * 2,
-                repeat: Infinity,
-                ease: "linear",
-                delay: i * 2,
-              }}
-            />
-          ))}
-        </div>
+          {/* Multiple Animated Gradient Orbs - More Playful */}
+          <motion.div 
+            animate={{ 
+              scale: [1, 1.4, 0.8, 1.2, 1], 
+              opacity: [0.3, 0.7, 0.4, 0.6, 0.3],
+              rotate: [0, 180, 360]
+            }}
+            transition={{ duration: 12, repeat: Infinity }}
+            className="absolute top-10 left-10 w-[600px] h-[600px] bg-gradient-to-br from-purple-500/40 to-pink-500/30 rounded-full blur-[120px]" 
+          />
+          <motion.div 
+            animate={{ 
+              scale: [1, 0.7, 1.5, 0.9, 1], 
+              opacity: [0.4, 0.8, 0.3, 0.7, 0.4],
+              rotate: [360, 180, 0]
+            }}
+            transition={{ duration: 15, repeat: Infinity }}
+            className="absolute top-1/2 right-10 w-[500px] h-[500px] bg-gradient-to-br from-cyan-500/35 to-purple-600/40 rounded-full blur-[100px]" 
+          />
+          <motion.div 
+            animate={{ 
+              scale: [1, 1.3, 0.6, 1.1, 1], 
+              opacity: [0.2, 0.6, 0.3, 0.5, 0.2],
+              x: [0, 100, -50, 0],
+              y: [0, -80, 60, 0]
+            }}
+            transition={{ duration: 18, repeat: Infinity }}
+            className="absolute bottom-20 left-1/3 w-[700px] h-[700px] bg-gradient-to-br from-yellow-500/25 to-orange-500/30 rounded-full blur-[140px]" 
+          />
+          <motion.div 
+            animate={{ 
+              scale: [1, 1.6, 0.9, 1.4, 1], 
+              opacity: [0.5, 0.9, 0.4, 0.8, 0.5],
+              rotate: [0, -90, -180, -270, -360]
+            }}
+            transition={{ duration: 10, repeat: Infinity }}
+            className="absolute top-1/4 left-1/2 w-[400px] h-[400px] bg-gradient-to-br from-green-500/30 to-blue-500/35 rounded-full blur-[90px]" 
+          />
+          <motion.div 
+            animate={{ 
+              scale: [1, 0.8, 1.7, 1.1, 1], 
+              opacity: [0.3, 0.7, 0.2, 0.6, 0.3],
+              x: [0, -120, 80, 0],
+              y: [0, 90, -70, 0]
+            }}
+            transition={{ duration: 14, repeat: Infinity }}
+            className="absolute bottom-1/4 right-1/3 w-[550px] h-[550px] bg-gradient-to-br from-rose-500/35 to-violet-500/40 rounded-full blur-[110px]" 
+          />
+
+          {/* Animated Grid Patterns - Multiple Layers */}
+          <div className="absolute inset-0 opacity-15">
+            <div className="absolute inset-0" style={{
+              backgroundImage: `
+                linear-gradient(45deg, rgba(139, 92, 246, 0.3) 1px, transparent 1px),
+                linear-gradient(-45deg, rgba(236, 72, 153, 0.2) 1px, transparent 1px),
+                linear-gradient(rgba(34, 197, 94, 0.15) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(59, 130, 246, 0.2) 1px, transparent 1px)
+              `,
+              backgroundSize: '40px 40px, 60px 60px, 80px 80px, 100px 100px',
+            }} />
+          </div>
+
+          {/* Animated Diagonal Lines - More Playful */}
+          <div className="absolute inset-0 overflow-hidden">
+            {[...Array(6)].map((_, i) => {
+              const colors = ['rgba(139, 92, 246, 0.4)', 'rgba(236, 72, 153, 0.3)', 'rgba(34, 197, 94, 0.3)', 'rgba(245, 101, 101, 0.4)', 'rgba(59, 130, 246, 0.3)', 'rgba(168, 85, 247, 0.4)'];
+              return (
+                <motion.div
+                  key={i}
+                  className="absolute h-px"
+                  style={{
+                    background: `linear-gradient(90deg, transparent, ${colors[i]}, transparent)`,
+                    top: `${15 + i * 12}%`,
+                    width: '100%',
+                    transform: `rotate(${Math.random() * 10 - 5}deg)`
+                  }}
+                  animate={{
+                    x: ['-100%', '100%'],
+                    opacity: [0, 1, 0]
+                  }}
+                  transition={{
+                    duration: 10 + i * 2,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                    delay: i * 1.5,
+                  }}
+                />
+              );
+            })}
+          </div>
         </div>
 
         {/* Content */}
