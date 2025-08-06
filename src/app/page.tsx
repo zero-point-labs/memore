@@ -7,6 +7,7 @@ import VIPCard from '@/components/hero-elements/VIPCard';
 import GlitchText from '@/components/hero-elements/GlitchText';
 import HypeEnergyMeter from '@/components/hero-elements/HypeEnergyMeter';
 import TestimonialCarousel from '@/components/hero-elements/TestimonialCarousel';
+import FAQSection from '@/components/FAQSection';
 import { useParallax } from '@/hooks/useParallax';
 import { useSwipeGesture } from '@/hooks/useSwipeGesture';
 import { isMobile } from '@/utils/isMobile';
@@ -370,6 +371,9 @@ export default function Home() {
           </div>
         </div>
       </div>
+      
+      {/* FAQ Section */}
+      <FAQSection />
     </div>
   );
 }
