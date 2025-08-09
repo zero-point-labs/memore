@@ -1,20 +1,24 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { useState, useEffect, memo, useRef } from 'react';
-import VIPCard from '@/components/hero-elements/VIPCard';
+import { useState, useEffect, useRef } from 'react';
+// import VIPCard from '@/components/hero-elements/VIPCard';
 
 import GlitchText from '@/components/hero-elements/GlitchText';
 import FAQSection from '@/components/FAQSection';
 import NextTripSection from '@/components/NextTripSection';
+import GallerySection from '@/components/GallerySection';
+import BlogSection from '@/components/BlogSection';
+import ContactSection from '@/components/ContactSection';
+import Footer from '@/components/Footer';
 import { useParallax } from '@/hooks/useParallax';
 import { useSwipeGesture } from '@/hooks/useSwipeGesture';
 import { isMobile } from '@/utils/isMobile';
-import { viewportOnce, fadeInUp, fadeIn, scaleIn, slideInFromTop } from '@/utils/animationVariants';
+import { viewportOnce, fadeInUp, fadeIn, slideInFromTop } from '@/utils/animationVariants';
 
 
 // Memoize VIPCard to prevent re-renders when title changes
-const MemoizedVIPCard = memo(VIPCard);
+// const MemoizedVIPCard = memo(VIPCard);
 
 // Constants
 const words = ['PARTIES', 'MEMORIES', 'MADNESS'];
@@ -290,8 +294,20 @@ export default function Home() {
       {/* Next Trip Details Section */}
       <NextTripSection />
       
+      {/* Gallery Section */}
+      <GallerySection />
+      
+      {/* Blog Section */}
+      <BlogSection />
+      
       {/* FAQ Section */}
       <FAQSection />
+      
+      {/* Contact Section - flows from FAQ */}
+      <ContactSection />
+      
+      {/* Footer - no gap */}
+      <Footer />
     </div>
   );
 }

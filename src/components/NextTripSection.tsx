@@ -10,12 +10,53 @@ import NumberTicker from '@/components/magicui/number-ticker';
 import Sparkles from '@/components/ui/Sparkles';
 import { cn } from '@/utils/cn';
 
-// Trip Stats
-const tripStats = [
-  { label: 'Students Joined', value: 500, icon: '👥' },
-  { label: 'Activities Planned', value: 24, icon: '🎉' },
-  { label: 'Locations', value: 4, icon: '📍' },
-  { label: 'Hours of Fun', value: 72, icon: '⏰' },
+// Student Reviews
+const studentReviews = [
+  {
+    id: 1,
+    name: 'Emma Thompson',
+    university: 'University of Manchester',
+    rating: 5,
+    review: 'Absolutely insane 3 days! The beach parties were unreal and Lora helped us skip every queue. Already planning my next trip!',
+    avatar: '👩‍🎓',
+    tripDate: 'July 2023',
+  },
+  {
+    id: 2,
+    name: 'Jake Wilson',
+    university: 'Kings College London',
+    rating: 5,
+    review: 'Best uni trip ever! The VIP treatment at every club, yacht parties, and cliff jumping - literally everything was perfect.',
+    avatar: '👨‍🎓',
+    tripDate: 'August 2023',
+  },
+  {
+    id: 3,
+    name: 'Sophia Chen',
+    university: 'UCL',
+    rating: 5,
+    review: 'Met so many amazing people! The sunset boat party was magical. Lora made everything so easy - just had to show up and party!',
+    avatar: '👩‍💼',
+    tripDate: 'June 2023',
+  },
+  {
+    id: 4,
+    name: 'Alex Martinez',
+    university: 'University of Edinburgh',
+    rating: 5,
+    review: 'Cyprus with this crew hits different! Every moment was Instagram-worthy. The villa parties were next level 🔥',
+    avatar: '🧑‍🎓',
+    tripDate: 'July 2023',
+  },
+  {
+    id: 5,
+    name: 'Mia Anderson',
+    university: 'University of Bristol',
+    rating: 5,
+    review: 'Worth every penny! VIP everywhere, no waiting, just pure vibes. The group chat before the trip got everyone hyped!',
+    avatar: '👩‍🎤',
+    tripDate: 'August 2023',
+  },
 ];
 
 // Daily Itinerary
@@ -63,12 +104,22 @@ const activities = [
 
 export default function NextTripSection() {
   const [selectedDay, setSelectedDay] = useState(0);
-  const [isMobileDevice, setIsMobileDevice] = useState(false);
+  // const [isMobileDevice, setIsMobileDevice] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [currentReview, setCurrentReview] = useState(0);
 
   // Prevent flash by ensuring component is mounted
   useEffect(() => {
     setIsLoaded(true);
+  }, []);
+
+  // Auto-play carousel
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentReview((prev) => (prev + 1) % studentReviews.length);
+    }, 5000); // Change review every 5 seconds
+
+    return () => clearInterval(interval);
   }, []);
 
   if (!isLoaded) {
@@ -216,32 +267,158 @@ export default function NextTripSection() {
               </p>
             </motion.div>
 
-            {/* Stats Section with Number Tickers */}
+            {/* Student Reviews Carousel */}
             <motion.div
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-20"
+              className="mb-20"
             >
-              {tripStats.map((stat, index) => (
+              {/* Section Title */}
+              <div className="text-center mb-8">
+                <h3 className="text-2xl font-bold text-white mb-2">
+                  What Students Are Saying
+                </h3>
+                <p className="text-gray-400">Real experiences from the Cyprus squad</p>
+              </div>
+
+              {/* Review Carousel Container */}
+              <div className="relative max-w-4xl mx-auto">
+                {/* Reviews */}
+                <div className="relative overflow-hidden">
+                  <div className="flex transition-transform duration-500 ease-out"
+                       style={{ transform: `translateX(-${currentReview * 100}%)` }}>
+                    {studentReviews.map((review) => (
+                      <div
+                        key={review.id}
+                        className="w-full flex-shrink-0 px-4"
+                      >
+                        <motion.div
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="bg-gradient-to-br from-purple-900/20 to-pink-900/20 backdrop-blur-sm border border-purple-500/20 rounded-2xl p-8 text-center relative overflow-hidden"
+                        >
+                          {/* Background Sparkles Effect */}
+                          <div className="absolute inset-0 opacity-20">
+                            <Sparkles density={15} color="#a855f7" speed={0.5} />
+                          </div>
+                          
+                          {/* Quote Icon */}
+                          <motion.div
+                            initial={{ rotate: -10 }}
+                            animate={{ rotate: 10 }}
+                            transition={{ duration: 2, repeat: Infinity, repeatType: "reverse" }}
+                            className="absolute top-4 left-4 text-purple-500/20 text-6xl"
+                          >
+                            &quot;
+                          </motion.div>
+                          
+                          {/* Rating Stars */}
+                          <div className="flex justify-center gap-1 mb-4 relative z-10">
+                            {[...Array(5)].map((_, i) => (
+                              <motion.span
+                                key={i}
+                                initial={{ opacity: 0, scale: 0, rotate: -180 }}
+                                animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                                transition={{ delay: 0.1 * i, type: "spring", stiffness: 200 }}
+                                className="text-yellow-400 text-xl"
+                              >
+                                ⭐
+                              </motion.span>
+                            ))}
+                          </div>
+                          
+                          {/* Review Text */}
+                          <p className="text-gray-300 text-lg mb-6 italic relative z-10 max-w-2xl mx-auto">
+                            &quot;{review.review}&quot;
+                          </p>
+                          
+                          {/* Reviewer Info */}
+                          <div className="flex items-center justify-center gap-4 relative z-10">
+                            <motion.span 
+                              className="text-4xl"
+                              whileHover={{ scale: 1.2, rotate: 10 }}
+                              transition={{ type: "spring", stiffness: 300 }}
+                            >
+                              {review.avatar}
+                            </motion.span>
+                            <div className="text-left">
+                              <p className="text-white font-semibold">{review.name}</p>
+                              <p className="text-gray-400 text-sm">{review.university}</p>
+                              <p className="text-purple-400 text-xs flex items-center gap-1">
+                                <span>🌴</span> {review.tripDate}
+                              </p>
+                            </div>
+                          </div>
+                        </motion.div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Navigation Buttons */}
+                <div className="absolute top-1/2 -translate-y-1/2 left-0 right-0 flex justify-between px-2 pointer-events-none">
+                  <motion.button
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    onClick={() => setCurrentReview((prev) => (prev - 1 + studentReviews.length) % studentReviews.length)}
+                    className="w-12 h-12 rounded-full bg-black/40 backdrop-blur-sm border border-purple-500/30 flex items-center justify-center text-purple-300 hover:bg-purple-500/20 transition-colors pointer-events-auto"
+                  >
+                    ←
+                  </motion.button>
+                  <motion.button
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    onClick={() => setCurrentReview((prev) => (prev + 1) % studentReviews.length)}
+                    className="w-12 h-12 rounded-full bg-black/40 backdrop-blur-sm border border-purple-500/30 flex items-center justify-center text-purple-300 hover:bg-purple-500/20 transition-colors pointer-events-auto"
+                  >
+                    →
+                  </motion.button>
+                </div>
+
+                {/* Manual Navigation Dots */}
+                <div className="flex justify-center gap-2 mt-6">
+                  {studentReviews.map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setCurrentReview(index)}
+                      className={cn(
+                        "w-2 h-2 rounded-full transition-all duration-300",
+                        currentReview === index
+                          ? "w-8 bg-gradient-to-r from-purple-500 to-pink-500"
+                          : "bg-purple-500/30 hover:bg-purple-500/60"
+                      )}
+                      aria-label={`Go to review ${index + 1}`}
+                    />
+                  ))}
+                </div>
+
+                {/* Submit Review Button */}
                 <motion.div
-                  key={stat.label}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ delay: index * 0.1 }}
-                  className="bg-black/40 backdrop-blur-sm border border-purple-500/20 rounded-xl p-6 text-center group hover:border-purple-500/40 transition-all duration-300"
-                  whileHover={{ scale: 1.05 }}
+                  transition={{ delay: 0.5 }}
+                  className="text-center mt-8"
                 >
-                  <div className="text-3xl mb-3">{stat.icon}</div>
-                  <div className="text-3xl font-bold mb-2">
-                    <NumberTicker value={stat.value} />
-                    <span className="text-purple-400">+</span>
-                  </div>
-                  <p className="text-gray-400 text-sm">{stat.label}</p>
+                  <motion.button
+                    whileHover={{ scale: 1.05, y: -2 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600/20 to-pink-600/20 border border-purple-500/30 rounded-full text-purple-300 font-medium hover:from-purple-600/30 hover:to-pink-600/30 hover:border-purple-500/50 transition-all duration-300 group"
+                  >
+                    <span className="text-xl group-hover:scale-110 transition-transform">✍️</span>
+                    <span>Share Your Cyprus Story</span>
+                    <motion.span
+                      animate={{ x: [0, 5, 0] }}
+                      transition={{ duration: 1.5, repeat: Infinity }}
+                      className="text-purple-400"
+                    >
+                      →
+                    </motion.span>
+                  </motion.button>
                 </motion.div>
-              ))}
+              </div>
             </motion.div>
 
             {/* Main Content Grid */}

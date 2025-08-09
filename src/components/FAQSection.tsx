@@ -4,8 +4,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 import GlitchText from '@/components/hero-elements/GlitchText';
-import Sparkles from '@/components/ui/Sparkles';
-import ShimmerBorder from '@/components/ui/ShimmerBorder';
 
 interface FAQItem {
   id: number;
@@ -36,6 +34,72 @@ const faqs: FAQItem[] = [
   }
 ];
 
+// Optimized Sparkles component using CSS animations
+function OptimizedSparkles() {
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      <style jsx>{`
+        @keyframes sparkle {
+          0% { opacity: 0; transform: scale(0) translateY(0); }
+          50% { opacity: 1; transform: scale(1) translateY(-10px); }
+          100% { opacity: 0; transform: scale(0) translateY(-20px); }
+        }
+        .sparkle {
+          position: absolute;
+          width: 2px;
+          height: 2px;
+          background: #a855f7;
+          border-radius: 50%;
+          box-shadow: 0 0 4px #a855f7;
+          animation: sparkle 2s infinite ease-out;
+        }
+        .sparkle:nth-child(1) { top: 10%; left: 20%; animation-delay: 0s; }
+        .sparkle:nth-child(2) { top: 60%; left: 80%; animation-delay: 0.5s; }
+        .sparkle:nth-child(3) { top: 30%; left: 50%; animation-delay: 1s; }
+        .sparkle:nth-child(4) { top: 80%; left: 30%; animation-delay: 1.5s; }
+        .sparkle:nth-child(5) { top: 20%; left: 70%; animation-delay: 2s; }
+        .sparkle:nth-child(6) { top: 70%; left: 10%; animation-delay: 2.5s; }
+        .sparkle:nth-child(7) { top: 40%; left: 90%; animation-delay: 3s; }
+        .sparkle:nth-child(8) { top: 90%; left: 60%; animation-delay: 3.5s; }
+      `}</style>
+      {[...Array(8)].map((_, i) => (
+        <div key={i} className="sparkle" />
+      ))}
+    </div>
+  );
+}
+
+// Optimized ShimmerBorder using pure CSS
+function OptimizedShimmerBorder({ children, duration = 4 }: { children: React.ReactNode; duration?: number }) {
+  return (
+    <div className="relative">
+      <style jsx>{`
+        @keyframes shimmer {
+          0% { background-position: 200% 0; }
+          100% { background-position: -200% 0; }
+        }
+        .shimmer-border::before {
+          content: '';
+          position: absolute;
+          inset: -1px;
+          border-radius: inherit;
+          background: linear-gradient(90deg, transparent, #a855f7, #ec4899, transparent);
+          background-size: 200% 100%;
+          animation: shimmer ${duration}s infinite linear;
+          opacity: 0.75;
+          -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+          -webkit-mask-composite: xor;
+          mask-composite: exclude;
+          padding: 2px;
+        }
+      `}</style>
+      <div className="shimmer-border relative">
+        {children}
+      </div>
+    </div>
+  );
+}
+
 export default function FAQSection() {
   const [openItems, setOpenItems] = useState<number[]>([]);
 
@@ -49,120 +113,43 @@ export default function FAQSection() {
 
   return (
     <section className="relative">
-      {/* Animated gradient line separator */}
-      <div className="relative h-px overflow-hidden">
-        <motion.div
-          className="absolute inset-0 bg-gradient-to-r from-transparent via-purple-500 to-transparent"
-          animate={{
-            backgroundPosition: ['0% 50%', '100% 50%'],
-          }}
-          transition={{
-            duration: 5,
-            repeat: Infinity,
-            ease: "linear",
-          }}
-          style={{
-            backgroundSize: '200% 100%',
-          }}
-        />
-      </div>
-      
       {/* FAQ Content Section */}
-      <div className="relative py-32 overflow-hidden bg-black">
-        {/* Subtle fade from black */}
-        <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-black to-transparent z-20 pointer-events-none" />
+      <div className="relative pt-20 pb-24 overflow-hidden bg-black">
         
-        {/* Playful Textured Background */}
-        <div className="absolute inset-0 z-0">
-          {/* Multiple Animated Gradient Orbs - More Playful */}
-          <motion.div 
-            animate={{ 
-              scale: [1, 1.4, 0.8, 1.2, 1], 
-              opacity: [0.3, 0.7, 0.4, 0.6, 0.3],
-              rotate: [0, 180, 360]
-            }}
-            transition={{ duration: 12, repeat: Infinity }}
-            className="absolute top-10 left-10 w-[600px] h-[600px] bg-gradient-to-br from-purple-500/40 to-pink-500/30 rounded-full blur-[120px]" 
-          />
-          <motion.div 
-            animate={{ 
-              scale: [1, 0.7, 1.5, 0.9, 1], 
-              opacity: [0.4, 0.8, 0.3, 0.7, 0.4],
-              rotate: [360, 180, 0]
-            }}
-            transition={{ duration: 15, repeat: Infinity }}
-            className="absolute top-1/2 right-10 w-[500px] h-[500px] bg-gradient-to-br from-cyan-500/35 to-purple-600/40 rounded-full blur-[100px]" 
-          />
-          <motion.div 
-            animate={{ 
-              scale: [1, 1.3, 0.6, 1.1, 1], 
-              opacity: [0.2, 0.6, 0.3, 0.5, 0.2],
-              x: [0, 100, -50, 0],
-              y: [0, -80, 60, 0]
-            }}
-            transition={{ duration: 18, repeat: Infinity }}
-            className="absolute bottom-20 left-1/3 w-[700px] h-[700px] bg-gradient-to-br from-yellow-500/25 to-orange-500/30 rounded-full blur-[140px]" 
-          />
-          <motion.div 
-            animate={{ 
-              scale: [1, 1.6, 0.9, 1.4, 1], 
-              opacity: [0.5, 0.9, 0.4, 0.8, 0.5],
-              rotate: [0, -90, -180, -270, -360]
-            }}
-            transition={{ duration: 10, repeat: Infinity }}
-            className="absolute top-1/4 left-1/2 w-[400px] h-[400px] bg-gradient-to-br from-green-500/30 to-blue-500/35 rounded-full blur-[90px]" 
-          />
-          <motion.div 
-            animate={{ 
-              scale: [1, 0.8, 1.7, 1.1, 1], 
-              opacity: [0.3, 0.7, 0.2, 0.6, 0.3],
-              x: [0, -120, 80, 0],
-              y: [0, 90, -70, 0]
-            }}
-            transition={{ duration: 14, repeat: Infinity }}
-            className="absolute bottom-1/4 right-1/3 w-[550px] h-[550px] bg-gradient-to-br from-rose-500/35 to-violet-500/40 rounded-full blur-[110px]" 
-          />
+        {/* Static Background with Performance Optimizations */}
+        <div className="absolute inset-0 z-0" style={{ willChange: 'transform' }}>
+          {/* Static Gradient Orbs - Your brilliant idea! */}
+          <div className="absolute top-10 left-10 w-[600px] h-[600px] bg-gradient-to-br from-purple-500/25 to-pink-500/20 rounded-full blur-[80px] transform3d(0,0,0)" />
+          <div className="absolute top-1/2 right-10 w-[500px] h-[500px] bg-gradient-to-br from-cyan-500/20 to-purple-600/25 rounded-full blur-[70px] transform3d(0,0,0)" />
+          <div className="absolute bottom-20 left-1/3 w-[700px] h-[700px] bg-gradient-to-br from-yellow-500/15 to-orange-500/20 rounded-full blur-[90px] transform3d(0,0,0)" />
+          <div className="absolute top-1/4 left-1/2 w-[400px] h-[400px] bg-gradient-to-br from-green-500/20 to-blue-500/25 rounded-full blur-[60px] transform3d(0,0,0)" />
+          <div className="absolute bottom-1/4 right-1/3 w-[550px] h-[550px] bg-gradient-to-br from-rose-500/25 to-violet-500/30 rounded-full blur-[75px] transform3d(0,0,0)" />
 
-          {/* Animated Grid Patterns - Multiple Layers */}
-          <div className="absolute inset-0 opacity-15">
+          {/* Simplified Static Grid Pattern */}
+          <div className="absolute inset-0 opacity-10">
             <div className="absolute inset-0" style={{
               backgroundImage: `
-                linear-gradient(45deg, rgba(139, 92, 246, 0.3) 1px, transparent 1px),
-                linear-gradient(-45deg, rgba(236, 72, 153, 0.2) 1px, transparent 1px),
-                linear-gradient(rgba(34, 197, 94, 0.15) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(59, 130, 246, 0.2) 1px, transparent 1px)
+                linear-gradient(45deg, rgba(139, 92, 246, 0.2) 1px, transparent 1px),
+                linear-gradient(-45deg, rgba(236, 72, 153, 0.15) 1px, transparent 1px)
               `,
-              backgroundSize: '40px 40px, 60px 60px, 80px 80px, 100px 100px',
+              backgroundSize: '60px 60px, 80px 80px',
             }} />
           </div>
 
-          {/* Animated Diagonal Lines - More Playful */}
+          {/* Subtle accent lines - reduced from 6 to 2 */}
           <div className="absolute inset-0 overflow-hidden">
-            {[...Array(6)].map((_, i) => {
-              const colors = ['rgba(139, 92, 246, 0.4)', 'rgba(236, 72, 153, 0.3)', 'rgba(34, 197, 94, 0.3)', 'rgba(245, 101, 101, 0.4)', 'rgba(59, 130, 246, 0.3)', 'rgba(168, 85, 247, 0.4)'];
-              return (
-                <motion.div
-                  key={i}
-                  className="absolute h-px"
-                  style={{
-                    background: `linear-gradient(90deg, transparent, ${colors[i]}, transparent)`,
-                    top: `${15 + i * 12}%`,
-                    width: '100%',
-                    transform: `rotate(${Math.random() * 10 - 5}deg)`
-                  }}
-                  animate={{
-                    x: ['-100%', '100%'],
-                    opacity: [0, 1, 0]
-                  }}
-                  transition={{
-                    duration: 10 + i * 2,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                    delay: i * 1.5,
-                  }}
-                />
-              );
-            })}
+            <div
+              className="absolute h-px top-1/4 w-full opacity-30"
+              style={{
+                background: 'linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.4), transparent)',
+              }}
+            />
+            <div
+              className="absolute h-px top-3/4 w-full opacity-20"
+              style={{
+                background: 'linear-gradient(90deg, transparent, rgba(236, 72, 153, 0.3), transparent)',
+              }}
+            />
           </div>
         </div>
 
@@ -176,13 +163,7 @@ export default function FAQSection() {
           transition={{ duration: 0.8 }}
           className="text-center mb-16"
         >
-          <motion.div
-            animate={{
-              backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
-            }}
-            transition={{ duration: 3, repeat: Infinity }}
-            className="inline-block mb-6"
-          >
+          <div className="inline-block mb-6">
             <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black">
               <span className="text-white">GOT </span>
               <GlitchText 
@@ -190,7 +171,7 @@ export default function FAQSection() {
                 className="text-white drop-shadow-[0_0_10px_rgba(168,85,247,0.8)]"
               />
             </h2>
-          </motion.div>
+          </div>
           <p className="text-lg sm:text-xl text-gray-300 max-w-2xl mx-auto">
             Everything you need to know about your epic Cyprus adventure
           </p>
@@ -198,13 +179,8 @@ export default function FAQSection() {
 
         {/* FAQ Items */}
         <div className="max-w-4xl mx-auto space-y-4 relative">
-          {/* Sparkles overlay for the FAQ section */}
-          <Sparkles 
-            className="z-0" 
-            density={30} 
-            color="#a855f7" 
-            speed={0.5}
-          />
+          {/* Optimized Sparkles */}
+          <OptimizedSparkles />
           
           {faqs.map((faq, index) => (
             <motion.div
@@ -215,14 +191,14 @@ export default function FAQSection() {
               transition={{ delay: index * 0.1 }}
               className="relative z-10"
             >
-              <ShimmerBorder duration={4 + index}>
+              <OptimizedShimmerBorder duration={4 + index}>
                 <motion.div
                   className="relative group"
-                  whileHover={{ scale: 1.02 }}
-                  transition={{ type: "spring", stiffness: 300 }}
+                  whileHover={{ scale: 1.01 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 25 }}
                 >
                   {/* FAQ Item */}
-                  <div className="relative bg-black/60 backdrop-blur-xl rounded-2xl overflow-hidden">
+                  <div className="relative bg-black/60 backdrop-blur-sm rounded-2xl overflow-hidden">
                   <button
                     onClick={() => toggleItem(faq.id)}
                     className="w-full px-6 py-6 flex items-center justify-between text-left transition-colors hover:bg-purple-500/5"
@@ -232,7 +208,7 @@ export default function FAQSection() {
                     </h3>
                     <motion.div
                       animate={{ rotate: openItems.includes(faq.id) ? 180 : 0 }}
-                      transition={{ duration: 0.3 }}
+                      transition={{ duration: 0.2 }}
                       className="flex-shrink-0"
                     >
                       <ChevronDown className="w-6 h-6 text-purple-400" />
@@ -245,7 +221,7 @@ export default function FAQSection() {
                         initial={{ height: 0, opacity: 0 }}
                         animate={{ height: 'auto', opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.3 }}
+                        transition={{ duration: 0.2 }}
                         className="overflow-hidden"
                       >
                         <div className="px-6 pb-6">
@@ -255,8 +231,8 @@ export default function FAQSection() {
                           </p>
                           {faq.id === 4 && (
                             <motion.button
-                              whileHover={{ scale: 1.05 }}
-                              whileTap={{ scale: 0.95 }}
+                              whileHover={{ scale: 1.03 }}
+                              whileTap={{ scale: 0.97 }}
                               className="mt-4 px-6 py-2 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full font-semibold text-white text-sm shadow-lg hover:shadow-purple-500/25 transition-all duration-300"
                             >
                               Chat with Lora
@@ -268,38 +244,12 @@ export default function FAQSection() {
                   </AnimatePresence>
                 </div>
               </motion.div>
-            </ShimmerBorder>
+            </OptimizedShimmerBorder>
           </motion.div>
           ))}
         </div>
 
-        {/* CTA Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.5 }}
-          className="text-center mt-16"
-        >
-          <p className="text-gray-400 mb-6">
-            Still have questions? Lora has all the answers
-          </p>
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full font-bold text-white shadow-lg hover:shadow-purple-500/25 transition-all duration-300 group"
-          >
-            <span className="flex items-center gap-2">
-              Ask Lora Anything
-              <motion.span
-                animate={{ x: [0, 5, 0] }}
-                transition={{ duration: 1.5, repeat: Infinity }}
-              >
-                →
-              </motion.span>
-            </span>
-          </motion.button>
-        </motion.div>
+
         </div>
       </div>
     </section>

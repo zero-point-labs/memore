@@ -34,7 +34,7 @@ export default function Footer() {
   ];
 
   return (
-    <footer className="relative bg-black border-t border-purple-500/20 mt-20">
+    <footer className="relative bg-black border-t border-purple-500/20">
       {/* Background Effects */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-purple-600/10 rounded-full blur-[120px]" />

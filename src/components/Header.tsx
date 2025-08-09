@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import { Menu, X, Sparkles } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -18,10 +19,10 @@ export default function Header() {
   }, []);
 
   const navItems = [
-    { label: 'Adventures', href: '#adventures' },
-    { label: 'Vibes', href: '#vibes' },
-    { label: 'Pricing', href: '#pricing' },
-    { label: 'FAQ', href: '#faq' },
+    { label: 'Next Trip', href: '/next-trip' },
+    { label: 'Gallery', href: '/gallery' },
+    { label: 'Stories', href: '/blog' },
+    { label: 'Contact', href: '/contact' },
   ];
 
   return (
@@ -36,44 +37,51 @@ export default function Header() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-12">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
-          <motion.div
-            whileHover={{ scale: 1.05 }}
-            className="flex items-center gap-2 cursor-pointer"
-          >
-            <div className="relative">
-              <div className="absolute inset-0 bg-purple-600 blur-lg opacity-50"></div>
-              <Sparkles className="relative w-8 h-8 text-purple-400" />
-            </div>
-            <span className="text-2xl font-black text-white">MEMORA</span>
-          </motion.div>
+          <Link href="/">
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              className="flex items-center gap-2 cursor-pointer"
+            >
+              <div className="relative">
+                <div className="absolute inset-0 bg-purple-600 blur-lg opacity-50"></div>
+                <Sparkles className="relative w-8 h-8 text-purple-400" />
+              </div>
+              <span className="text-2xl font-black text-white">MEMORA</span>
+            </motion.div>
+          </Link>
 
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center gap-8">
             {navItems.map((item, index) => (
-              <motion.a
+              <motion.div
                 key={item.label}
-                href={item.href}
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
-                className="relative text-gray-300 hover:text-white transition-colors group"
               >
-                {item.label}
-                <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-gradient-to-r from-purple-400 to-pink-400 group-hover:w-full transition-all duration-300"></span>
-              </motion.a>
+                <Link
+                  href={item.href}
+                  className="relative text-gray-300 hover:text-white transition-colors group"
+                >
+                  {item.label}
+                  <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-gradient-to-r from-purple-400 to-pink-400 group-hover:w-full transition-all duration-300"></span>
+                </Link>
+              </motion.div>
             ))}
           </nav>
 
           {/* CTA Button */}
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="hidden lg:block relative px-6 py-2.5 overflow-hidden rounded-lg font-bold text-sm"
-          >
-            <span className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600"></span>
-            <span className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 blur-lg opacity-50"></span>
-            <span className="relative text-white">BOOK NOW</span>
-          </motion.button>
+          <Link href="/next-trip">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="hidden lg:block relative px-6 py-2.5 overflow-hidden rounded-lg font-bold text-sm"
+            >
+              <span className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600"></span>
+              <span className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 blur-lg opacity-50"></span>
+              <span className="relative text-white">BOOK NOW</span>
+            </motion.button>
+          </Link>
 
           {/* Mobile Menu Button */}
           <button
@@ -101,18 +109,20 @@ export default function Header() {
       >
         <nav className="container mx-auto px-4 sm:px-6 py-6 space-y-4">
           {navItems.map((item) => (
-            <a
+            <Link
               key={item.label}
               href={item.href}
               onClick={() => setIsMenuOpen(false)}
               className="block text-gray-300 hover:text-white transition-colors"
             >
               {item.label}
-            </a>
+            </Link>
           ))}
-          <button className="w-full mt-4 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg font-bold text-white">
-            BOOK NOW
-          </button>
+          <Link href="/next-trip" onClick={() => setIsMenuOpen(false)}>
+            <button className="w-full mt-4 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg font-bold text-white">
+              BOOK NOW
+            </button>
+          </Link>
         </nav>
       </motion.div>
     </motion.header>
