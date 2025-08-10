@@ -29,7 +29,7 @@ const galleryItems = [
     id: 1,
     category: 'beach',
     type: 'image',
-    src: '/gallery/beach-sunset.jpg',
+    src: '/gallery/nissibeach.jpg',
     title: 'Golden Hour at Nissi Beach',
     location: 'Ayia Napa',
     date: 'July 15, 2023',
@@ -44,9 +44,9 @@ const galleryItems = [
   {
     id: 2,
     category: 'party',
-    type: 'video',
-    src: '/gallery/club-night.mp4',
-    thumbnail: '/gallery/club-night-thumb.jpg',
+    type: 'image',
+    src: '/gallery/castleclub.jpg',
+    thumbnail: '/gallery/castleclub.jpg',
     title: 'VIP Night at Castle Club',
     location: 'Limassol',
     date: 'July 16, 2023',
@@ -63,7 +63,7 @@ const galleryItems = [
     id: 3,
     category: 'adventure',
     type: 'image',
-    src: '/gallery/cliff-jumping.jpg',
+    src: '/gallery/cliffjump.jpg',
     title: 'Cliff Jumping Adventures',
     location: 'Cape Greco',
     date: 'July 17, 2023',
@@ -79,7 +79,7 @@ const galleryItems = [
     id: 4,
     category: 'culture',
     type: 'image',
-    src: '/gallery/ancient-ruins.jpg',
+    src: '/gallery/kourion.jpg',
     title: 'Exploring Ancient Kourion',
     location: 'Limassol District',
     date: 'July 18, 2023',
@@ -94,9 +94,9 @@ const galleryItems = [
   {
     id: 5,
     category: 'yacht',
-    type: 'video',
-    src: '/gallery/yacht-party.mp4',
-    thumbnail: '/gallery/yacht-party-thumb.jpg',
+    type: 'image',
+    src: '/gallery/yatch.avif',
+    thumbnail: '/gallery/yatch.avif',
     title: 'Luxury Yacht Experience',
     location: 'Larnaca Bay',
     date: 'July 19, 2023',
@@ -113,7 +113,7 @@ const galleryItems = [
     id: 6,
     category: 'party',
     type: 'image',
-    src: '/gallery/pool-party.jpg',
+    src: '/gallery/poolparty.jpg',
     title: 'Exclusive Pool Party',
     location: 'Private Villa',
     date: 'July 20, 2023',
@@ -124,40 +124,6 @@ const galleryItems = [
     photographer: 'Anna Petrou',
     tags: ['pool', 'villa', 'exclusive', 'summer'],
     description: 'Private villa pool party with the most amazing views and vibes. This is what Cyprus dreams are made of!',
-  },
-  {
-    id: 7,
-    category: 'food',
-    type: 'image',
-    src: '/gallery/cypriot-feast.jpg',
-    title: 'Traditional Cypriot Feast',
-    location: 'Omodos Village',
-    date: 'July 18, 2023',
-    time: '20:00',
-    likes: 234,
-    views: 890,
-    attendees: 35,
-    photographer: 'Dimitri Kostas',
-    tags: ['food', 'traditional', 'village', 'feast'],
-    description: 'Authentic Cypriot meze with endless dishes and the most welcoming local family.',
-  },
-  {
-    id: 8,
-    category: 'sunset',
-    type: 'video',
-    src: '/gallery/sunset-yacht.mp4',
-    thumbnail: '/gallery/sunset-yacht-thumb.jpg',
-    title: 'Sunset Yacht Sail',
-    location: 'Paphos Coast',
-    date: 'July 21, 2023',
-    time: '19:00',
-    likes: 789,
-    views: 2890,
-    attendees: 40,
-    photographer: 'Maria Stavros',
-    tags: ['sunset', 'yacht', 'sailing', 'romance'],
-    description: 'Sailing into the sunset on our last day. The perfect ending to the perfect trip.',
-    duration: '2:15',
   },
 ];
 
@@ -199,20 +165,20 @@ function GalleryItem({ item, viewMode, onItemClick }: {
           {!imageLoaded && (
             <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 to-pink-500/20 animate-pulse" />
           )}
-          <div 
+          <img
+            src={item.src}
+            alt={item.title}
             className={cn(
-              "absolute inset-0 bg-gradient-to-br from-purple-600/40 to-pink-600/40 transition-opacity duration-500 flex items-center justify-center",
+              "absolute inset-0 w-full h-full object-cover transition-opacity duration-500",
               imageLoaded ? "opacity-100" : "opacity-0"
             )}
             onLoad={() => setImageLoaded(true)}
-          >
-            <span className="text-3xl">{categories.find(c => c.id === item.category)?.icon}</span>
-            {item.type === 'video' && (
-              <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
-                <Play className="w-6 h-6 text-white" />
-              </div>
-            )}
-          </div>
+          />
+          {item.type === 'video' && (
+            <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
+              <Play className="w-6 h-6 text-white" />
+            </div>
+          )}
         </div>
 
         <div className="flex-1 min-w-0">
@@ -290,15 +256,15 @@ function GalleryItem({ item, viewMode, onItemClick }: {
             <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 to-pink-500/20 animate-pulse" />
           )}
           
-          <div 
+          <img
+            src={item.src}
+            alt={item.title}
             className={cn(
-              "absolute inset-0 bg-gradient-to-br from-purple-600/40 to-pink-600/40 transition-opacity duration-500 flex items-center justify-center",
-              imageLoaded ? "opacity-100" : "opacity-0"
+              "absolute inset-0 w-full h-full object-cover transition-all duration-500",
+              imageLoaded ? "opacity-100 scale-100" : "opacity-0 scale-110"
             )}
             onLoad={() => setImageLoaded(true)}
-          >
-            <span className="text-6xl opacity-50">{categories.find(c => c.id === item.category)?.icon}</span>
-          </div>
+          />
 
           {/* Video indicator */}
           {item.type === 'video' && (
@@ -438,16 +404,22 @@ function MediaModal({ item, isOpen, onClose }: {
             {/* Media */}
             <div className="relative bg-black flex items-center justify-center min-h-[400px] lg:min-h-[600px]">
               {item.type === 'video' ? (
-                <div className="w-full h-full flex items-center justify-center">
-                  <div className="text-6xl opacity-50">{categories.find(c => c.id === item.category)?.icon}</div>
+                <div className="w-full h-full relative">
+                  <img
+                    src={item.thumbnail || item.src}
+                    alt={item.title}
+                    className="w-full h-full object-cover"
+                  />
                   <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
                     <Play className="w-16 h-16 text-white" />
                   </div>
                 </div>
               ) : (
-                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-600/40 to-pink-600/40">
-                  <span className="text-8xl opacity-50">{categories.find(c => c.id === item.category)?.icon}</span>
-                </div>
+                <img
+                  src={item.src}
+                  alt={item.title}
+                  className="w-full h-full object-cover"
+                />
               )}
             </div>
 

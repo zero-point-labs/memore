@@ -11,6 +11,7 @@ import GallerySection from '@/components/GallerySection';
 import BlogSection from '@/components/BlogSection';
 import ContactSection from '@/components/ContactSection';
 import Footer from '@/components/Footer';
+import BookingFormPopup from '@/components/BookingFormPopup';
 import { useParallax } from '@/hooks/useParallax';
 import { useSwipeGesture } from '@/hooks/useSwipeGesture';
 import { isMobile } from '@/utils/isMobile';
@@ -27,6 +28,7 @@ export default function Home() {
 
   const [currentWord, setCurrentWord] = useState(0);
   const [isMobileDevice, setIsMobileDevice] = useState(false);
+  const [isBookingPopupOpen, setIsBookingPopupOpen] = useState(false);
   const heroRef = useRef<HTMLDivElement>(null);
   const parallax = useParallax(isMobileDevice ? 0 : 0.5);
 
@@ -120,7 +122,7 @@ export default function Home() {
 
                 {/* Subtitle */}
                 <p className="text-sm sm:text-base text-gray-300 leading-relaxed mx-auto max-w-2xl px-2 drop-shadow-lg">
-                  Chat with{' '}
+                  Let Memora take you on an incredible journey to experience{' '}
                   <motion.span 
                     className="text-purple-400 font-semibold relative inline-block"
                     animate={{
@@ -132,9 +134,37 @@ export default function Home() {
                     }}
                     transition={{ duration: 2, repeat: Infinity }}
                   >
-                    Lora
+                    Cyprus
                   </motion.span>
-                  {' '}to secure your personalized VIP pass for Cyprus adventures.
+                  {' and its '}
+                  <motion.span 
+                    className="text-pink-400 font-semibold relative inline-block"
+                    animate={{
+                      textShadow: [
+                        '0 0 10px rgba(251, 113, 133, 0.5)',
+                        '0 0 20px rgba(251, 113, 133, 0.8)',
+                        '0 0 10px rgba(251, 113, 133, 0.5)',
+                      ],
+                    }}
+                    transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
+                  >
+                    legendary nightlife
+                  </motion.span>
+                  {' like '}
+                  <motion.span 
+                    className="text-cyan-400 font-semibold relative inline-block"
+                    animate={{
+                      textShadow: [
+                        '0 0 10px rgba(34, 211, 238, 0.5)',
+                        '0 0 20px rgba(34, 211, 238, 0.8)',
+                        '0 0 10px rgba(34, 211, 238, 0.5)',
+                      ],
+                    }}
+                    transition={{ duration: 2, repeat: Infinity, delay: 1 }}
+                  >
+                    never before
+                  </motion.span>
+                  .
                 </p>
 
                 {/* Features */}
@@ -146,7 +176,7 @@ export default function Home() {
                   variants={fadeIn}
                   transition={{ staggerChildren: 0.1 }}
                 >
-                  {['Instant Booking', 'VIP Access', 'AI Trip Planning'].map((feature, index) => (
+                  {['Beach Adventures', 'Epic Parties', 'Cultural Experiences'].map((feature, index) => (
                     <motion.div
                       key={feature}
                       variants={{
@@ -166,13 +196,47 @@ export default function Home() {
                   ))}
                 </motion.div>
 
+                {/* Action Buttons */}
+                <motion.div
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={viewportOnce}
+                  variants={fadeIn}
+                  className="mt-12"
+                >
+                  <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                    {/* Scroll to Cyprus Map Button */}
+                    <button
+                      onClick={() => {
+                        const cyprusElement = document.querySelector('[data-cyprus-map]');
+                        if (cyprusElement) {
+                          cyprusElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }
+                      }}
+                      className="flex items-center gap-2 px-6 py-3 bg-black/20 border border-purple-500/30 rounded-full text-gray-300 hover:text-purple-300 hover:border-purple-500/50 transition-colors backdrop-blur-sm"
+                    >
+                      <span>🗺️</span>
+                      <span className="font-medium">Next Trip</span>
+                    </button>
+
+                    {/* Sign Up Button */}
+                    <button
+                      onClick={() => setIsBookingPopupOpen(true)}
+                      className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600/20 to-pink-600/20 border border-purple-500/30 rounded-full text-purple-300 hover:from-purple-600/30 hover:to-pink-600/30 hover:border-purple-500/50 transition-all duration-300 backdrop-blur-sm"
+                    >
+                      <span>✨</span>
+                      <span className="font-medium">Get Started</span>
+                    </button>
+                  </div>
+                </motion.div>
+
                 {/* Countdown Timer */}
                 <motion.div
                   initial="hidden"
                   whileInView="visible"
                   viewport={viewportOnce}
                   variants={fadeIn}
-                  className="mt-16 text-center"
+                  className="mt-12 text-center"
                 >
                   <motion.p 
                     className="text-purple-300 text-xs font-medium mb-2"
@@ -251,14 +315,21 @@ export default function Home() {
                 >
                   <motion.div
                     className="cursor-pointer group"
-                    onClick={() => window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })}
+                    onClick={() => {
+                      const nextSection = document.querySelector('[data-cyprus-map]') || document.querySelector('section:nth-child(2)');
+                      if (nextSection) {
+                        nextSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                      } else {
+                        window.scrollTo({ top: window.innerHeight, behavior: 'smooth' });
+                      }
+                    }}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                   >
                     <motion.div
-                      className="flex items-center gap-2"
-                      animate={{ y: [0, 8, 0] }}
-                      transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                      className="flex flex-col items-center gap-3"
+                      animate={{ y: [0, 12, 0] }}
+                      transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
                     >
                       <motion.span
                         className="text-purple-400 text-sm font-medium tracking-wider uppercase"
@@ -271,16 +342,39 @@ export default function Home() {
                         }}
                         transition={{ duration: 3, repeat: Infinity }}
                       >
-                        EXPLORE MORE
+                        SCROLL TO EXPLORE
                       </motion.span>
                       <motion.div
                         className="flex flex-col gap-1"
-                        animate={{ y: [0, 4, 0] }}
-                        transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                        animate={{ y: [0, 6, 0] }}
+                        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
                       >
-                        <div className="w-1 h-1 bg-purple-400 rounded-full opacity-80" />
-                        <div className="w-1 h-1 bg-purple-400 rounded-full opacity-60" />
-                        <div className="w-1 h-1 bg-purple-400 rounded-full opacity-40" />
+                        <motion.div 
+                          className="w-1 h-3 bg-purple-400 rounded-full"
+                          animate={{ opacity: [0.4, 1, 0.4] }}
+                          transition={{ duration: 2, repeat: Infinity, delay: 0 }}
+                        />
+                        <motion.div 
+                          className="w-1 h-3 bg-purple-400 rounded-full"
+                          animate={{ opacity: [0.4, 1, 0.4] }}
+                          transition={{ duration: 2, repeat: Infinity, delay: 0.3 }}
+                        />
+                        <motion.div 
+                          className="w-1 h-3 bg-purple-400 rounded-full"
+                          animate={{ opacity: [0.4, 1, 0.4] }}
+                          transition={{ duration: 2, repeat: Infinity, delay: 0.6 }}
+                        />
+                      </motion.div>
+                      <motion.div
+                        className="w-6 h-6 border-2 border-purple-400 rounded-full flex items-center justify-center"
+                        animate={{ y: [0, 8, 0] }}
+                        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                      >
+                        <motion.div
+                          className="w-1 h-1 bg-purple-400 rounded-full"
+                          animate={{ scale: [1, 1.5, 1] }}
+                          transition={{ duration: 2, repeat: Infinity }}
+                        />
                       </motion.div>
                     </motion.div>
                   </motion.div>
@@ -308,6 +402,12 @@ export default function Home() {
       
       {/* Footer - no gap */}
       <Footer />
+      
+      {/* Booking Form Popup */}
+      <BookingFormPopup 
+        isOpen={isBookingPopupOpen}
+        onClose={() => setIsBookingPopupOpen(false)}
+      />
     </div>
   );
 }

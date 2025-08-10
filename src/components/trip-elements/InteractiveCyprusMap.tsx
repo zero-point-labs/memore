@@ -53,7 +53,7 @@ export default function InteractiveCyprusMap() {
   const [hoveredLocation, setHoveredLocation] = useState<string | null>(null);
 
   return (
-    <div className="relative w-full max-w-4xl mx-auto">
+    <div className="relative w-full max-w-4xl mx-auto" data-cyprus-map>
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}

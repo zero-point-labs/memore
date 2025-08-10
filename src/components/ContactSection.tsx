@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Mail, MessageCircle, Phone } from 'lucide-react';
+import { Mail, Phone } from 'lucide-react';
 
 export default function ContactSection() {
   return (
@@ -29,26 +29,11 @@ export default function ContactSection() {
             Still Have Questions?
           </h2>
           <p className="text-gray-400 mb-8">
-            Get in touch with our team or chat with Lora for instant help
+            Get in touch with our team for instant help and personalized assistance
           </p>
           
           {/* Contact Options */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-12">
-            {/* Chat with Lora */}
-            <motion.div
-              whileHover={{ scale: 1.05, y: -5 }}
-              className="bg-gradient-to-br from-purple-900/10 to-purple-800/5 border border-purple-500/20 rounded-2xl p-6 cursor-pointer group hover:border-purple-500/40 transition-all duration-300"
-            >
-              <motion.div 
-                className="w-12 h-12 bg-purple-600/20 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-purple-600/30 transition-colors"
-                whileHover={{ rotate: 10 }}
-              >
-                <MessageCircle className="w-6 h-6 text-purple-400" />
-              </motion.div>
-              <h3 className="text-white font-semibold mb-2">Chat with Lora</h3>
-              <p className="text-gray-400 text-sm">Instant AI assistance 24/7</p>
-            </motion.div>
-            
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-12 max-w-2xl mx-auto">
             {/* Email */}
             <motion.div
               whileHover={{ scale: 1.05, y: -5 }}
@@ -61,7 +46,7 @@ export default function ContactSection() {
                 <Mail className="w-6 h-6 text-purple-400" />
               </motion.div>
               <h3 className="text-white font-semibold mb-2">Email Us</h3>
-              <p className="text-gray-400 text-sm">hello@memora.com</p>
+              <p className="text-gray-400 text-sm">info@memora-cy.com</p>
             </motion.div>
             
             {/* WhatsApp */}
@@ -76,7 +61,7 @@ export default function ContactSection() {
                 <Phone className="w-6 h-6 text-purple-400" />
               </motion.div>
               <h3 className="text-white font-semibold mb-2">WhatsApp</h3>
-              <p className="text-gray-400 text-sm">+357 99 123 456</p>
+              <p className="text-gray-400 text-sm">+357 99 116020</p>
             </motion.div>
           </div>
           

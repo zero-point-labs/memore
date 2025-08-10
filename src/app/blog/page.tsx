@@ -74,7 +74,7 @@ const blogPosts = [
     views: 1890,
     trending: true,
     featured: true,
-    image: '☀️',
+    image: '/blogs/summer-packing-list.jpg',
     tags: ['Packing', 'Summer', 'Essentials', 'Tips'],
   },
   {
@@ -92,7 +92,7 @@ const blogPosts = [
     views: 3240,
     trending: true,
     featured: false,
-    image: '🏖️',
+    image: '/blogs/beach-bars.jpg',
     tags: ['Clubs', 'VIP', 'Nightlife', 'Beach'],
   },
   {
@@ -110,7 +110,7 @@ const blogPosts = [
     views: 2100,
     trending: false,
     featured: true,
-    image: '🏝️',
+    image: '/blogs/ayianapa-gem.jpeg',
     tags: ['Ayia Napa', 'Hidden Gems', 'Local', 'Beach'],
   },
   {
@@ -128,7 +128,7 @@ const blogPosts = [
     views: 4560,
     trending: true,
     featured: true,
-    image: '✈️',
+    image: '/blogs/student-adventure.jpg',
     tags: ['Personal', 'Adventure', 'Story', 'Student'],
   },
   {
@@ -146,7 +146,7 @@ const blogPosts = [
     views: 2890,
     trending: false,
     featured: false,
-    image: '💰',
+    image: '/blogs/budjet-hacks.webp',
     tags: ['Budget', 'Tips', 'Savings', 'VIP'],
   },
   {
@@ -164,7 +164,7 @@ const blogPosts = [
     views: 3450,
     trending: false,
     featured: false,
-    image: '🌃',
+    image: '/blogs/limasol-dark.jpg',
     tags: ['Limassol', 'Nightlife', 'Guide', 'Bars'],
   },
   {
@@ -182,7 +182,7 @@ const blogPosts = [
     views: 2340,
     trending: false,
     featured: false,
-    image: '🏔️',
+    image: '/blogs/camping-equipement.jpg',
     tags: ['Adventure', 'Cliff Jumping', 'Adrenaline', 'Cape Greco'],
   },
   {
@@ -200,7 +200,7 @@ const blogPosts = [
     views: 1980,
     trending: false,
     featured: false,
-    image: '🍽️',
+    image: '/blogs/camping-equipement.jpg',
     tags: ['Food', 'Cuisine', 'Local', 'Restaurants'],
   },
 ];
@@ -308,17 +308,13 @@ function BlogCard({ post, featured = false }: {
           </motion.button>
 
           <div className="grid lg:grid-cols-2">
-            {/* Image/Icon Section */}
+            {/* Image Section */}
             <div className="relative h-64 lg:h-full bg-gradient-to-br from-purple-600/20 to-pink-600/20 overflow-hidden">
-              <div className="absolute inset-0 flex items-center justify-center">
-                <motion.span 
-                  className="text-8xl"
-                  animate={isHovered ? { scale: [1, 1.2, 1], rotate: [0, 10, -10, 0] } : {}}
-                  transition={{ duration: 0.5 }}
-                >
-                  {post.image}
-                </motion.span>
-              </div>
+              <img
+                src={post.image}
+                alt={post.title}
+                className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+              />
               
               {/* Hover Gradient Overlay */}
               <AnimatePresence>
@@ -442,17 +438,13 @@ function BlogCard({ post, featured = false }: {
           />
         </motion.button>
 
-        {/* Image/Icon Section */}
+        {/* Image Section */}
         <div className="relative h-48 overflow-hidden bg-gradient-to-br from-purple-600/20 to-pink-600/20">
-          <div className="absolute inset-0 flex items-center justify-center">
-            <motion.span 
-              className="text-6xl"
-              animate={isHovered ? { scale: [1, 1.2, 1], rotate: [0, 10, -10, 0] } : {}}
-              transition={{ duration: 0.5 }}
-            >
-              {post.image}
-            </motion.span>
-          </div>
+          <img
+            src={post.image}
+            alt={post.title}
+            className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+          />
           
           {/* Hover Gradient Overlay */}
           <AnimatePresence>

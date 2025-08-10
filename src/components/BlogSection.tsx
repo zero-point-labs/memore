@@ -40,7 +40,7 @@ const blogPosts = [
     likes: 234,
     comments: 42,
     trending: true,
-    image: '☀️',
+    image: '/blogs/summer-packing-list.jpg',
     tags: ['Packing', 'Summer', 'Essentials'],
   },
   {
@@ -54,7 +54,7 @@ const blogPosts = [
     likes: 567,
     comments: 89,
     trending: true,
-    image: '🏖️',
+    image: '/blogs/beach-bars.jpg',
     tags: ['Clubs', 'VIP', 'Nightlife'],
   },
   {
@@ -67,7 +67,7 @@ const blogPosts = [
     readTime: 6,
     likes: 345,
     comments: 56,
-    image: '🏝️',
+    image: '/blogs/ayianapa-gem.jpeg',
     tags: ['Ayia Napa', 'Hidden Gems', 'Local'],
   },
   {
@@ -81,7 +81,7 @@ const blogPosts = [
     likes: 892,
     comments: 123,
     trending: true,
-    image: '✈️',
+    image: '/blogs/student-adventure.jpg',
     tags: ['Personal', 'Adventure', 'Story'],
   },
   {
@@ -94,7 +94,7 @@ const blogPosts = [
     readTime: 7,
     likes: 456,
     comments: 67,
-    image: '💰',
+    image: '/blogs/budjet-hacks.webp',
     tags: ['Budget', 'Tips', 'Savings'],
   },
   {
@@ -107,7 +107,7 @@ const blogPosts = [
     readTime: 10,
     likes: 678,
     comments: 91,
-    image: '🌃',
+    image: '/blogs/limasol-dark.jpg',
     tags: ['Limassol', 'Nightlife', 'Guide'],
   },
 ];
@@ -160,17 +160,13 @@ function BlogCard({ post, index }: { post: typeof blogPosts[0]; index: number })
           />
         </motion.button>
 
-        {/* Image/Icon Section */}
+        {/* Image Section */}
         <div className="relative h-48 overflow-hidden bg-gradient-to-br from-purple-600/20 to-pink-600/20">
-          <div className="absolute inset-0 flex items-center justify-center">
-            <motion.span 
-              className="text-6xl"
-              animate={isHovered ? { scale: [1, 1.2, 1], rotate: [0, 10, -10, 0] } : {}}
-              transition={{ duration: 0.5 }}
-            >
-              {post.image}
-            </motion.span>
-          </div>
+          <img
+            src={post.image}
+            alt={post.title}
+            className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+          />
           
           {/* Hover Gradient Overlay */}
           <AnimatePresence>

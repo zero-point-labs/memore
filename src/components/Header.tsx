@@ -79,7 +79,7 @@ export default function Header() {
             >
               <span className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600"></span>
               <span className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 blur-lg opacity-50"></span>
-              <span className="relative text-white">BOOK NOW</span>
+              <span className="relative text-white">SIGN UP</span>
             </motion.button>
           </Link>
 
@@ -120,7 +120,7 @@ export default function Header() {
           ))}
           <Link href="/next-trip" onClick={() => setIsMenuOpen(false)}>
             <button className="w-full mt-4 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg font-bold text-white">
-              BOOK NOW
+              SIGN UP
             </button>
           </Link>
         </nav>

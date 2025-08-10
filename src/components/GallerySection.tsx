@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
 import { Meteors } from '@/components/magicui/meteors';
@@ -23,7 +24,7 @@ const galleryItems = [
   {
     id: 1,
     category: 'beach',
-    image: '/gallery/beach-sunset.jpg',
+    image: '/gallery/nissibeach.jpg',
     title: 'Golden Hour at Nissi Beach',
     location: 'Ayia Napa',
     date: 'July 15',
@@ -34,7 +35,7 @@ const galleryItems = [
   {
     id: 2,
     category: 'party',
-    image: '/gallery/club-night.jpg',
+    image: '/gallery/castleclub.jpg',
     title: 'VIP Night at Castle Club',
     location: 'Limassol',
     date: 'July 16',
@@ -45,7 +46,7 @@ const galleryItems = [
   {
     id: 3,
     category: 'adventure',
-    image: '/gallery/cliff-jumping.jpg',
+    image: '/gallery/cliffjump.jpg',
     title: 'Cliff Jumping Adventures',
     location: 'Cape Greco',
     date: 'July 17',
@@ -56,7 +57,7 @@ const galleryItems = [
   {
     id: 4,
     category: 'culture',
-    image: '/gallery/ancient-ruins.jpg',
+    image: '/gallery/kourion.jpg',
     title: 'Exploring Ancient Kourion',
     location: 'Limassol District',
     date: 'July 18',
@@ -67,7 +68,7 @@ const galleryItems = [
   {
     id: 5,
     category: 'beach',
-    image: '/gallery/yacht-party.jpg',
+    image: '/gallery/yatch.avif',
     title: 'Luxury Yacht Experience',
     location: 'Larnaca Bay',
     date: 'July 19',
@@ -78,7 +79,7 @@ const galleryItems = [
   {
     id: 6,
     category: 'party',
-    image: '/gallery/pool-party.jpg',
+    image: '/gallery/poolparty.jpg',
     title: 'Exclusive Pool Party',
     location: 'Private Villa',
     date: 'July 20',
@@ -92,6 +93,28 @@ const galleryItems = [
 function GalleryItem({ item, index }: { item: typeof galleryItems[0]; index: number }) {
   const [isHovered, setIsHovered] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
+  const [imageError, setImageError] = useState(false);
+  const imgRef = React.useRef<HTMLImageElement>(null);
+
+  // Check if image is already loaded (cached)
+  React.useEffect(() => {
+    const img = imgRef.current;
+    if (img && img.complete && img.naturalHeight !== 0) {
+      setImageLoaded(true);
+    }
+  }, []);
+
+  // Fallback timer to mark image as loaded if onLoad doesn't fire
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      if (!imageLoaded && !imageError) {
+        console.log(`Fallback loading for image: ${item.image}`);
+        setImageLoaded(true);
+      }
+    }, 3000); // 3 second fallback
+
+    return () => clearTimeout(timer);
+  }, [imageLoaded, imageError, item.image]);
 
   return (
     <motion.div
@@ -107,23 +130,36 @@ function GalleryItem({ item, index }: { item: typeof galleryItems[0]; index: num
         {/* Image Container */}
         <div className="relative h-64 sm:h-72 lg:h-80 overflow-hidden">
           {/* Placeholder gradient while loading */}
-          {!imageLoaded && (
+          {!imageLoaded && !imageError && (
             <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 to-pink-500/20 animate-pulse" />
           )}
           
-          {/* Actual Image - Using placeholder for demo */}
-          <div 
-            className={cn(
-              "absolute inset-0 bg-gradient-to-br from-purple-600/40 to-pink-600/40 transition-opacity duration-500",
-              imageLoaded ? "opacity-100" : "opacity-0"
-            )}
-            onLoad={() => setImageLoaded(true)}
-          >
-            {/* In production, replace with actual images */}
-            <div className="w-full h-full flex items-center justify-center">
-              <span className="text-6xl opacity-50">{categories.find(c => c.id === item.category)?.icon}</span>
+          {/* Error state */}
+          {imageError && (
+            <div className="absolute inset-0 bg-gradient-to-br from-red-500/10 to-gray-500/20 flex items-center justify-center">
+              <span className="text-white/60 text-sm">Image not available</span>
             </div>
-          </div>
+          )}
+          
+          {/* Actual Image */}
+          <img
+            ref={imgRef}
+            src={item.image}
+            alt={item.title}
+            className={cn(
+              "absolute inset-0 w-full h-full object-cover transition-all duration-300",
+              imageLoaded && !imageError ? "opacity-100 scale-100" : "opacity-0 scale-105"
+            )}
+            onLoad={() => {
+              setImageLoaded(true);
+              setImageError(false);
+            }}
+            onError={() => {
+              setImageError(true);
+              setImageLoaded(false);
+              console.error(`Failed to load image: ${item.image}`);
+            }}
+          />
 
           {/* Hover Overlay */}
           <AnimatePresence>
@@ -322,25 +358,7 @@ export default function GallerySection() {
           </div>
         </BlurFade>
 
-        {/* CTA */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.5 }}
-          className="text-center mt-16"
-        >
-          <p className="text-gray-400 mb-6">
-            Want to be part of the next adventure?
-          </p>
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full font-bold text-white shadow-lg hover:shadow-purple-500/25 transition-all duration-300"
-          >
-            Join The Experience
-          </motion.button>
-        </motion.div>
+
       </div>
     </section>
   );

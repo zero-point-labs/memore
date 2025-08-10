@@ -7,23 +7,22 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   const footerLinks = {
-    adventures: [
-      { label: 'Day 1 - Beach Party', href: '#' },
-      { label: 'Day 2 - Boat Trip', href: '#' },
-      { label: 'Day 3 - Club Night', href: '#' },
-      { label: 'All Activities', href: '#' },
-    ],
     support: [
       { label: 'FAQs', href: '#' },
-      { label: 'Contact Us', href: '#' },
-      { label: 'Terms & Conditions', href: '#' },
-      { label: 'Privacy Policy', href: '#' },
+      { label: 'Contact Us', href: '/contact' },
+      { label: 'Terms & Conditions', href: '/terms' },
+      { label: 'Privacy Policy', href: '/privacy' },
     ],
     company: [
       { label: 'About Memora', href: '#' },
       { label: 'Reviews', href: '#' },
       { label: 'Partner With Us', href: '#' },
-      { label: 'Careers', href: '#' },
+    ],
+    trip: [
+      { label: 'Next Trip', href: '/next-trip' },
+      { label: 'Gallery', href: '/gallery' },
+      { label: 'Stories', href: '/blog' },
+      { label: 'Book Now', href: '/next-trip' },
     ],
   };
 
@@ -55,17 +54,17 @@ export default function Footer() {
 
             {/* Contact Info */}
             <div className="space-y-3">
-              <a href="mailto:hello@memora.com" className="flex items-center gap-3 text-gray-400 hover:text-purple-400 transition-colors">
+              <a href="mailto:info@memora-cy.com" className="flex items-center gap-3 text-gray-400 hover:text-purple-400 transition-colors">
                 <Mail className="w-5 h-5" />
-                <span>hello@memora.com</span>
+                <span>info@memora-cy.com</span>
               </a>
-              <a href="tel:+35799123456" className="flex items-center gap-3 text-gray-400 hover:text-purple-400 transition-colors">
+              <a href="tel:+35799116020" className="flex items-center gap-3 text-gray-400 hover:text-purple-400 transition-colors">
                 <Phone className="w-5 h-5" />
-                <span>+357 99 123 456</span>
+                <span>+357 99 116020</span>
               </a>
               <div className="flex items-center gap-3 text-gray-400">
                 <MapPin className="w-5 h-5" />
-                <span>Ayia Napa, Cyprus</span>
+                <span>Nicosia, Cyprus</span>
               </div>
             </div>
 
@@ -86,11 +85,11 @@ export default function Footer() {
 
           {/* Links Sections */}
           <div className="lg:col-span-3 grid grid-cols-1 sm:grid-cols-3 gap-8">
-            {/* Adventures */}
+            {/* Trip */}
             <div>
-              <h4 className="text-white font-bold mb-4">Adventures</h4>
+              <h4 className="text-white font-bold mb-4">Trip</h4>
               <ul className="space-y-3">
-                {footerLinks.adventures.map((link) => (
+                {footerLinks.trip.map((link) => (
                   <li key={link.label}>
                     <a
                       href={link.href}

@@ -5,8 +5,10 @@ import { useState } from 'react';
 import { MapPin, Calendar, Users, Check } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import InteractiveCyprusMap from '@/components/trip-elements/InteractiveCyprusMap';
-import OrbitingCircles from '@/components/magicui/orbiting-circles';
+import BookingFormPopup from '@/components/BookingFormPopup';
+import Sid3DMascot from '@/components/trip-elements/Sid3DMascot';
+import TripImageCarousel from '@/components/trip-elements/TripImageCarousel';
+
 import { Meteors } from '@/components/magicui/meteors';
 import NumberTicker from '@/components/magicui/number-ticker';
 import BlurFade from '@/components/ui/BlurFade';
@@ -431,6 +433,7 @@ function BookingForm() {
 
 export default function NextTripPage() {
   const [selectedDay, setSelectedDay] = useState(0);
+  const [isBookingPopupOpen, setIsBookingPopupOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-black">
@@ -496,8 +499,8 @@ export default function NextTripPage() {
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                onClick={() => document.getElementById('booking')?.scrollIntoView({ behavior: 'smooth' })}
-                className="px-12 py-5 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full font-bold text-white text-lg shadow-2xl hover:shadow-purple-500/25 transition-all duration-300"
+                onClick={() => setIsBookingPopupOpen(true)}
+                className="px-6 sm:px-12 py-3 sm:py-5 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full font-bold text-white text-sm sm:text-lg shadow-2xl hover:shadow-purple-500/25 transition-all duration-300"
               >
                 BOOK YOUR ADVENTURE NOW
               </motion.button>
@@ -527,50 +530,10 @@ export default function NextTripPage() {
           </BlurFade>
 
           <div className="grid lg:grid-cols-2 gap-16 items-center">
-            {/* Cyprus Map with Activities */}
+            {/* Sid 3D Mascot */}
             <BlurFade delay={0.2}>
               <div className="relative">
-                <div className="relative flex items-center justify-center min-h-[500px]">
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <OrbitingCircles
-                      className="h-[60px] w-[60px] border-purple-500/20 bg-black/30"
-                      duration={35}
-                      delay={0}
-                      radius={150}
-                    >
-                      <div className="flex flex-col items-center justify-center">
-                        <span className="text-2xl">🏖️</span>
-                        <span className="text-xs text-cyan-400 font-medium">Beaches</span>
-                      </div>
-                    </OrbitingCircles>
-                    <OrbitingCircles
-                      className="h-[60px] w-[60px] border-purple-500/20 bg-black/30"
-                      duration={40}
-                      delay={5}
-                      radius={200}
-                      reverse
-                    >
-                      <div className="flex flex-col items-center justify-center">
-                        <span className="text-2xl">🎉</span>
-                        <span className="text-xs text-purple-400 font-medium">Parties</span>
-                      </div>
-                    </OrbitingCircles>
-                    <OrbitingCircles
-                      className="h-[60px] w-[60px] border-purple-500/20 bg-black/30"
-                      duration={30}
-                      delay={10}
-                      radius={120}
-                    >
-                      <div className="flex flex-col items-center justify-center">
-                        <span className="text-2xl">🏛️</span>
-                        <span className="text-xs text-orange-400 font-medium">Culture</span>
-                      </div>
-                    </OrbitingCircles>
-                  </div>
-                  <div className="relative z-10 w-full max-w-md">
-                    <InteractiveCyprusMap />
-                  </div>
-                </div>
+                <Sid3DMascot />
               </div>
             </BlurFade>
 
@@ -642,7 +605,7 @@ export default function NextTripPage() {
           </BlurFade>
 
           {/* Day Selector */}
-          <div className="flex justify-center gap-4 mb-12">
+          <div className="flex justify-center gap-2 sm:gap-4 mb-12">
             {detailedItinerary.map((day, index) => (
               <motion.button
                 key={day.day}
@@ -650,15 +613,15 @@ export default function NextTripPage() {
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setSelectedDay(index)}
                 className={cn(
-                  "px-8 py-4 rounded-full font-bold transition-all duration-300",
+                  "px-4 sm:px-8 py-3 sm:py-4 rounded-full font-bold transition-all duration-300",
                   selectedDay === index
                     ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg"
                     : "bg-black/40 border border-purple-500/30 text-gray-300 hover:border-purple-500/50"
                 )}
               >
                 <div className="text-center">
-                  <div className="text-lg">{day.day}</div>
-                  <div className="text-xs opacity-80">{day.date}</div>
+                  <div className="text-sm sm:text-lg">{day.day}</div>
+                  <div className="text-xs opacity-80 hidden sm:block">{day.date}</div>
                 </div>
               </motion.button>
             ))}
@@ -721,7 +684,74 @@ export default function NextTripPage() {
         </div>
       </section>
 
+      {/* Gallery Section */}
+      <section className="relative py-32 bg-black overflow-hidden">
+        <div className="absolute inset-0">
+          <Meteors number={8} />
+          <div className="absolute top-20 left-20 w-[600px] h-[600px] bg-purple-600/20 rounded-full blur-[120px]" />
+          <div className="absolute bottom-20 right-20 w-[700px] h-[700px] bg-pink-600/20 rounded-full blur-[120px]" />
+        </div>
 
+        <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-12">
+          <BlurFade delay={0.1}>
+            <div className="text-center mb-16">
+              <h2 className="text-4xl sm:text-5xl font-black text-white mb-6">
+                CYPRUS <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">GALLERY</span>
+              </h2>
+              <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+                Immerse yourself in the Cyprus experience with stunning visuals from our adventures
+              </p>
+            </div>
+          </BlurFade>
+
+          <BlurFade delay={0.2}>
+            <div className="max-w-6xl mx-auto">
+              {/* Enhanced Image Carousel */}
+              <TripImageCarousel 
+                className="w-full" 
+                autoPlay={true} 
+                autoPlayInterval={5000}
+                showControls={true}
+                showDots={true}
+              />
+              
+              {/* Gallery Features */}
+              <div className="grid md:grid-cols-3 gap-8 mt-16">
+                {[
+                  {
+                    icon: '🌅',
+                    title: 'Epic Sunsets',
+                    description: 'Witness breathtaking Mediterranean sunsets from exclusive beach venues and luxury yacht parties.'
+                  },
+                  {
+                    icon: '🎉',
+                    title: 'VIP Experiences',
+                    description: 'Skip the lines and enjoy exclusive access to the hottest clubs and beach parties in Cyprus.'
+                  },
+                  {
+                    icon: '🏛️',
+                    title: 'Cultural Adventures',
+                    description: 'Explore ancient ruins, traditional villages, and immerse yourself in rich Cypriot culture.'
+                  }
+                ].map((feature, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: index * 0.1 + 0.3 }}
+                    className="text-center p-6 bg-black/30 backdrop-blur-sm border border-purple-500/20 rounded-xl hover:border-purple-500/40 transition-all duration-300"
+                  >
+                    <span className="text-4xl mb-4 block">{feature.icon}</span>
+                    <h3 className="text-xl font-bold text-white mb-3">{feature.title}</h3>
+                    <p className="text-gray-400 leading-relaxed">{feature.description}</p>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </BlurFade>
+        </div>
+      </section>
 
       {/* Booking Section */}
       <section id="booking" className="relative py-32 bg-gradient-to-br from-purple-950/30 to-pink-950/30">
@@ -744,6 +774,12 @@ export default function NextTripPage() {
       </section>
 
       <Footer />
+      
+      {/* Booking Form Popup */}
+      <BookingFormPopup 
+        isOpen={isBookingPopupOpen}
+        onClose={() => setIsBookingPopupOpen(false)}
+      />
     </div>
   );
 }

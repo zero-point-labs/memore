@@ -2,8 +2,9 @@
 
 import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
-import InteractiveCyprusMap from '@/components/trip-elements/InteractiveCyprusMap';
-import OrbitingCircles from '@/components/magicui/orbiting-circles';
+import Sid3DMascot from '@/components/trip-elements/Sid3DMascot';
+import TripImageCarousel from '@/components/trip-elements/TripImageCarousel';
+import BookingFormPopup from '@/components/BookingFormPopup';
 // Removed AnimatedList - using static list instead
 import { Meteors } from '@/components/magicui/meteors';
 import NumberTicker from '@/components/magicui/number-ticker';
@@ -94,19 +95,14 @@ const itinerary = [
   }
 ];
 
-// Activities for orbiting circles
-const activities = [
-  { id: 1, name: 'Nightlife', icon: '🎉', color: 'from-purple-400 to-pink-400' },
-  { id: 2, name: 'Beach', icon: '🏖️', color: 'from-blue-400 to-cyan-400' },
-  { id: 3, name: 'Adventure', icon: '🚁', color: 'from-orange-400 to-red-400' },
-  { id: 4, name: 'Culture', icon: '🏛️', color: 'from-green-400 to-emerald-400' },
-];
+
 
 export default function NextTripSection() {
   const [selectedDay, setSelectedDay] = useState(0);
   // const [isMobileDevice, setIsMobileDevice] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
   const [currentReview, setCurrentReview] = useState(0);
+  const [isBookingPopupOpen, setIsBookingPopupOpen] = useState(false);
 
   // Prevent flash by ensuring component is mounted
   useEffect(() => {
@@ -267,7 +263,7 @@ export default function NextTripSection() {
               </p>
             </motion.div>
 
-            {/* Student Reviews Carousel */}
+            {/* Trip Image Carousel */}
             <motion.div
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
@@ -277,10 +273,139 @@ export default function NextTripSection() {
             >
               {/* Section Title */}
               <div className="text-center mb-8">
-                <h3 className="text-2xl font-bold text-white mb-2">
+                <h3 className="text-2xl font-bold mb-2">
+                  <span className="text-white">Cyprus </span>
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">Adventure</span>
+                  <span className="text-white"> Gallery</span>
+                </h3>
+                <p className="text-gray-400">Get a taste of what awaits you in paradise</p>
+              </div>
+
+              {/* Image Carousel */}
+              <TripImageCarousel className="max-w-full sm:max-w-lg lg:max-w-2xl mx-auto" />
+            </motion.div>
+
+            {/* Main Content Grid */}
+            <div className="grid lg:grid-cols-2 gap-12 items-start">
+              {/* Left: 3D Mascot */}
+              <motion.div
+                initial={{ opacity: 0, x: -50 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.8 }}
+                className="relative"
+              >
+                <Sid3DMascot />
+              </motion.div>
+
+              {/* Right: Animated Itinerary */}
+              <motion.div
+                initial={{ opacity: 0, x: 50 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.8 }}
+                className="space-y-6"
+              >
+                <h3 className="text-2xl font-bold text-white mb-6">Trip Itinerary</h3>
+                
+                {/* Day Selector */}
+                <div className="flex gap-4 mb-8">
+                  {itinerary.map((day, index) => (
+                    <motion.button
+                      key={day.day}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => setSelectedDay(index)}
+                      className={cn(
+                        "px-6 py-3 rounded-full font-semibold transition-all duration-300",
+                        selectedDay === index
+                          ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg"
+                          : "bg-black/40 border border-purple-500/30 text-gray-300 hover:border-purple-500/50"
+                      )}
+                    >
+                      {day.day}
+                    </motion.button>
+                  ))}
+                </div>
+
+                {/* Day Details */}
+                <motion.div
+                  key={selectedDay}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="bg-black/40 backdrop-blur-sm border border-purple-500/20 rounded-xl p-6"
+                >
+                  <h4 className="text-xl font-bold text-purple-400 mb-4">
+                    {itinerary[selectedDay].title}
+                  </h4>
+                  
+                  <div className="space-y-4">
+                    {itinerary[selectedDay].items.map((item, index) => (
+                      <motion.div
+                        key={index}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.1, duration: 0.3 }}
+                        className="flex items-center gap-4 p-4 bg-purple-500/10 rounded-lg border border-purple-500/20 hover:border-purple-500/40 transition-all duration-300"
+                      >
+                        <span className="text-2xl">{item.icon}</span>
+                        <div className="flex-1">
+                          <p className="text-purple-300 font-semibold">{item.time}</p>
+                          <p className="text-gray-300">{item.activity}</p>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                </motion.div>
+              </motion.div>
+            </div>
+
+            {/* Bottom CTA */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, delay: 0.4 }}
+              className="text-center mt-8"
+            >
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setIsBookingPopupOpen(true)}
+                className="relative px-6 sm:px-12 py-3 sm:py-5 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full font-bold text-white text-sm sm:text-lg shadow-2xl hover:shadow-purple-500/25 transition-all duration-300 overflow-hidden group"
+              >
+                <motion.div
+                  className="absolute inset-0 bg-gradient-to-r from-pink-600 to-purple-600"
+                  initial={{ x: '-100%' }}
+                  whileHover={{ x: '100%' }}
+                  transition={{ duration: 0.8 }}
+                />
+                <span className="relative z-10">RESERVE YOUR ADVENTURE NOW</span>
+              </motion.button>
+              
+              <motion.p 
+                className="text-gray-400 text-sm mt-4"
+                animate={{ opacity: [0.7, 1, 0.7] }}
+                transition={{ duration: 2, repeat: Infinity }}
+              >
+                Only <NumberTicker value={12} className="text-purple-400 font-bold" /> spots left • Early bird pricing ends soon
+              </motion.p>
+            </motion.div>
+
+            {/* Student Reviews Section */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="mt-20"
+            >
+              {/* Section Title */}
+              <div className="text-center mb-12">
+                <h3 className="text-3xl font-bold text-white mb-4">
                   What Students Are Saying
                 </h3>
-                <p className="text-gray-400">Real experiences from the Cyprus squad</p>
+                <p className="text-gray-400 text-lg">Real experiences from the Cyprus squad</p>
               </div>
 
               {/* Review Carousel Container */}
@@ -420,143 +545,14 @@ export default function NextTripSection() {
                 </motion.div>
               </div>
             </motion.div>
-
-            {/* Main Content Grid */}
-            <div className="grid lg:grid-cols-2 gap-12 items-start">
-              {/* Left: Cyprus Map with Orbiting Activities */}
-              <motion.div
-                initial={{ opacity: 0, x: -50 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.8 }}
-                className="relative"
-              >
-                <div className="relative flex items-center justify-center min-h-[500px]">
-                  {/* Orbiting Activities */}
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    {activities.map((activity, index) => (
-                      <OrbitingCircles
-                        key={activity.id}
-                        className="h-[50px] w-[50px] border-purple-500/20 bg-black/30"
-                        duration={30 + index * 8}
-                        delay={index * 3}
-                        radius={120 + index * 25}
-                        reverse={index % 2 === 1}
-                      >
-                        <div className="flex flex-col items-center justify-center">
-                          <span className="text-2xl">{activity.icon}</span>
-                          <span className={cn(
-                            "text-xs font-medium bg-gradient-to-r bg-clip-text text-transparent",
-                            activity.color
-                          )}>
-                            {activity.name}
-                          </span>
-                        </div>
-                      </OrbitingCircles>
-                    ))}
-                  </div>
-                  
-                  {/* Cyprus Map in Center */}
-                  <div className="relative z-10 w-full max-w-md">
-                    <InteractiveCyprusMap />
-                  </div>
-                </div>
-              </motion.div>
-
-              {/* Right: Animated Itinerary */}
-              <motion.div
-                initial={{ opacity: 0, x: 50 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.8 }}
-                className="space-y-6"
-              >
-                <h3 className="text-2xl font-bold text-white mb-6">Trip Itinerary</h3>
-                
-                {/* Day Selector */}
-                <div className="flex gap-4 mb-8">
-                  {itinerary.map((day, index) => (
-                    <motion.button
-                      key={day.day}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={() => setSelectedDay(index)}
-                      className={cn(
-                        "px-6 py-3 rounded-full font-semibold transition-all duration-300",
-                        selectedDay === index
-                          ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg"
-                          : "bg-black/40 border border-purple-500/30 text-gray-300 hover:border-purple-500/50"
-                      )}
-                    >
-                      {day.day}
-                    </motion.button>
-                  ))}
-                </div>
-
-                {/* Day Details */}
-                <motion.div
-                  key={selectedDay}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="bg-black/40 backdrop-blur-sm border border-purple-500/20 rounded-xl p-6"
-                >
-                  <h4 className="text-xl font-bold text-purple-400 mb-4">
-                    {itinerary[selectedDay].title}
-                  </h4>
-                  
-                  <div className="space-y-4">
-                    {itinerary[selectedDay].items.map((item, index) => (
-                      <motion.div
-                        key={index}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: index * 0.1, duration: 0.3 }}
-                        className="flex items-center gap-4 p-4 bg-purple-500/10 rounded-lg border border-purple-500/20 hover:border-purple-500/40 transition-all duration-300"
-                      >
-                        <span className="text-2xl">{item.icon}</span>
-                        <div className="flex-1">
-                          <p className="text-purple-300 font-semibold">{item.time}</p>
-                          <p className="text-gray-300">{item.activity}</p>
-                        </div>
-                      </motion.div>
-                    ))}
-                  </div>
-                </motion.div>
-              </motion.div>
-            </div>
-
-            {/* Bottom CTA */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, delay: 0.4 }}
-              className="text-center mt-8"
-            >
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="relative px-12 py-5 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full font-bold text-white text-lg shadow-2xl hover:shadow-purple-500/25 transition-all duration-300 overflow-hidden group"
-              >
-                <motion.div
-                  className="absolute inset-0 bg-gradient-to-r from-pink-600 to-purple-600"
-                  initial={{ x: '-100%' }}
-                  whileHover={{ x: '100%' }}
-                  transition={{ duration: 0.8 }}
-                />
-                <span className="relative z-10">RESERVE YOUR ADVENTURE NOW</span>
-              </motion.button>
-              
-              <motion.p 
-                className="text-gray-400 text-sm mt-4"
-                animate={{ opacity: [0.7, 1, 0.7] }}
-                transition={{ duration: 2, repeat: Infinity }}
-              >
-                Only <NumberTicker value={12} className="text-purple-400 font-bold" /> spots left • Early bird pricing ends soon
-              </motion.p>
-            </motion.div>
           </div>
         </div>
+
+        {/* Booking Form Popup */}
+        <BookingFormPopup 
+          isOpen={isBookingPopupOpen}
+          onClose={() => setIsBookingPopupOpen(false)}
+        />
       </section>
   );
 }
