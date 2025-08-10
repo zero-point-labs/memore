@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { useState } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 // import { cn } from '@/utils/cn';
 
 interface Location {
@@ -51,13 +51,34 @@ const locations: Location[] = [
 export default function InteractiveCyprusMap() {
   const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
   const [hoveredLocation, setHoveredLocation] = useState<string | null>(null);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+
+  // Create memoized lookup map for O(1) location access
+  const locationsMap = useMemo(() => {
+    const map = new Map<string, Location>();
+    locations.forEach(location => map.set(location.id, location));
+    return map;
+  }, []);
+
+  // Check for prefers-reduced-motion
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setPrefersReducedMotion(mediaQuery.matches);
+    
+    const handleChange = (e: MediaQueryListEvent) => {
+      setPrefersReducedMotion(e.matches);
+    };
+    
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, []);
 
   return (
     <div className="relative w-full max-w-4xl mx-auto" data-cyprus-map>
       <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.8 }}
+        initial={prefersReducedMotion ? {} : { opacity: 0, scale: 0.9 }}
+        animate={prefersReducedMotion ? {} : { opacity: 1, scale: 1 }}
+        transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.8 }}
         className="relative"
       >
         {/* Cyprus Map Image - now using PNG for background */}
@@ -76,22 +97,6 @@ export default function InteractiveCyprusMap() {
           >
             {locations.map((location) => (
               <g key={location.id}>
-                {/* Pulsing circle background */}
-                <motion.circle
-                  cx={location.x}
-                  cy={location.y}
-                  r="3"
-                  fill="rgba(139, 92, 246, 0.3)"
-                  animate={{
-                    scale: [1, 2, 1],
-                    opacity: [0.6, 0, 0.6],
-                  }}
-                  transition={{
-                    duration: 2,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                  }}
-                />
                 {/* Location dot */}
                 <motion.circle
                   cx={location.x}
@@ -100,7 +105,8 @@ export default function InteractiveCyprusMap() {
                   fill="#8b5cf6"
                   filter="url(#glow)"
                   className="cursor-pointer pointer-events-auto"
-                  whileHover={{ scale: 1.5 }}
+                  whileHover={prefersReducedMotion ? {} : { scale: 1.5 }}
+                  transition={prefersReducedMotion ? { duration: 0 } : undefined}
                   onMouseEnter={() => setHoveredLocation(location.id)}
                   onMouseLeave={() => setHoveredLocation(null)}
                   onClick={() => setSelectedLocation(location)}
@@ -113,10 +119,10 @@ export default function InteractiveCyprusMap() {
                   fontSize="4"
                   className="pointer-events-none select-none"
                   initial={{ y: location.y - 5 }}
-                  animate={{
+                  animate={prefersReducedMotion ? {} : {
                     y: hoveredLocation === location.id ? location.y - 7 : location.y - 5,
                   }}
-                  transition={{ type: "spring", stiffness: 300 }}
+                  transition={prefersReducedMotion ? { duration: 0 } : { type: "spring", stiffness: 300 }}
                 >
                   {location.icon}
                 </motion.text>
@@ -137,21 +143,25 @@ export default function InteractiveCyprusMap() {
 
         {/* Location tooltips */}
         <AnimatePresence>
-          {hoveredLocation && !selectedLocation && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 10 }}
-              className="absolute z-10 bg-black/90 backdrop-blur-sm px-3 py-1 rounded-lg text-sm text-white border border-purple-500/50"
-              style={{
-                left: `${locations.find(l => l.id === hoveredLocation)?.x}%`,
-                top: `${(locations.find(l => l.id === hoveredLocation)?.y || 0) - 15}%`,
-                transform: 'translateX(-50%)',
-              }}
-            >
-              {locations.find(l => l.id === hoveredLocation)?.name}
-            </motion.div>
-          )}
+          {hoveredLocation && !selectedLocation && (() => {
+            const location = locationsMap.get(hoveredLocation);
+            return location ? (
+              <motion.div
+                initial={prefersReducedMotion ? {} : { opacity: 0, y: 10 }}
+                animate={prefersReducedMotion ? {} : { opacity: 1, y: 0 }}
+                exit={prefersReducedMotion ? {} : { opacity: 0, y: 10 }}
+                transition={prefersReducedMotion ? { duration: 0 } : undefined}
+                className="absolute z-10 bg-black/90 backdrop-blur-sm px-3 py-1 rounded-lg text-sm text-white border border-purple-500/50"
+                style={{
+                  left: `${location.x}%`,
+                  top: `${location.y - 15}%`,
+                  transform: 'translateX(-50%)',
+                }}
+              >
+                {location.name}
+              </motion.div>
+            ) : null;
+          })()}
         </AnimatePresence>
       </motion.div>
 
@@ -159,9 +169,10 @@ export default function InteractiveCyprusMap() {
       <AnimatePresence>
         {selectedLocation && (
           <motion.div
-            initial={{ opacity: 0, y: 20, scale: 0.9 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 20, scale: 0.9 }}
+            initial={prefersReducedMotion ? {} : { opacity: 0, y: 20, scale: 0.9 }}
+            animate={prefersReducedMotion ? {} : { opacity: 1, y: 0, scale: 1 }}
+            exit={prefersReducedMotion ? {} : { opacity: 0, y: 20, scale: 0.9 }}
+            transition={prefersReducedMotion ? { duration: 0 } : undefined}
             className="absolute inset-x-0 bottom-0 transform translate-y-full mt-8"
           >
             <div className="bg-black/80 backdrop-blur-lg border border-purple-500/30 rounded-xl p-6 mt-4">
@@ -171,8 +182,9 @@ export default function InteractiveCyprusMap() {
                   {selectedLocation.name}
                 </h3>
                 <motion.button
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
+                  whileHover={prefersReducedMotion ? {} : { scale: 1.1 }}
+                  whileTap={prefersReducedMotion ? {} : { scale: 0.9 }}
+                  transition={prefersReducedMotion ? { duration: 0 } : undefined}
                   onClick={() => setSelectedLocation(null)}
                   className="text-gray-400 hover:text-white transition-colors"
                 >
@@ -186,9 +198,9 @@ export default function InteractiveCyprusMap() {
                   {selectedLocation.activities.map((activity, index) => (
                     <motion.span
                       key={activity}
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.1 }}
+                      initial={prefersReducedMotion ? {} : { opacity: 0, x: -10 }}
+                      animate={prefersReducedMotion ? {} : { opacity: 1, x: 0 }}
+                      transition={prefersReducedMotion ? { duration: 0 } : { delay: index * 0.1 }}
                       className="px-3 py-1 bg-purple-500/20 border border-purple-500/30 rounded-full text-sm text-purple-300"
                     >
                       {activity}

@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 // import VIPCard from '@/components/hero-elements/VIPCard';
 
 import GlitchText from '@/components/hero-elements/GlitchText';
@@ -30,6 +30,7 @@ export default function Home() {
   const [isMobileDevice, setIsMobileDevice] = useState(false);
   const [isBookingPopupOpen, setIsBookingPopupOpen] = useState(false);
   const heroRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
   const parallax = useParallax(isMobileDevice ? 0 : 0.5);
 
   useEffect(() => {
@@ -40,6 +41,86 @@ export default function Home() {
     }, 2000);
     return () => clearInterval(interval);
   }, []);
+
+  // Video management to ensure it never stops playing
+  const ensureVideoPlays = useCallback(async () => {
+    if (videoRef.current) {
+      try {
+        await videoRef.current.play();
+      } catch (error) {
+        console.log('Video play failed:', error);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    // Force video to play when component mounts
+    ensureVideoPlays();
+
+    // Create intersection observer to play video when visible
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            ensureVideoPlays();
+          }
+        });
+      },
+      { threshold: 0.1 } // Play when 10% visible
+    );
+
+    observer.observe(video);
+
+    // Event listeners to handle video pause/ended events
+    const handlePause = () => {
+      // If video pauses, try to play it again immediately
+      setTimeout(ensureVideoPlays, 100);
+    };
+
+    const handleEnded = () => {
+      // If video ends (shouldn't happen with loop), restart it
+      ensureVideoPlays();
+    };
+
+    const handleLoadedData = () => {
+      // When video data loads, ensure it plays
+      ensureVideoPlays();
+    };
+
+    // Handle page visibility changes (e.g., switching tabs)
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        // Page became visible, ensure video plays
+        setTimeout(ensureVideoPlays, 200);
+      }
+    };
+
+    // Add event listeners
+    video.addEventListener('pause', handlePause);
+    video.addEventListener('ended', handleEnded);
+    video.addEventListener('loadeddata', handleLoadedData);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    // Force play attempt on focus/scroll events
+    const handleFocus = () => {
+      setTimeout(ensureVideoPlays, 100);
+    };
+    
+    window.addEventListener('focus', handleFocus);
+
+    // Cleanup
+    return () => {
+      observer.disconnect();
+      video.removeEventListener('pause', handlePause);
+      video.removeEventListener('ended', handleEnded);
+      video.removeEventListener('loadeddata', handleLoadedData);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, [ensureVideoPlays]);
 
   // Swipe gesture for desktop only
   useSwipeGesture(heroRef as React.RefObject<HTMLElement>, {
@@ -57,10 +138,14 @@ export default function Home() {
         {/* Video Background */}
         <div className="absolute inset-0 z-0">
           <video
+            ref={videoRef}
             autoPlay
             loop
             muted
             playsInline
+            preload="auto"
+            disablePictureInPicture
+            disableRemotePlayback
             className="absolute inset-0 w-full h-full object-cover"
           >
             <source src="/0806.mov" type="video/mp4" />
