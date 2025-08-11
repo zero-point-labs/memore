@@ -5,11 +5,12 @@ import { useState, useEffect } from 'react';
 import Sid3DMascot from '@/components/trip-elements/Sid3DMascot';
 import TripImageCarousel from '@/components/trip-elements/TripImageCarousel';
 import BookingFormPopup from '@/components/BookingFormPopup';
-// Removed AnimatedList - using static list instead
 import { Meteors } from '@/components/magicui/meteors';
 import NumberTicker from '@/components/magicui/number-ticker';
 import Sparkles from '@/components/ui/Sparkles';
 import { cn } from '@/utils/cn';
+import { tripService } from '@/services/tripService';
+import { TripDocument } from '@/types/trip';
 
 // Student Reviews
 const studentReviews = [
@@ -99,10 +100,27 @@ const itinerary = [
 
 export default function NextTripSection() {
   const [selectedDay, setSelectedDay] = useState(0);
-  // const [isMobileDevice, setIsMobileDevice] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
   const [currentReview, setCurrentReview] = useState(0);
   const [isBookingPopupOpen, setIsBookingPopupOpen] = useState(false);
+  const [featuredTrip, setFeaturedTrip] = useState<TripDocument | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch next upcoming trip data (date-based)
+  useEffect(() => {
+    const fetchNextTrip = async () => {
+      try {
+        const trip = await tripService.getNextTrip();
+        setFeaturedTrip(trip);
+      } catch (error) {
+        console.error('Error fetching next trip:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchNextTrip();
+  }, []);
 
   // Prevent flash by ensuring component is mounted
   useEffect(() => {
@@ -118,7 +136,7 @@ export default function NextTripSection() {
     return () => clearInterval(interval);
   }, []);
 
-  if (!isLoaded) {
+  if (!isLoaded || loading) {
     return (
       <section className="relative bg-black min-h-screen overflow-hidden">
         <div className="absolute inset-0">
@@ -127,7 +145,25 @@ export default function NextTripSection() {
           <div className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-pink-600/20 rounded-full blur-[150px]" />
         </div>
         <div className="relative z-10 flex items-center justify-center min-h-screen">
-          <div className="text-purple-400">Loading...</div>
+          <div className="text-purple-400">Loading trip data...</div>
+        </div>
+      </section>
+    );
+  }
+
+  // If no featured trip is found, show a fallback message
+  if (!featuredTrip) {
+    return (
+      <section className="relative bg-black min-h-screen overflow-hidden">
+        <div className="absolute inset-0">
+          <div className="absolute top-0 left-0 w-[800px] h-[800px] bg-purple-600/20 rounded-full blur-[150px]" />
+          <div className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-pink-600/20 rounded-full blur-[150px]" />
+        </div>
+        <div className="relative z-10 flex items-center justify-center min-h-screen">
+          <div className="text-center">
+            <div className="text-purple-400 text-xl mb-4">No featured trip available</div>
+            <div className="text-gray-400">Check back soon for our next amazing adventure!</div>
+          </div>
         </div>
       </section>
     );
@@ -239,7 +275,7 @@ export default function NextTripSection() {
               />
               
               <motion.h2 className="text-4xl sm:text-5xl lg:text-6xl font-black mb-6 relative z-10">
-                <span className="text-white">CYPRUS ADVENTURE </span>
+                <span className="text-white">{featuredTrip.title.toUpperCase()} </span>
                 <motion.span
                   className="text-transparent bg-clip-text"
                   animate={{
@@ -258,8 +294,7 @@ export default function NextTripSection() {
               </motion.h2>
               
               <p className="text-gray-300 text-lg max-w-3xl mx-auto leading-relaxed">
-                3 days of non-stop action, from sunrise boat parties to sunset beach clubs. 
-                Every moment designed for maximum memories.
+                {featuredTrip.description}
               </p>
             </motion.div>
 
@@ -281,8 +316,11 @@ export default function NextTripSection() {
                 <p className="text-gray-400">Get a taste of what awaits you in paradise</p>
               </div>
 
-              {/* Image Carousel */}
-              <TripImageCarousel className="max-w-full sm:max-w-lg lg:max-w-2xl mx-auto" />
+              {/* Image Carousel with database images */}
+              <TripImageCarousel 
+                images={featuredTrip.gallery} 
+                className="max-w-full sm:max-w-lg lg:max-w-2xl mx-auto" 
+              />
             </motion.div>
 
             {/* Main Content Grid */}
@@ -309,15 +347,15 @@ export default function NextTripSection() {
                 <h3 className="text-2xl font-bold text-white mb-6">Trip Itinerary</h3>
                 
                 {/* Day Selector */}
-                <div className="flex gap-4 mb-8">
-                  {itinerary.map((day, index) => (
+                <div className="flex gap-4 mb-8 overflow-x-auto">
+                  {featuredTrip.itinerary.map((day, index) => (
                     <motion.button
                       key={day.day}
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                       onClick={() => setSelectedDay(index)}
                       className={cn(
-                        "px-6 py-3 rounded-full font-semibold transition-all duration-300",
+                        "px-6 py-3 rounded-full font-semibold transition-all duration-300 whitespace-nowrap",
                         selectedDay === index
                           ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg"
                           : "bg-black/40 border border-purple-500/30 text-gray-300 hover:border-purple-500/50"
@@ -329,34 +367,57 @@ export default function NextTripSection() {
                 </div>
 
                 {/* Day Details */}
-                <motion.div
-                  key={selectedDay}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="bg-black/40 backdrop-blur-sm border border-purple-500/20 rounded-xl p-6"
-                >
-                  <h4 className="text-xl font-bold text-purple-400 mb-4">
-                    {itinerary[selectedDay].title}
-                  </h4>
-                  
-                  <div className="space-y-4">
-                    {itinerary[selectedDay].items.map((item, index) => (
-                      <motion.div
-                        key={index}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: index * 0.1, duration: 0.3 }}
-                        className="flex items-center gap-4 p-4 bg-purple-500/10 rounded-lg border border-purple-500/20 hover:border-purple-500/40 transition-all duration-300"
-                      >
-                        <span className="text-2xl">{item.icon}</span>
-                        <div className="flex-1">
-                          <p className="text-purple-300 font-semibold">{item.time}</p>
-                          <p className="text-gray-300">{item.activity}</p>
-                        </div>
-                      </motion.div>
-                    ))}
-                  </div>
-                </motion.div>
+                {featuredTrip.itinerary.length > 0 && featuredTrip.itinerary[selectedDay] && (
+                  <motion.div
+                    key={selectedDay}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="bg-black/40 backdrop-blur-sm border border-purple-500/20 rounded-xl p-6"
+                  >
+                    <h4 className="text-xl font-bold text-purple-400 mb-4">
+                      {featuredTrip.itinerary[selectedDay].title}
+                    </h4>
+                    
+                    {featuredTrip.itinerary[selectedDay].theme && (
+                      <p className="text-gray-400 mb-4 italic">
+                        {featuredTrip.itinerary[selectedDay].theme}
+                      </p>
+                    )}
+                    
+                    <div className="space-y-4">
+                      {featuredTrip.itinerary[selectedDay].items.map((item, index) => (
+                        <motion.div
+                          key={index}
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: index * 0.1, duration: 0.3 }}
+                          className="flex items-start gap-4 p-4 bg-purple-500/10 rounded-lg border border-purple-500/20 hover:border-purple-500/40 transition-all duration-300"
+                        >
+                          <span className="text-2xl flex-shrink-0">{item.icon}</span>
+                          <div className="flex-1">
+                            <p className="text-purple-300 font-semibold">{item.time}</p>
+                            <p className="text-gray-300 font-medium">{item.activity}</p>
+                            {item.description && (
+                              <p className="text-gray-400 text-sm mt-1">{item.description}</p>
+                            )}
+                            {item.included && item.included.length > 0 && (
+                              <div className="flex flex-wrap gap-1 mt-2">
+                                {item.included.map((include, i) => (
+                                  <span
+                                    key={i}
+                                    className="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded-full"
+                                  >
+                                    ✓ {include}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
               </motion.div>
             </div>
 
@@ -388,7 +449,10 @@ export default function NextTripSection() {
                 animate={{ opacity: [0.7, 1, 0.7] }}
                 transition={{ duration: 2, repeat: Infinity }}
               >
-                Only <NumberTicker value={12} className="text-purple-400 font-bold" /> spots left • Early bird pricing ends soon
+                Only <NumberTicker value={featuredTrip.availability.spotsRemaining} className="text-purple-400 font-bold" /> spots left 
+                {featuredTrip.pricing.earlyBird && featuredTrip.pricing.earlyBird.deadline && (
+                  <span> • Early bird pricing ends {new Date(featuredTrip.pricing.earlyBird.deadline).toLocaleDateString()}</span>
+                )}
               </motion.p>
             </motion.div>
 

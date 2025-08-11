@@ -1,13 +1,17 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { useState } from 'react';
-import { MapPin, Calendar, Users, Check } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { MapPin, Calendar, Users, Check, ArrowRight, Clock } from 'lucide-react';
+import Link from 'next/link';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import BookingFormPopup from '@/components/BookingFormPopup';
 import Sid3DMascot from '@/components/trip-elements/Sid3DMascot';
 import TripImageCarousel from '@/components/trip-elements/TripImageCarousel';
+import TripDetailsCard from '@/components/trip-elements/TripDetailsCard';
+import { tripService } from '@/services/tripService';
+import { TripDocument } from '@/types/trip';
 
 import { Meteors } from '@/components/magicui/meteors';
 import NumberTicker from '@/components/magicui/number-ticker';
@@ -15,138 +19,7 @@ import BlurFade from '@/components/ui/BlurFade';
 import { fadeInUp, fadeIn } from '@/utils/animationVariants';
 import { cn } from '@/utils/cn';
 
-// Extended itinerary data
-const detailedItinerary = [
-  {
-    day: 'Day 1',
-    date: 'Friday, May 24th',
-    title: 'Arrival & Welcome Party',
-    theme: 'Welcome to Paradise',
-    items: [
-      { 
-        time: '12:00', 
-        activity: 'Airport VIP Pickup & Transfer', 
-        icon: '✈️',
-        description: 'Private transport with welcome drinks and Cyprus orientation',
-        included: ['VIP airport lounge access', 'Welcome drink', 'Cyprus guide booklet']
-      },
-      { 
-        time: '14:00', 
-        activity: 'Check-in at Beachfront Resort', 
-        icon: '🏨',
-        description: 'Luxury accommodation with sea views and welcome packages',
-        included: ['Ocean view room', 'Welcome gift bag', 'Resort orientation']
-      },
-      { 
-        time: '16:00', 
-        activity: 'Group Meet & Greet Pool Party', 
-        icon: '🏊',
-        description: 'Ice-breaking activities and first-day celebrations',
-        included: ['Pool games', 'Welcome cocktails', 'Photo session']
-      },
-      { 
-        time: '18:00', 
-        activity: 'Sunset Beach BBQ', 
-        icon: '🌅',
-        description: 'Traditional Cypriot BBQ on the beach with live music',
-        included: ['Cypriot BBQ feast', 'Live acoustic music', 'Beach games']
-      },
-      { 
-        time: '22:00', 
-        activity: 'VIP Club Night at Castle Club', 
-        icon: '🎊',
-        description: 'Skip-the-line access and VIP booth experience',
-        included: ['VIP table', 'Bottle service', 'Skip-the-line access']
-      },
-    ]
-  },
-  {
-    day: 'Day 2',
-    date: 'Saturday, May 25th',
-    title: 'Adventure & Culture Day',
-    theme: 'Explore & Discover',
-    items: [
-      { 
-        time: '09:00', 
-        activity: 'Recovery Breakfast & Spa Time', 
-        icon: '☕',
-        description: 'Hangover breakfast and optional spa treatments',
-        included: ['Full breakfast', 'Spa access', 'Pool relaxation']
-      },
-      { 
-        time: '11:00', 
-        activity: 'Water Sports Adventure', 
-        icon: '🏄',
-        description: 'Jet skiing, parasailing, and cliff jumping at Cape Greco',
-        included: ['Equipment rental', 'Professional instruction', 'Safety gear']
-      },
-      { 
-        time: '15:00', 
-        activity: 'Ancient Kourion & Wine Tasting', 
-        icon: '🏛️',
-        description: 'Historical tour followed by Cypriot wine experience',
-        included: ['Guided tour', 'Wine tasting session', 'Historical insights']
-      },
-      { 
-        time: '19:00', 
-        activity: 'Traditional Village Dinner', 
-        icon: '🍽️',
-        description: 'Authentic Cypriot cuisine in a traditional village setting',
-        included: ['Multi-course dinner', 'Cultural show', 'Local music']
-      },
-      { 
-        time: '23:00', 
-        activity: 'Ayia Napa Bar Crawl', 
-        icon: '🍻',
-        description: 'VIP access to the best bars and clubs in Ayia Napa',
-        included: ['5 venues', 'VIP entry', 'Welcome drinks']
-      },
-    ]
-  },
-  {
-    day: 'Day 3',
-    date: 'Sunday, May 26th',
-    title: 'Yacht Party & Farewell',
-    theme: 'Grand Finale',
-    items: [
-      { 
-        time: '10:00', 
-        activity: 'Luxury Yacht Charter', 
-        icon: '🚤',
-        description: 'Private yacht with DJ, drinks, and Mediterranean views',
-        included: ['Luxury yacht', 'DJ & sound system', 'Open bar']
-      },
-      { 
-        time: '14:00', 
-        activity: 'Beach Club Hopping', 
-        icon: '🏖️',
-        description: 'VIP access to exclusive beach clubs and infinity pools',
-        included: ['3 beach clubs', 'Pool access', 'VIP loungers']
-      },
-      { 
-        time: '17:00', 
-        activity: 'Golden Hour Photography', 
-        icon: '📸',
-        description: 'Professional photo session at scenic Cyprus locations',
-        included: ['Professional photographer', 'Multiple locations', 'Digital gallery']
-      },
-      { 
-        time: '20:00', 
-        activity: 'Farewell Gala Dinner', 
-        icon: '🏆',
-        description: 'Elegant dinner with awards ceremony and memories sharing',
-        included: ['Gala dinner', 'Award ceremony', 'Memory book']
-      },
-      { 
-        time: '23:00', 
-        activity: 'Final Party at Rooftop Club', 
-        icon: '🌃',
-        description: 'Last night celebration with panoramic city views',
-        included: ['Rooftop access', 'Premium drinks', 'Group photos']
-      },
-    ]
-  }
-];
+// Note: Trip data now comes from database via tripService.getNextTrip() (date-based)
 
 
 
@@ -434,6 +307,68 @@ function BookingForm() {
 export default function NextTripPage() {
   const [selectedDay, setSelectedDay] = useState(0);
   const [isBookingPopupOpen, setIsBookingPopupOpen] = useState(false);
+  const [featuredTrip, setFeaturedTrip] = useState<TripDocument | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [upcomingTrips, setUpcomingTrips] = useState<TripDocument[]>([]);
+  const [previousTrips, setPreviousTrips] = useState<TripDocument[]>([]);
+  const [otherTripsLoading, setOtherTripsLoading] = useState(true);
+
+  // Fetch next upcoming trip data (date-based)
+  useEffect(() => {
+    const fetchNextTrip = async () => {
+      try {
+        const trip = await tripService.getNextTrip();
+        setFeaturedTrip(trip);
+      } catch (error) {
+        console.error('Error fetching next trip:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchNextTrip();
+  }, []);
+
+  // Fetch other trips for browsing
+  useEffect(() => {
+    const fetchOtherTrips = async () => {
+      try {
+        const [upcoming, previous] = await Promise.all([
+          tripService.getUpcomingTrips(true), // Exclude the next trip
+          tripService.getPreviousTrips(10)    // Get last 10 previous trips
+        ]);
+        setUpcomingTrips(upcoming);
+        setPreviousTrips(previous);
+      } catch (error) {
+        console.error('Error fetching other trips:', error);
+      } finally {
+        setOtherTripsLoading(false);
+      }
+    };
+
+    fetchOtherTrips();
+  }, []);
+
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="text-white">Loading trip details...</div>
+      </div>
+    );
+  }
+
+  // Show fallback if no featured trip
+  if (!featuredTrip) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-purple-400 text-xl mb-4">No featured trip available</div>
+          <div className="text-gray-400">Check back soon for our next amazing adventure!</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-black">
@@ -469,30 +404,33 @@ export default function NextTripPage() {
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-purple-500/30 bg-purple-500/10 backdrop-blur-sm"
               >
                 <span className="text-lg">🇨🇾</span>
-                <span className="text-purple-300 text-sm font-medium">MAY 24-26, 2024</span>
+                <span className="text-purple-300 text-sm font-medium">
+                  {new Date(featuredTrip.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }).toUpperCase()} - {new Date(featuredTrip.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).toUpperCase()}
+                </span>
               </motion.div>
 
               <h1 className="text-4xl sm:text-5xl lg:text-7xl font-black text-white leading-tight">
-                CYPRUS <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">ADVENTURE</span>
-                <br />AWAITS YOU
+                {featuredTrip.title.toUpperCase()} 
+                <br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">AWAITS YOU</span>
               </h1>
 
               <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-                3 days of non-stop adventure, luxury experiences, and unforgettable memories in the Mediterranean paradise
+                {featuredTrip.description}
               </p>
 
               <div className="flex flex-wrap gap-6 justify-center text-gray-300">
                 <span className="flex items-center gap-2">
                   <MapPin className="w-5 h-5 text-purple-400" />
-                  Ayia Napa & Limassol
+                  {featuredTrip.location}
                 </span>
                 <span className="flex items-center gap-2">
                   <Calendar className="w-5 h-5 text-purple-400" />
-                  May 24-26, 2024
+                  {new Date(featuredTrip.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - {new Date(featuredTrip.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                 </span>
                 <span className="flex items-center gap-2">
                   <Users className="w-5 h-5 text-purple-400" />
-                  Limited to 50 Students
+                  Limited to {featuredTrip.availability.totalSpots} Students
                 </span>
               </div>
 
@@ -537,54 +475,9 @@ export default function NextTripPage() {
               </div>
             </BlurFade>
 
-            {/* Key Features */}
+            {/* Trip Details Card */}
             <BlurFade delay={0.3}>
-              <div className="space-y-8">
-                <h3 className="text-2xl font-bold text-white mb-6">Why Choose Our Cyprus Experience?</h3>
-                
-                {[
-                  {
-                    icon: '🏆',
-                    title: 'VIP Treatment Everywhere',
-                    description: 'Skip lines, get priority access, and enjoy exclusive experiences at every venue.'
-                  },
-                  {
-                    icon: '🌊',
-                    title: 'Premium Locations',
-                    description: 'Beachfront hotels, luxury yachts, and the hottest clubs in Cyprus.'
-                  },
-                  {
-                    icon: '👥',
-                    title: 'Perfect Group Size',
-                    description: 'Limited to 50 students for an intimate, personalized experience.'
-                  },
-                  {
-                    icon: '🔒',
-                    title: 'Safe & Secure',
-                    description: '24/7 support, emergency assistance, and verified accommodations.'
-                  },
-                  {
-                    icon: '📸',
-                    title: 'Memory Creation',
-                    description: 'Professional photography, custom content, and lifelong memories.'
-                  }
-                ].map((feature, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: index * 0.1 }}
-                    className="flex gap-4 p-4 bg-white/5 rounded-lg border border-purple-500/20 hover:bg-white/10 transition-all duration-300"
-                  >
-                    <span className="text-3xl">{feature.icon}</span>
-                    <div>
-                      <h4 className="text-white font-bold mb-2">{feature.title}</h4>
-                      <p className="text-gray-400">{feature.description}</p>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
+              <TripDetailsCard trip={featuredTrip} />
             </BlurFade>
           </div>
         </div>
@@ -605,15 +498,15 @@ export default function NextTripPage() {
           </BlurFade>
 
           {/* Day Selector */}
-          <div className="flex justify-center gap-2 sm:gap-4 mb-12">
-            {detailedItinerary.map((day, index) => (
+          <div className="flex justify-center gap-2 sm:gap-4 mb-12 overflow-x-auto">
+            {featuredTrip.itinerary.map((day, index) => (
               <motion.button
                 key={day.day}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setSelectedDay(index)}
                 className={cn(
-                  "px-4 sm:px-8 py-3 sm:py-4 rounded-full font-bold transition-all duration-300",
+                  "px-4 sm:px-8 py-3 sm:py-4 rounded-full font-bold transition-all duration-300 whitespace-nowrap",
                   selectedDay === index
                     ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg"
                     : "bg-black/40 border border-purple-500/30 text-gray-300 hover:border-purple-500/50"
@@ -621,66 +514,74 @@ export default function NextTripPage() {
               >
                 <div className="text-center">
                   <div className="text-sm sm:text-lg">{day.day}</div>
-                  <div className="text-xs opacity-80 hidden sm:block">{day.date}</div>
+                  {day.date && <div className="text-xs opacity-80 hidden sm:block">{day.date}</div>}
                 </div>
               </motion.button>
             ))}
           </div>
 
           {/* Day Content */}
-          <motion.div
-            key={selectedDay}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="max-w-6xl mx-auto"
-          >
-            <div className="text-center mb-12">
-              <h3 className="text-3xl font-bold text-purple-400 mb-2">
-                {detailedItinerary[selectedDay].title}
-              </h3>
-              <p className="text-gray-400">{detailedItinerary[selectedDay].theme}</p>
-            </div>
+          {featuredTrip.itinerary.length > 0 && featuredTrip.itinerary[selectedDay] && (
+            <motion.div
+              key={selectedDay}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="max-w-6xl mx-auto"
+            >
+              <div className="text-center mb-12">
+                <h3 className="text-3xl font-bold text-purple-400 mb-2">
+                  {featuredTrip.itinerary[selectedDay].title}
+                </h3>
+                {featuredTrip.itinerary[selectedDay].theme && (
+                  <p className="text-gray-400">{featuredTrip.itinerary[selectedDay].theme}</p>
+                )}
+              </div>
 
-            <div className="space-y-6">
-              {detailedItinerary[selectedDay].items.map((item, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  className="bg-black/40 backdrop-blur-sm border border-purple-500/20 rounded-xl p-6 hover:border-purple-500/40 transition-all duration-300"
-                >
-                  <div className="flex gap-6">
-                    <div className="flex-shrink-0">
-                      <div className="w-16 h-16 bg-purple-600/20 rounded-full flex items-center justify-center">
-                        <span className="text-2xl">{item.icon}</span>
+              <div className="space-y-6">
+                {featuredTrip.itinerary[selectedDay].items.map((item, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    className="bg-black/40 backdrop-blur-sm border border-purple-500/20 rounded-xl p-6 hover:border-purple-500/40 transition-all duration-300"
+                  >
+                    <div className="flex gap-6">
+                      <div className="flex-shrink-0">
+                        <div className="w-16 h-16 bg-purple-600/20 rounded-full flex items-center justify-center">
+                          <span className="text-2xl">{item.icon}</span>
+                        </div>
+                        <div className="text-center mt-2">
+                          <span className="text-purple-400 font-bold text-sm">{item.time}</span>
+                        </div>
                       </div>
-                      <div className="text-center mt-2">
-                        <span className="text-purple-400 font-bold text-sm">{item.time}</span>
-                      </div>
-                    </div>
-                    
-                    <div className="flex-1">
-                      <h4 className="text-xl font-bold text-white mb-2">{item.activity}</h4>
-                      <p className="text-gray-300 mb-4">{item.description}</p>
                       
-                      <div className="flex flex-wrap gap-2">
-                        {item.included.map((include, i) => (
-                          <span
-                            key={i}
-                            className="flex items-center gap-1 text-xs bg-green-500/20 text-green-400 px-3 py-1 rounded-full"
-                          >
-                            <Check className="w-3 h-3" />
-                            {include}
-                          </span>
-                        ))}
+                      <div className="flex-1">
+                        <h4 className="text-xl font-bold text-white mb-2">{item.activity}</h4>
+                        {item.description && (
+                          <p className="text-gray-300 mb-4">{item.description}</p>
+                        )}
+                        
+                        {item.included && item.included.length > 0 && (
+                          <div className="flex flex-wrap gap-2">
+                            {item.included.map((include, i) => (
+                              <span
+                                key={i}
+                                className="flex items-center gap-1 text-xs bg-green-500/20 text-green-400 px-3 py-1 rounded-full"
+                              >
+                                <Check className="w-3 h-3" />
+                                {include}
+                              </span>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     </div>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
+          )}
         </div>
       </section>
 
@@ -706,8 +607,9 @@ export default function NextTripPage() {
 
           <BlurFade delay={0.2}>
             <div className="max-w-6xl mx-auto">
-              {/* Enhanced Image Carousel */}
+              {/* Enhanced Image Carousel with database images */}
               <TripImageCarousel 
+                images={featuredTrip.gallery}
                 className="w-full" 
                 autoPlay={true} 
                 autoPlayInterval={5000}
@@ -763,13 +665,212 @@ export default function NextTripPage() {
                   SECURE YOUR <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">SPOT NOW</span>
                 </h2>
                 <p className="text-xl text-gray-300">
-                  Only <NumberTicker value={8} className="text-purple-400 font-bold" /> spots remaining for this exclusive experience!
+                  Only <NumberTicker value={featuredTrip.availability.spotsRemaining} className="text-purple-400 font-bold" /> spots remaining for this exclusive experience!
                 </p>
               </div>
             </BlurFade>
 
             <BookingForm />
           </div>
+        </div>
+      </section>
+
+      {/* Other Trips Section */}
+      <section className="relative py-32 bg-gradient-to-br from-black via-purple-950/10 to-black">
+        <div className="absolute inset-0">
+          <Meteors number={4} />
+          <div className="absolute top-20 right-20 w-[400px] h-[400px] bg-purple-600/10 rounded-full blur-[80px]" />
+          <div className="absolute bottom-20 left-20 w-[500px] h-[500px] bg-pink-600/10 rounded-full blur-[100px]" />
+        </div>
+
+        <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-12">
+          <BlurFade delay={0.1}>
+            <div className="text-center mb-16">
+              <h2 className="text-4xl sm:text-5xl font-black text-white mb-6">
+                EXPLORE <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">MORE TRIPS</span>
+              </h2>
+              <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+                Discover upcoming adventures and relive amazing memories from past trips
+              </p>
+            </div>
+          </BlurFade>
+
+          {!otherTripsLoading && (upcomingTrips.length > 0 || previousTrips.length > 0) && (
+            <div className="space-y-16">
+              {/* Upcoming Trips */}
+              {upcomingTrips.length > 0 && (
+                <BlurFade delay={0.2}>
+                  <div>
+                    <div className="flex items-center gap-3 mb-8">
+                      <h3 className="text-2xl font-bold text-white">Upcoming Adventures</h3>
+                      <div className="flex-1 h-0.5 bg-gradient-to-r from-purple-500/50 to-transparent" />
+                    </div>
+                    
+                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {upcomingTrips.map((trip, index) => (
+                        <motion.div
+                          key={trip.$id}
+                          initial={{ opacity: 0, y: 20 }}
+                          whileInView={{ opacity: 1, y: 0 }}
+                          viewport={{ once: true }}
+                          transition={{ delay: index * 0.1 }}
+                          whileHover={{ scale: 1.02 }}
+                          className="group"
+                        >
+                          <Link href={`/trip/${trip.$id}`}>
+                            <div className="bg-gradient-to-br from-purple-900/20 to-pink-900/20 backdrop-blur-sm border border-purple-500/20 rounded-2xl p-6 hover:border-purple-500/40 transition-all duration-300 cursor-pointer">
+                              {/* Trip Image */}
+                              {trip.gallery && trip.gallery.length > 0 && (
+                                <div className="relative h-48 rounded-xl overflow-hidden mb-4">
+                                  <img
+                                    src={typeof trip.gallery[0] === 'string' ? trip.gallery[0] : trip.gallery[0].url}
+                                    alt={trip.title}
+                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                  />
+                                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                                  <div className="absolute bottom-3 left-3">
+                                    <span className="px-2 py-1 bg-green-500/20 text-green-400 text-xs font-medium rounded-full border border-green-500/30">
+                                      Upcoming
+                                    </span>
+                                  </div>
+                                </div>
+                              )}
+                              
+                              {/* Trip Info */}
+                              <div className="space-y-3">
+                                <h4 className="text-xl font-bold text-white group-hover:text-purple-300 transition-colors">
+                                  {trip.title}
+                                </h4>
+                                
+                                <p className="text-gray-400 text-sm line-clamp-2">
+                                  {trip.description}
+                                </p>
+                                
+                                <div className="flex items-center gap-4 text-sm text-gray-300">
+                                  <span className="flex items-center gap-1">
+                                    <MapPin className="w-4 h-4 text-purple-400" />
+                                    {trip.location.split(',')[0]}
+                                  </span>
+                                  <span className="flex items-center gap-1">
+                                    <Clock className="w-4 h-4 text-pink-400" />
+                                    {trip.duration} days
+                                  </span>
+                                </div>
+                                
+                                <div className="flex items-center justify-between pt-3 border-t border-purple-500/20">
+                                  <div className="text-sm text-gray-400">
+                                    {new Date(trip.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                  </div>
+                                  <div className="flex items-center gap-1 text-purple-300 group-hover:text-white transition-colors">
+                                    <span className="text-sm font-medium">Explore</span>
+                                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </Link>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </div>
+                </BlurFade>
+              )}
+              
+              {/* Previous Trips */}
+              {previousTrips.length > 0 && (
+                <BlurFade delay={0.3}>
+                  <div>
+                    <div className="flex items-center gap-3 mb-8">
+                      <h3 className="text-2xl font-bold text-white">Past Adventures</h3>
+                      <div className="flex-1 h-0.5 bg-gradient-to-r from-pink-500/50 to-transparent" />
+                    </div>
+                    
+                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {previousTrips.slice(0, 6).map((trip, index) => (
+                        <motion.div
+                          key={trip.$id}
+                          initial={{ opacity: 0, y: 20 }}
+                          whileInView={{ opacity: 1, y: 0 }}
+                          viewport={{ once: true }}
+                          transition={{ delay: index * 0.1 }}
+                          whileHover={{ scale: 1.02 }}
+                          className="group"
+                        >
+                          <Link href={`/trip/${trip.$id}`}>
+                            <div className="bg-gradient-to-br from-gray-900/40 to-purple-900/20 backdrop-blur-sm border border-gray-500/20 rounded-2xl p-6 hover:border-purple-500/40 transition-all duration-300 cursor-pointer">
+                              {/* Trip Image */}
+                              {trip.gallery && trip.gallery.length > 0 && (
+                                <div className="relative h-48 rounded-xl overflow-hidden mb-4">
+                                  <img
+                                    src={typeof trip.gallery[0] === 'string' ? trip.gallery[0] : trip.gallery[0].url}
+                                    alt={trip.title}
+                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 grayscale-[30%] group-hover:grayscale-0"
+                                  />
+                                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                                  <div className="absolute bottom-3 left-3">
+                                    <span className="px-2 py-1 bg-gray-500/20 text-gray-400 text-xs font-medium rounded-full border border-gray-500/30">
+                                      Completed
+                                    </span>
+                                  </div>
+                                </div>
+                              )}
+                              
+                              {/* Trip Info */}
+                              <div className="space-y-3">
+                                <h4 className="text-xl font-bold text-white group-hover:text-purple-300 transition-colors">
+                                  {trip.title}
+                                </h4>
+                                
+                                <p className="text-gray-400 text-sm line-clamp-2">
+                                  {trip.description}
+                                </p>
+                                
+                                <div className="flex items-center gap-4 text-sm text-gray-300">
+                                  <span className="flex items-center gap-1">
+                                    <MapPin className="w-4 h-4 text-purple-400" />
+                                    {trip.location.split(',')[0]}
+                                  </span>
+                                  <span className="flex items-center gap-1">
+                                    <Clock className="w-4 h-4 text-pink-400" />
+                                    {trip.duration} days
+                                  </span>
+                                </div>
+                                
+                                <div className="flex items-center justify-between pt-3 border-t border-gray-500/20">
+                                  <div className="text-sm text-gray-400">
+                                    {new Date(trip.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                  </div>
+                                  <div className="flex items-center gap-1 text-gray-300 group-hover:text-purple-300 transition-colors">
+                                    <span className="text-sm font-medium">View Memories</span>
+                                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </Link>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </div>
+                </BlurFade>
+              )}
+            </div>
+          )}
+
+          {/* Loading State for Other Trips */}
+          {otherTripsLoading && (
+            <div className="text-center">
+              <div className="w-8 h-8 border-4 border-purple-500/30 border-t-purple-500 rounded-full animate-spin mx-auto mb-4" />
+              <p className="text-gray-400">Loading more trips...</p>
+            </div>
+          )}
+
+          {/* No Other Trips */}
+          {!otherTripsLoading && upcomingTrips.length === 0 && previousTrips.length === 0 && (
+            <div className="text-center py-16">
+              <p className="text-gray-400 text-lg">More trips coming soon! Stay tuned for amazing adventures.</p>
+            </div>
+          )}
         </div>
       </section>
 

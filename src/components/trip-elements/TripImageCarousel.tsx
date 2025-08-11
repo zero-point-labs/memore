@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { TripGalleryImage } from '@/types/trip';
 import { cn } from '@/utils/cn';
 
 interface TripImage {
@@ -59,6 +60,7 @@ const tripImages: TripImage[] = [
 ];
 
 interface TripImageCarouselProps {
+  images?: string[] | TripGalleryImage[];
   autoPlay?: boolean;
   autoPlayInterval?: number;
   showControls?: boolean;
@@ -67,6 +69,7 @@ interface TripImageCarouselProps {
 }
 
 export default function TripImageCarousel({
+  images,
   autoPlay = true,
   autoPlayInterval = 4000,
   showControls = true,
@@ -75,23 +78,52 @@ export default function TripImageCarousel({
 }: TripImageCarouselProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
 
+  // Convert images to standard format
+  const processedImages: TripImage[] = (() => {
+    if (!images || images.length === 0) {
+      return tripImages; // Fallback to default images
+    }
+
+    return images.map((img, index) => {
+      if (typeof img === 'string') {
+        return {
+          id: index,
+          src: img,
+          alt: `Trip image ${index + 1}`,
+          title: `Adventure ${index + 1}`,
+          description: 'Amazing moments from our Cyprus adventure',
+          location: 'Cyprus'
+        };
+      } else {
+        return {
+          id: index,
+          src: img.url,
+          alt: img.altText || img.title || `Trip image ${index + 1}`,
+          title: img.title || `Adventure ${index + 1}`,
+          description: img.description || 'Amazing moments from our Cyprus adventure',
+          location: 'Cyprus'
+        };
+      }
+    });
+  })();
+
   // Auto-play functionality
   useEffect(() => {
-    if (!autoPlay) return;
+    if (!autoPlay || processedImages.length === 0) return;
 
     const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % tripImages.length);
+      setCurrentIndex((prev) => (prev + 1) % processedImages.length);
     }, autoPlayInterval);
 
     return () => clearInterval(interval);
-  }, [autoPlay, autoPlayInterval]);
+  }, [autoPlay, autoPlayInterval, processedImages.length]);
 
   const goToNext = () => {
-    setCurrentIndex((prev) => (prev + 1) % tripImages.length);
+    setCurrentIndex((prev) => (prev + 1) % processedImages.length);
   };
 
   const goToPrev = () => {
-    setCurrentIndex((prev) => (prev - 1 + tripImages.length) % tripImages.length);
+    setCurrentIndex((prev) => (prev - 1 + processedImages.length) % processedImages.length);
   };
 
   const goToSlide = (index: number) => {
@@ -114,8 +146,8 @@ export default function TripImageCarousel({
             {/* Background Image */}
             <div className="absolute inset-0">
               <img
-                src={tripImages[currentIndex].src}
-                alt={tripImages[currentIndex].alt}
+                src={processedImages[currentIndex].src}
+                alt={processedImages[currentIndex].alt}
                 className="w-full h-full object-cover"
               />
               {/* Gradient overlay for text readability */}
@@ -132,12 +164,12 @@ export default function TripImageCarousel({
               >
                 {/* Title */}
                 <h3 className="text-2xl sm:text-3xl font-bold text-white leading-tight">
-                  {tripImages[currentIndex].title}
+                  {processedImages[currentIndex].title}
                 </h3>
 
                 {/* Description */}
                 <p className="text-gray-200 text-sm sm:text-base max-w-lg leading-relaxed">
-                  {tripImages[currentIndex].description}
+                  {processedImages[currentIndex].description}
                 </p>
               </motion.div>
             </div>
@@ -170,16 +202,16 @@ export default function TripImageCarousel({
             </span>
             <span className="text-gray-400 text-sm">/</span>
             <span className="text-gray-400 text-sm">
-              {String(tripImages.length).padStart(2, '0')}
+              {String(processedImages.length).padStart(2, '0')}
             </span>
           </div>
         </div>
       </div>
 
       {/* Dots Navigation */}
-      {showDots && (
+      {showDots && processedImages.length > 1 && (
         <div className="flex justify-center gap-2 mt-6">
-          {tripImages.map((_, index) => (
+          {processedImages.map((_, index) => (
             <button
               key={index}
               onClick={() => goToSlide(index)}
@@ -195,29 +227,31 @@ export default function TripImageCarousel({
       )}
 
       {/* Thumbnail Navigation (Optional) */}
-      <div className="hidden lg:flex gap-3 mt-6 justify-center">
-        {tripImages.map((image, index) => (
-          <button
-            key={image.id}
-            onClick={() => goToSlide(index)}
-            className={cn(
-              "relative w-16 h-12 rounded-lg overflow-hidden border-2 transition-all duration-300",
-              currentIndex === index
-                ? "border-purple-500 scale-110"
-                : "border-transparent opacity-60 hover:opacity-80"
-            )}
-          >
-            <img
-              src={image.src}
-              alt={image.alt}
-              className="w-full h-full object-cover"
-            />
-            {currentIndex === index && (
-              <div className="absolute inset-0 bg-purple-500/20" />
-            )}
-          </button>
-        ))}
-      </div>
+      {processedImages.length > 1 && (
+        <div className="hidden lg:flex gap-3 mt-6 justify-center">
+          {processedImages.map((image, index) => (
+            <button
+              key={image.id}
+              onClick={() => goToSlide(index)}
+              className={cn(
+                "relative w-16 h-12 rounded-lg overflow-hidden border-2 transition-all duration-300",
+                currentIndex === index
+                  ? "border-purple-500 scale-110"
+                  : "border-transparent opacity-60 hover:opacity-80"
+              )}
+            >
+              <img
+                src={image.src}
+                alt={image.alt}
+                className="w-full h-full object-cover"
+              />
+              {currentIndex === index && (
+                <div className="absolute inset-0 bg-purple-500/20" />
+              )}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

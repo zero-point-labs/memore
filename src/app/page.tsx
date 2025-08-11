@@ -12,6 +12,7 @@ import BlogSection from '@/components/BlogSection';
 import ContactSection from '@/components/ContactSection';
 import Footer from '@/components/Footer';
 import BookingFormPopup from '@/components/BookingFormPopup';
+import HeroCountdown from '@/components/hero-elements/HeroCountdown';
 import { useParallax } from '@/hooks/useParallax';
 import { useSwipeGesture } from '@/hooks/useSwipeGesture';
 import { isMobile } from '@/utils/isMobile';
@@ -315,79 +316,14 @@ export default function Home() {
                   </div>
                 </motion.div>
 
-                {/* Countdown Timer */}
+                {/* Dynamic Countdown Timer */}
                 <motion.div
                   initial="hidden"
                   whileInView="visible"
                   viewport={viewportOnce}
                   variants={fadeIn}
-                  className="mt-12 text-center"
                 >
-                  <motion.p 
-                    className="text-purple-300 text-xs font-medium mb-2"
-                    animate={{
-                      textShadow: [
-                        '0 0 10px rgba(139, 92, 246, 0.5)',
-                        '0 0 20px rgba(139, 92, 246, 0.8)',
-                        '0 0 10px rgba(139, 92, 246, 0.5)',
-                      ],
-                    }}
-                    transition={{ duration: 2, repeat: Infinity }}
-                  >
-                    🚀 NEXT ADVENTURE DEPARTING IN
-                  </motion.p>
-                  
-                  <motion.div 
-                    className="flex items-center justify-center gap-3"
-                    initial={{ scale: 0.9, opacity: 0 }}
-                    whileInView={{ scale: 1, opacity: 1 }}
-                    transition={{ duration: 0.5 }}
-                  >
-                    <div className="text-center">
-                      <motion.div
-                        className="text-2xl sm:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400"
-                        animate={{ scale: [1, 1.05, 1] }}
-                        transition={{ duration: 2, repeat: Infinity }}
-                      >
-                        23
-                      </motion.div>
-                      <div className="text-xs text-gray-400 uppercase tracking-wide">Days</div>
-                    </div>
-                    
-                    <div className="w-px h-10 bg-gradient-to-b from-transparent via-purple-500/50 to-transparent" />
-                    
-                    <div className="text-center">
-                      <motion.div
-                        className="text-2xl sm:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-purple-400"
-                        animate={{ scale: [1, 1.05, 1] }}
-                        transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
-                      >
-                        14
-                      </motion.div>
-                      <div className="text-xs text-gray-400 uppercase tracking-wide">Hours</div>
-                    </div>
-                    
-                    <div className="w-px h-10 bg-gradient-to-b from-transparent via-purple-500/50 to-transparent" />
-                    
-                    <div className="text-center">
-                      <motion.div
-                        className="text-2xl sm:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400"
-                        animate={{ scale: [1, 1.05, 1] }}
-                        transition={{ duration: 2, repeat: Infinity, delay: 1 }}
-                      >
-                        37
-                      </motion.div>
-                      <div className="text-xs text-gray-400 uppercase tracking-wide">Minutes</div>
-                    </div>
-                  </motion.div>
-                  
-                  <motion.p 
-                    className="text-gray-400 text-xs mt-3"
-                    animate={{ opacity: [0.7, 1, 0.7] }}
-                    transition={{ duration: 3, repeat: Infinity }}
-                  >
-                    Limited spots • Early bird pricing ends soon
-                  </motion.p>
+                  <HeroCountdown />
                 </motion.div>
 
                 {/* Scroll Animation */}

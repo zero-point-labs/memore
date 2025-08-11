@@ -1,13 +1,15 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Menu, X, Sparkles } from 'lucide-react';
+import { Menu, X, Sparkles, User } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const { user, loading } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -71,17 +73,34 @@ export default function Header() {
           </nav>
 
           {/* CTA Button */}
-          <Link href="/next-trip">
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="hidden lg:block relative px-6 py-2.5 overflow-hidden rounded-lg font-bold text-sm"
-            >
-              <span className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600"></span>
-              <span className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 blur-lg opacity-50"></span>
-              <span className="relative text-white">SIGN UP</span>
-            </motion.button>
-          </Link>
+          {!loading && (
+            user ? (
+              <Link href="/account">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="hidden lg:flex items-center gap-2 relative px-6 py-2.5 overflow-hidden rounded-lg font-bold text-sm"
+                >
+                  <span className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600"></span>
+                  <span className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 blur-lg opacity-50"></span>
+                  <User className="relative w-4 h-4 text-white" />
+                  <span className="relative text-white">ACCOUNT</span>
+                </motion.button>
+              </Link>
+            ) : (
+              <Link href="/auth/signup">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="hidden lg:block relative px-6 py-2.5 overflow-hidden rounded-lg font-bold text-sm"
+                >
+                  <span className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600"></span>
+                  <span className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 blur-lg opacity-50"></span>
+                  <span className="relative text-white">SIGN UP</span>
+                </motion.button>
+              </Link>
+            )
+          )}
 
           {/* Mobile Menu Button */}
           <button
@@ -118,11 +137,22 @@ export default function Header() {
               {item.label}
             </Link>
           ))}
-          <Link href="/next-trip" onClick={() => setIsMenuOpen(false)}>
-            <button className="w-full mt-4 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg font-bold text-white">
-              SIGN UP
-            </button>
-          </Link>
+          {!loading && (
+            user ? (
+              <Link href="/account" onClick={() => setIsMenuOpen(false)}>
+                <button className="w-full mt-4 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg font-bold text-white flex items-center justify-center gap-2">
+                  <User size={16} />
+                  ACCOUNT
+                </button>
+              </Link>
+            ) : (
+              <Link href="/auth/signup" onClick={() => setIsMenuOpen(false)}>
+                <button className="w-full mt-4 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg font-bold text-white">
+                  SIGN UP
+                </button>
+              </Link>
+            )
+          )}
         </nav>
       </motion.div>
     </motion.header>

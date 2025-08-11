@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Clock, Heart, MessageCircle, Bookmark, TrendingUp, Sparkles as SparklesIcon } from 'lucide-react';
 import { Meteors } from '@/components/magicui/meteors';
 import NumberTicker from '@/components/magicui/number-ticker';
@@ -9,111 +9,18 @@ import OrbitingCircles from '@/components/magicui/orbiting-circles';
 import BlurFade from '@/components/ui/BlurFade';
 import GlitchText from '@/components/hero-elements/GlitchText';
 import { cn } from '@/utils/cn';
+import { blogService } from '@/services/blogService';
+import { BlogDocument, BLOG_CATEGORIES } from '@/types/blog';
+import Link from 'next/link';
 
-// Blog Categories
+// Blog Categories - now including 'all' category
 const categories = [
   { id: 'all', label: 'All Stories', icon: '📚', color: 'from-purple-600 to-pink-600' },
-  { id: 'tips', label: 'Travel Tips', icon: '💡', color: 'from-blue-600 to-cyan-600' },
-  { id: 'experiences', label: 'Experiences', icon: '🌟', color: 'from-yellow-600 to-orange-600' },
-  { id: 'guides', label: 'City Guides', icon: '🗺️', color: 'from-green-600 to-emerald-600' },
-  { id: 'nightlife', label: 'Nightlife', icon: '🎊', color: 'from-pink-600 to-rose-600' },
-];
-
-// Featured Authors
-const authors = [
-  { name: 'Lora AI', avatar: '🤖', role: 'Trip Planner' },
-  { name: 'Alex Chen', avatar: '👨', role: 'Adventure Guide' },
-  { name: 'Sofia Kyriakou', avatar: '👩', role: 'Local Expert' },
-  { name: 'Marcus Johnson', avatar: '👱', role: 'Party Coordinator' },
-];
-
-// Blog Posts Data
-const blogPosts = [
-  {
-    id: 1,
-    category: 'tips',
-    title: 'Ultimate Packing List for Cyprus Summer',
-    excerpt: 'Everything you need for 3 days of sun, sea, and unforgettable parties. From beach essentials to club outfits.',
-    author: authors[0],
-    date: 'Mar 15, 2024',
-    readTime: 5,
-    likes: 234,
-    comments: 42,
-    trending: true,
-    image: '/blogs/summer-packing-list.jpg',
-    tags: ['Packing', 'Summer', 'Essentials'],
-  },
-  {
-    id: 2,
-    category: 'nightlife',
-    title: 'Top 10 Beach Clubs You Can\'t Miss',
-    excerpt: 'From exclusive VIP lounges to wild beach raves, discover where the party never stops in Cyprus.',
-    author: authors[3],
-    date: 'Mar 12, 2024',
-    readTime: 8,
-    likes: 567,
-    comments: 89,
-    trending: true,
-    image: '/blogs/beach-bars.jpg',
-    tags: ['Clubs', 'VIP', 'Nightlife'],
-  },
-  {
-    id: 3,
-    category: 'guides',
-    title: 'Hidden Gems of Ayia Napa',
-    excerpt: 'Beyond the parties: secret beaches, local tavernas, and Instagram-worthy spots only locals know.',
-    author: authors[2],
-    date: 'Mar 10, 2024',
-    readTime: 6,
-    likes: 345,
-    comments: 56,
-    image: '/blogs/ayianapa-gem.jpeg',
-    tags: ['Ayia Napa', 'Hidden Gems', 'Local'],
-  },
-  {
-    id: 4,
-    category: 'experiences',
-    title: 'My First Cyprus Adventure: A Student\'s Story',
-    excerpt: 'From nervous first-timer to Cyprus veteran - how one trip changed everything.',
-    author: authors[1],
-    date: 'Mar 8, 2024',
-    readTime: 12,
-    likes: 892,
-    comments: 123,
-    trending: true,
-    image: '/blogs/student-adventure.jpg',
-    tags: ['Personal', 'Adventure', 'Story'],
-  },
-  {
-    id: 5,
-    category: 'tips',
-    title: 'Budget Hacks: Party Like VIP on a Student Budget',
-    excerpt: 'Smart tips to experience luxury without breaking the bank. Early bird deals, group discounts, and more.',
-    author: authors[0],
-    date: 'Mar 5, 2024',
-    readTime: 7,
-    likes: 456,
-    comments: 67,
-    image: '/blogs/budjet-hacks.webp',
-    tags: ['Budget', 'Tips', 'Savings'],
-  },
-  {
-    id: 6,
-    category: 'guides',
-    title: 'Limassol After Dark: Complete Guide',
-    excerpt: 'Navigate the nightlife capital like a pro. Best bars, clubs, and late-night eats mapped out.',
-    author: authors[2],
-    date: 'Mar 3, 2024',
-    readTime: 10,
-    likes: 678,
-    comments: 91,
-    image: '/blogs/limasol-dark.jpg',
-    tags: ['Limassol', 'Nightlife', 'Guide'],
-  },
+  ...BLOG_CATEGORIES,
 ];
 
 // Blog Card Component
-function BlogCard({ post, index }: { post: typeof blogPosts[0]; index: number }) {
+function BlogCard({ post, index }: { post: BlogDocument; index: number }) {
   const [isHovered, setIsHovered] = useState(false);
   const [isBookmarked, setIsBookmarked] = useState(false);
 
@@ -227,7 +134,7 @@ function BlogCard({ post, index }: { post: typeof blogPosts[0]; index: number })
               <span className="text-2xl">{post.author.avatar}</span>
               <div>
                 <p className="text-sm font-medium text-white">{post.author.name}</p>
-                <p className="text-xs text-gray-400">{post.date}</p>
+                <p className="text-xs text-gray-400">{new Date(post.$createdAt).toLocaleDateString()}</p>
               </div>
             </div>
 
@@ -254,13 +161,15 @@ function BlogCard({ post, index }: { post: typeof blogPosts[0]; index: number })
               exit={{ opacity: 0, y: 10 }}
               className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-purple-600/20 to-transparent"
             >
-              <motion.button
-                whileHover={{ x: 5 }}
-                className="text-purple-300 text-sm font-medium flex items-center gap-2"
-              >
-                Read Full Story
-                <span>→</span>
-              </motion.button>
+              <Link href={`/blog/${post.$id}`}>
+                <motion.button
+                  whileHover={{ x: 5 }}
+                  className="text-purple-300 text-sm font-medium flex items-center gap-2"
+                >
+                  Read Full Story
+                  <span>→</span>
+                </motion.button>
+              </Link>
             </motion.div>
           )}
         </AnimatePresence>
@@ -271,7 +180,30 @@ function BlogCard({ post, index }: { post: typeof blogPosts[0]; index: number })
 
 export default function BlogSection() {
   const [activeCategory, setActiveCategory] = useState('all');
-  const [filteredPosts, setFilteredPosts] = useState(blogPosts);
+  const [blogPosts, setBlogPosts] = useState<BlogDocument[]>([]);
+  const [filteredPosts, setFilteredPosts] = useState<BlogDocument[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch blogs from Appwrite
+  useEffect(() => {
+    const fetchBlogs = async () => {
+      try {
+        setLoading(true);
+        const blogs = await blogService.getBlogs({
+          published: true,
+          limit: 20,
+        });
+        setBlogPosts(blogs);
+        setFilteredPosts(blogs);
+      } catch (error) {
+        console.error('Error fetching blogs:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBlogs();
+  }, []);
 
   const handleCategoryChange = (categoryId: string) => {
     setActiveCategory(categoryId);
@@ -385,16 +317,22 @@ export default function BlogSection() {
         </BlurFade>
 
         {/* Blog Grid */}
-        <motion.div
-          layout
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-        >
-          <AnimatePresence mode="popLayout">
-            {filteredPosts.map((post, index) => (
-              <BlogCard key={post.id} post={post} index={index} />
-            ))}
-          </AnimatePresence>
-        </motion.div>
+        {loading ? (
+          <div className="text-center py-12">
+            <div className="text-gray-400 text-lg">Loading amazing stories...</div>
+          </div>
+        ) : (
+          <motion.div
+            layout
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+          >
+            <AnimatePresence mode="popLayout">
+              {filteredPosts.map((post, index) => (
+                <BlogCard key={post.$id} post={post} index={index} />
+              ))}
+            </AnimatePresence>
+          </motion.div>
+        )}
 
         {/* Upcoming Events - Smaller Card */}
         <motion.div
