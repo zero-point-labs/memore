@@ -1,10 +1,12 @@
 'use client';
 
-import { motion } from 'framer-motion';
-import { Menu, X, Sparkles, User } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { User, Compass, Camera, MessageSquare, FileText } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useAuth } from '@/contexts/AuthContext';
+import AnimatedHamburgerIcon from './AnimatedHamburgerIcon';
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -21,11 +23,40 @@ export default function Header() {
   }, []);
 
   const navItems = [
-    { label: 'Next Trip', href: '/next-trip' },
-    { label: 'Gallery', href: '/gallery' },
-    { label: 'Stories', href: '/blog' },
-    { label: 'Contact', href: '/contact' },
+    { label: 'Next Trip', href: '/next-trip', icon: <Compass size={20} /> },
+    { label: 'Gallery', href: '/gallery', icon: <Camera size={20} /> },
+    { label: 'Stories', href: '/blog', icon: <FileText size={20} /> },
+    { label: 'Contact', href: '/contact', icon: <MessageSquare size={20} /> },
   ];
+
+  const menuVariants = {
+    hidden: {
+      opacity: 0,
+      scale: 0.95,
+      transition: {
+        duration: 0.2,
+      },
+    },
+    visible: {
+      opacity: 1,
+      scale: 1,
+      transition: {
+        duration: 0.2,
+        staggerChildren: 0.1,
+      },
+    },
+  };
+
+  const navItemVariants = {
+    hidden: {
+      opacity: 0,
+      y: 20,
+    },
+    visible: {
+      opacity: 1,
+      y: 0,
+    },
+  };
 
   return (
     <motion.header
@@ -42,11 +73,17 @@ export default function Header() {
           <Link href="/">
             <motion.div
               whileHover={{ scale: 1.05 }}
-              className="flex items-center gap-2 cursor-pointer"
+              className="flex items-center gap-3 cursor-pointer"
             >
               <div className="relative">
                 <div className="absolute inset-0 bg-purple-600 blur-lg opacity-50"></div>
-                <Sparkles className="relative w-8 h-8 text-purple-400" />
+                <Image
+                  src="/logo.png"
+                  alt="Memora Logo"
+                  width={48}
+                  height={48}
+                  className="relative object-contain"
+                />
               </div>
               <span className="text-2xl font-black text-white">MEMORA</span>
             </motion.div>
@@ -103,58 +140,62 @@ export default function Header() {
           )}
 
           {/* Mobile Menu Button */}
-          <button
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="lg:hidden relative z-50"
-          >
-            {isMenuOpen ? (
-              <X className="w-6 h-6 text-white" />
-            ) : (
-              <Menu className="w-6 h-6 text-white" />
-            )}
-          </button>
+          <div className="lg:hidden relative z-50">
+            <AnimatedHamburgerIcon
+              isOpen={isMenuOpen}
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+            />
+          </div>
         </div>
       </div>
 
       {/* Mobile Menu */}
-      <motion.div
-        initial={false}
-        animate={{ 
-          height: isMenuOpen ? 'auto' : 0,
-          opacity: isMenuOpen ? 1 : 0
-        }}
-        transition={{ duration: 0.3 }}
-        className="lg:hidden overflow-hidden bg-black/95 backdrop-blur-xl border-t border-purple-500/20"
-      >
-        <nav className="container mx-auto px-4 sm:px-6 py-6 space-y-4">
-          {navItems.map((item) => (
-            <Link
-              key={item.label}
-              href={item.href}
-              onClick={() => setIsMenuOpen(false)}
-              className="block text-gray-300 hover:text-white transition-colors"
-            >
-              {item.label}
-            </Link>
-          ))}
-          {!loading && (
-            user ? (
-              <Link href="/account" onClick={() => setIsMenuOpen(false)}>
-                <button className="w-full mt-4 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg font-bold text-white flex items-center justify-center gap-2">
-                  <User size={16} />
-                  ACCOUNT
-                </button>
-              </Link>
-            ) : (
-              <Link href="/auth/signup" onClick={() => setIsMenuOpen(false)}>
-                <button className="w-full mt-4 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg font-bold text-white">
-                  SIGN UP
-                </button>
-              </Link>
-            )
-          )}
-        </nav>
-      </motion.div>
+      <AnimatePresence>
+        {isMenuOpen && (
+          <motion.div
+            variants={menuVariants}
+            initial="hidden"
+            animate="visible"
+            exit="hidden"
+            className="lg:hidden fixed inset-0 bg-black/90 backdrop-blur-xl z-40 flex flex-col items-center justify-center"
+          >
+            <nav className="flex flex-col items-center gap-8">
+              {navItems.map((item) => (
+                <motion.div key={item.label} variants={navItemVariants}>
+                  <Link
+                    href={item.href}
+                    onClick={() => setIsMenuOpen(false)}
+                    className="flex items-center gap-4 text-2xl text-gray-300 hover:text-white transition-colors group w-full max-w-xs p-4 rounded-lg bg-white/5 border border-white/10"
+                  >
+                    <span className="bg-gradient-to-r from-purple-500 to-pink-500 p-2 rounded-md">
+                      {item.icon}
+                    </span>
+                    <span>{item.label}</span>
+                  </Link>
+                </motion.div>
+              ))}
+              <motion.div variants={navItemVariants} className="mt-8 w-full max-w-xs">
+                {!loading && (
+                  user ? (
+                    <Link href="/account" onClick={() => setIsMenuOpen(false)}>
+                      <button className="w-full px-6 py-4 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg font-bold text-white flex items-center justify-center gap-2 text-lg">
+                        <User size={20} />
+                        ACCOUNT
+                      </button>
+                    </Link>
+                  ) : (
+                    <Link href="/auth/signup" onClick={() => setIsMenuOpen(false)}>
+                      <button className="w-full px-6 py-4 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg font-bold text-white text-lg">
+                        SIGN UP
+                      </button>
+                    </Link>
+                  )
+                )}
+              </motion.div>
+            </nav>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.header>
   );
 }

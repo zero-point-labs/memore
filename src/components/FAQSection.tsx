@@ -112,7 +112,7 @@ export default function FAQSection() {
   };
 
   return (
-    <section className="relative">
+    <section id="faq" aria-label="FAQ" className="relative">
       {/* FAQ Content Section */}
       <div className="relative pt-20 pb-24 overflow-hidden bg-black">
         

@@ -17,6 +17,7 @@ import { useParallax } from '@/hooks/useParallax';
 import { useSwipeGesture } from '@/hooks/useSwipeGesture';
 import { isMobile } from '@/utils/isMobile';
 import { viewportOnce, fadeInUp, fadeIn, slideInFromTop } from '@/utils/animationVariants';
+import { BorderBeam } from '@/components/magicui/border-beam';
 
 
 // Memoize VIPCard to prevent re-renders when title changes
@@ -149,7 +150,7 @@ export default function Home() {
             disableRemotePlayback
             className="absolute inset-0 w-full h-full object-cover"
           >
-            <source src="/0806.mov" type="video/mp4" />
+            <source src="/hero-backround.mp4" type="video/mp4" />
           </video>
           
           {/* Dark Overlay for readability */}
@@ -294,22 +295,28 @@ export default function Home() {
                     {/* Scroll to Cyprus Map Button */}
                     <button
                       onClick={() => {
-                        const cyprusElement = document.querySelector('[data-cyprus-map]');
-                        if (cyprusElement) {
-                          cyprusElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        const nextTripElement = document.querySelector('#next-trip');
+                        if (nextTripElement) {
+                          nextTripElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
                         }
                       }}
                       className="flex items-center gap-2 px-6 py-3 bg-black/20 border border-purple-500/30 rounded-full text-gray-300 hover:text-purple-300 hover:border-purple-500/50 transition-colors backdrop-blur-sm"
                     >
-                      <span>🗺️</span>
+                      <span>✈️</span>
                       <span className="font-medium">Next Trip</span>
                     </button>
 
                     {/* Sign Up Button */}
                     <button
                       onClick={() => setIsBookingPopupOpen(true)}
-                      className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600/20 to-pink-600/20 border border-purple-500/30 rounded-full text-purple-300 hover:from-purple-600/30 hover:to-pink-600/30 hover:border-purple-500/50 transition-all duration-300 backdrop-blur-sm"
+                      className="relative flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-purple-600/20 to-pink-600/20 border border-purple-500/30 rounded-full text-purple-300 hover:from-purple-600/30 hover:to-pink-600/30 hover:border-purple-500/50 transition-all duration-300 backdrop-blur-sm overflow-hidden"
                     >
+                      <BorderBeam
+                        colorFrom="#8B5CF6"
+                        colorTo="#EC4899"
+                        borderWidth={2}
+                        duration={4}
+                      />
                       <span>✨</span>
                       <span className="font-medium">Get Started</span>
                     </button>
@@ -337,9 +344,14 @@ export default function Home() {
                   <motion.div
                     className="cursor-pointer group"
                     onClick={() => {
-                      const nextSection = document.querySelector('[data-cyprus-map]') || document.querySelector('section:nth-child(2)');
-                      if (nextSection) {
-                        nextSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                      const faqSection = document.querySelector('#faq');
+                      if (faqSection) {
+                        (faqSection as HTMLElement).scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        return;
+                      }
+                      const fallbackSection = document.querySelector('[data-cyprus-map]') || document.querySelector('section:nth-child(2)');
+                      if (fallbackSection) {
+                        (fallbackSection as HTMLElement).scrollIntoView({ behavior: 'smooth', block: 'start' });
                       } else {
                         window.scrollTo({ top: window.innerHeight, behavior: 'smooth' });
                       }
@@ -363,7 +375,7 @@ export default function Home() {
                         }}
                         transition={{ duration: 3, repeat: Infinity }}
                       >
-                        SCROLL TO EXPLORE
+                        Got a Question?
                       </motion.span>
                       <motion.div
                         className="flex flex-col gap-1"
@@ -407,7 +419,7 @@ export default function Home() {
       </section>
 
       {/* Next Trip Details Section */}
-      <NextTripSection />
+      <NextTripSection isHomepage={true} />
       
       {/* Gallery Section */}
       <GallerySection />

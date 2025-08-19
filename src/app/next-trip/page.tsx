@@ -7,7 +7,6 @@ import Link from 'next/link';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import BookingFormPopup from '@/components/BookingFormPopup';
-import Sid3DMascot from '@/components/trip-elements/Sid3DMascot';
 import TripImageCarousel from '@/components/trip-elements/TripImageCarousel';
 import TripDetailsCard from '@/components/trip-elements/TripDetailsCard';
 import { tripService } from '@/services/tripService';
@@ -18,6 +17,8 @@ import NumberTicker from '@/components/magicui/number-ticker';
 import BlurFade from '@/components/ui/BlurFade';
 import { fadeInUp, fadeIn } from '@/utils/animationVariants';
 import { cn } from '@/utils/cn';
+import TripAboutCard from '@/components/trip-elements/TripAboutCard';
+import { BorderBeam } from '@/components/magicui/border-beam';
 
 // Note: Trip data now comes from database via tripService.getNextTrip() (date-based)
 
@@ -304,6 +305,246 @@ function BookingForm() {
   );
 }
 
+// Expandable Cards Component for Trip Information
+const ExpandableCardsSection = ({ 
+  featuredTrip, 
+  selectedDay, 
+  setSelectedDay 
+}: { 
+  featuredTrip: TripDocument; 
+  selectedDay: number; 
+  setSelectedDay: (day: number) => void; 
+}) => {
+  const [expandedCard, setExpandedCard] = useState<string | null>(null);
+
+  const toggleCard = (cardId: string) => {
+    setExpandedCard(expandedCard === cardId ? null : cardId);
+  };
+
+  const cards = [
+    {
+      id: 'trip-details',
+      icon: '🏖️',
+      title: 'Trip Details & Information',
+      subtitle: 'Duration, pricing & what\'s included',
+      preview: `${featuredTrip.duration} days in ${featuredTrip.location.split(',')[0]}`,
+      content: (
+        <div className="space-y-6">
+          <TripAboutCard trip={featuredTrip} />
+        </div>
+      )
+    },
+    {
+      id: 'itinerary',
+      icon: '📅',
+      title: 'Detailed Trip Itinerary',
+      subtitle: 'Day-by-day adventure breakdown',
+      preview: `${featuredTrip.itinerary.length} action-packed days planned`,
+      content: (
+        <div className="space-y-6">
+          <div className="flex justify-center gap-2 sm:gap-4 mb-8 overflow-x-auto">
+            {featuredTrip.itinerary.map((day, index) => (
+              <motion.button
+                key={day.day}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setSelectedDay(index)}
+                className={cn(
+                  "px-4 sm:px-6 py-2 sm:py-3 rounded-full font-bold transition-all duration-300 whitespace-nowrap text-sm sm:text-base",
+                  selectedDay === index
+                    ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg"
+                    : "bg-black/40 border border-purple-500/30 text-gray-300 hover:border-purple-500/50"
+                )}
+              >
+                <div className="text-center">
+                  <div>{day.day}</div>
+                  {day.date && <div className="text-xs opacity-80 hidden sm:block">{day.date}</div>}
+                </div>
+              </motion.button>
+            ))}
+          </div>
+          
+          {featuredTrip.itinerary.length > 0 && featuredTrip.itinerary[selectedDay] && (
+            <motion.div
+              key={selectedDay}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="max-w-4xl mx-auto"
+            >
+              <div className="text-center mb-8">
+                <h4 className="text-2xl font-bold text-purple-400 mb-2">
+                  {featuredTrip.itinerary[selectedDay].title}
+                </h4>
+                {featuredTrip.itinerary[selectedDay].theme && (
+                  <p className="text-gray-400 italic">{featuredTrip.itinerary[selectedDay].theme}</p>
+                )}
+              </div>
+
+              <div className="space-y-4">
+                {featuredTrip.itinerary[selectedDay].items.map((item, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    className="bg-black/40 backdrop-blur-sm border border-purple-500/20 rounded-xl p-4 hover:border-purple-500/40 transition-all duration-300"
+                  >
+                    <div className="flex gap-4">
+                      <div className="flex-shrink-0">
+                        <div className="w-12 h-12 bg-purple-600/20 rounded-full flex items-center justify-center">
+                          <span className="text-lg">{item.icon}</span>
+                        </div>
+                        <div className="text-center mt-1">
+                          <span className="text-purple-400 font-bold text-xs">{item.time}</span>
+                        </div>
+                      </div>
+                      
+                      <div className="flex-1">
+                        <h5 className="text-lg font-bold text-white mb-1">{item.activity}</h5>
+                        {item.description && (
+                          <p className="text-gray-300 text-sm mb-3">{item.description}</p>
+                        )}
+                        
+                        {item.included && item.included.length > 0 && (
+                          <div className="flex flex-wrap gap-1">
+                            {item.included.map((include, i) => (
+                              <span
+                                key={i}
+                                className="flex items-center gap-1 text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded-full"
+                              >
+                                <Check className="w-3 h-3" />
+                                {include}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
+          )}
+        </div>
+      )
+    },
+    {
+      id: 'gallery',
+      icon: '📸',
+      title: 'Trip Preview Gallery',
+      subtitle: 'See what awaits you on this adventure',
+      preview: `${featuredTrip.gallery.length} breathtaking images`,
+      content: (
+        <div className="space-y-6">
+          <TripImageCarousel 
+            images={featuredTrip.gallery}
+            className="w-full max-w-4xl mx-auto" 
+            autoPlay={true} 
+            autoPlayInterval={4000}
+            showControls={true}
+            showDots={true}
+          />
+          <div className="text-center">
+            <p className="text-gray-400 text-lg">Swipe through memories from our Cyprus adventures</p>
+            <p className="text-purple-300 text-sm mt-2">✨ Every photo tells a story of incredible experiences</p>
+          </div>
+        </div>
+      )
+    }
+  ];
+
+  return (
+    <section className="relative py-24 bg-gradient-to-br from-purple-950/20 to-pink-950/20">
+      <div className="absolute inset-0">
+        <Meteors number={6} />
+        <div className="absolute top-20 left-20 w-[500px] h-[500px] bg-purple-600/15 rounded-full blur-[100px]" />
+        <div className="absolute bottom-20 right-20 w-[600px] h-[600px] bg-pink-600/15 rounded-full blur-[120px]" />
+      </div>
+
+      <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-12">
+        <BlurFade delay={0.1}>
+          <div className="text-center mb-16">
+            <h2 className="text-4xl sm:text-5xl font-black text-white mb-6">
+              DISCOVER <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">MORE DETAILS</span>
+            </h2>
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+              Expand each section to explore comprehensive trip information, detailed itineraries, and stunning gallery
+            </p>
+          </div>
+        </BlurFade>
+
+        <div className="max-w-5xl mx-auto space-y-6">
+          {cards.map((card, index) => (
+            <motion.div
+              key={card.id}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: index * 0.1 }}
+              className="bg-gradient-to-br from-purple-900/20 to-pink-900/20 backdrop-blur-sm border border-purple-500/20 rounded-2xl overflow-hidden hover:border-purple-500/40 transition-all duration-300"
+            >
+              {/* Card Header */}
+              <motion.button
+                onClick={() => toggleCard(card.id)}
+                className="w-full p-6 text-left focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:ring-inset"
+                whileHover={{ scale: 1.005 }}
+                whileTap={{ scale: 0.995 }}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-6">
+                    <motion.span 
+                      className="text-4xl"
+                      animate={{ 
+                        rotate: expandedCard === card.id ? [0, 10, -10, 0] : 0,
+                        scale: expandedCard === card.id ? 1.1 : 1
+                      }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      {card.icon}
+                    </motion.span>
+                    <div>
+                      <h3 className="text-xl sm:text-2xl font-bold text-white mb-1">{card.title}</h3>
+                      <p className="text-gray-400 text-sm sm:text-base">{card.subtitle}</p>
+                      <p className="text-purple-300 text-sm sm:text-base font-medium mt-1">{card.preview}</p>
+                    </div>
+                  </div>
+                  <motion.div
+                    animate={{ 
+                      rotate: expandedCard === card.id ? 180 : 0,
+                      color: expandedCard === card.id ? '#a855f7' : '#9ca3af'
+                    }}
+                    transition={{ duration: 0.3 }}
+                    className="text-3xl"
+                  >
+                    ⌄
+                  </motion.div>
+                </div>
+              </motion.button>
+
+              {/* Expandable Content */}
+              <motion.div
+                initial={false}
+                animate={{
+                  height: expandedCard === card.id ? "auto" : 0,
+                  opacity: expandedCard === card.id ? 1 : 0
+                }}
+                transition={{ duration: 0.3, ease: "easeInOut" }}
+                className="overflow-hidden"
+              >
+                <div className="px-6 pb-6 border-t border-purple-500/10">
+                  <div className="pt-6">
+                    {card.content}
+                  </div>
+                </div>
+              </motion.div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
 export default function NextTripPage() {
   const [selectedDay, setSelectedDay] = useState(0);
   const [isBookingPopupOpen, setIsBookingPopupOpen] = useState(false);
@@ -434,14 +675,23 @@ export default function NextTripPage() {
                 </span>
               </div>
 
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setIsBookingPopupOpen(true)}
-                className="px-6 sm:px-12 py-3 sm:py-5 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full font-bold text-white text-sm sm:text-lg shadow-2xl hover:shadow-purple-500/25 transition-all duration-300"
-              >
-                BOOK YOUR ADVENTURE NOW
-              </motion.button>
+              <div className="flex justify-center">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setIsBookingPopupOpen(true)}
+                  className="relative flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-purple-600/20 to-pink-600/20 border border-purple-500/30 rounded-full text-purple-300 hover:from-purple-600/30 hover:to-pink-600/30 hover:border-purple-500/50 transition-all duration-300 backdrop-blur-sm overflow-hidden font-medium text-lg"
+                >
+                <BorderBeam
+                  colorFrom="#8B5CF6"
+                  colorTo="#EC4899"
+                  borderWidth={2}
+                  duration={4}
+                />
+                  <span>✨</span>
+                  <span>Get Started</span>
+                </motion.button>
+              </div>
             </motion.div>
           </div>
         </div>
@@ -467,193 +717,23 @@ export default function NextTripPage() {
             </div>
           </BlurFade>
 
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            {/* Sid 3D Mascot */}
-            <BlurFade delay={0.2}>
-              <div className="relative">
-                <Sid3DMascot />
-              </div>
-            </BlurFade>
-
-            {/* Trip Details Card */}
+          <div className="flex justify-center">
+            {/* Trip Details Card - Full Width on Desktop */}
             <BlurFade delay={0.3}>
-              <TripDetailsCard trip={featuredTrip} />
+              <div className="w-full max-w-4xl">
+                <TripDetailsCard trip={featuredTrip} />
+              </div>
             </BlurFade>
           </div>
         </div>
       </section>
 
-      {/* Detailed Itinerary */}
-      <section className="relative py-32 bg-gradient-to-br from-purple-950/20 to-pink-950/20">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-12">
-          <BlurFade delay={0.1}>
-            <div className="text-center mb-16">
-              <h2 className="text-4xl sm:text-5xl font-black text-white mb-6">
-                DETAILED <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">ITINERARY</span>
-              </h2>
-              <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-                Every moment is planned for maximum fun, adventure, and unforgettable experiences.
-              </p>
-            </div>
-          </BlurFade>
-
-          {/* Day Selector */}
-          <div className="flex justify-center gap-2 sm:gap-4 mb-12 overflow-x-auto">
-            {featuredTrip.itinerary.map((day, index) => (
-              <motion.button
-                key={day.day}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setSelectedDay(index)}
-                className={cn(
-                  "px-4 sm:px-8 py-3 sm:py-4 rounded-full font-bold transition-all duration-300 whitespace-nowrap",
-                  selectedDay === index
-                    ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg"
-                    : "bg-black/40 border border-purple-500/30 text-gray-300 hover:border-purple-500/50"
-                )}
-              >
-                <div className="text-center">
-                  <div className="text-sm sm:text-lg">{day.day}</div>
-                  {day.date && <div className="text-xs opacity-80 hidden sm:block">{day.date}</div>}
-                </div>
-              </motion.button>
-            ))}
-          </div>
-
-          {/* Day Content */}
-          {featuredTrip.itinerary.length > 0 && featuredTrip.itinerary[selectedDay] && (
-            <motion.div
-              key={selectedDay}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="max-w-6xl mx-auto"
-            >
-              <div className="text-center mb-12">
-                <h3 className="text-3xl font-bold text-purple-400 mb-2">
-                  {featuredTrip.itinerary[selectedDay].title}
-                </h3>
-                {featuredTrip.itinerary[selectedDay].theme && (
-                  <p className="text-gray-400">{featuredTrip.itinerary[selectedDay].theme}</p>
-                )}
-              </div>
-
-              <div className="space-y-6">
-                {featuredTrip.itinerary[selectedDay].items.map((item, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                    className="bg-black/40 backdrop-blur-sm border border-purple-500/20 rounded-xl p-6 hover:border-purple-500/40 transition-all duration-300"
-                  >
-                    <div className="flex gap-6">
-                      <div className="flex-shrink-0">
-                        <div className="w-16 h-16 bg-purple-600/20 rounded-full flex items-center justify-center">
-                          <span className="text-2xl">{item.icon}</span>
-                        </div>
-                        <div className="text-center mt-2">
-                          <span className="text-purple-400 font-bold text-sm">{item.time}</span>
-                        </div>
-                      </div>
-                      
-                      <div className="flex-1">
-                        <h4 className="text-xl font-bold text-white mb-2">{item.activity}</h4>
-                        {item.description && (
-                          <p className="text-gray-300 mb-4">{item.description}</p>
-                        )}
-                        
-                        {item.included && item.included.length > 0 && (
-                          <div className="flex flex-wrap gap-2">
-                            {item.included.map((include, i) => (
-                              <span
-                                key={i}
-                                className="flex items-center gap-1 text-xs bg-green-500/20 text-green-400 px-3 py-1 rounded-full"
-                              >
-                                <Check className="w-3 h-3" />
-                                {include}
-                              </span>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
-          )}
-        </div>
-      </section>
-
-      {/* Gallery Section */}
-      <section className="relative py-32 bg-black overflow-hidden">
-        <div className="absolute inset-0">
-          <Meteors number={8} />
-          <div className="absolute top-20 left-20 w-[600px] h-[600px] bg-purple-600/20 rounded-full blur-[120px]" />
-          <div className="absolute bottom-20 right-20 w-[700px] h-[700px] bg-pink-600/20 rounded-full blur-[120px]" />
-        </div>
-
-        <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-12">
-          <BlurFade delay={0.1}>
-            <div className="text-center mb-16">
-              <h2 className="text-4xl sm:text-5xl font-black text-white mb-6">
-                CYPRUS <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">GALLERY</span>
-              </h2>
-              <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-                Immerse yourself in the Cyprus experience with stunning visuals from our adventures
-              </p>
-            </div>
-          </BlurFade>
-
-          <BlurFade delay={0.2}>
-            <div className="max-w-6xl mx-auto">
-              {/* Enhanced Image Carousel with database images */}
-              <TripImageCarousel 
-                images={featuredTrip.gallery}
-                className="w-full" 
-                autoPlay={true} 
-                autoPlayInterval={5000}
-                showControls={true}
-                showDots={true}
-              />
-              
-              {/* Gallery Features */}
-              <div className="grid md:grid-cols-3 gap-8 mt-16">
-                {[
-                  {
-                    icon: '🌅',
-                    title: 'Epic Sunsets',
-                    description: 'Witness breathtaking Mediterranean sunsets from exclusive beach venues and luxury yacht parties.'
-                  },
-                  {
-                    icon: '🎉',
-                    title: 'VIP Experiences',
-                    description: 'Skip the lines and enjoy exclusive access to the hottest clubs and beach parties in Cyprus.'
-                  },
-                  {
-                    icon: '🏛️',
-                    title: 'Cultural Adventures',
-                    description: 'Explore ancient ruins, traditional villages, and immerse yourself in rich Cypriot culture.'
-                  }
-                ].map((feature, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: index * 0.1 + 0.3 }}
-                    className="text-center p-6 bg-black/30 backdrop-blur-sm border border-purple-500/20 rounded-xl hover:border-purple-500/40 transition-all duration-300"
-                  >
-                    <span className="text-4xl mb-4 block">{feature.icon}</span>
-                    <h3 className="text-xl font-bold text-white mb-3">{feature.title}</h3>
-                    <p className="text-gray-400 leading-relaxed">{feature.description}</p>
-                  </motion.div>
-                ))}
-              </div>
-            </div>
-          </BlurFade>
-        </div>
-      </section>
+      {/* Expandable Trip Information Cards */}
+      <ExpandableCardsSection 
+        featuredTrip={featuredTrip} 
+        selectedDay={selectedDay} 
+        setSelectedDay={setSelectedDay} 
+      />
 
       {/* Booking Section */}
       <section id="booking" className="relative py-32 bg-gradient-to-br from-purple-950/30 to-pink-950/30">

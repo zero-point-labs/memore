@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { Instagram, Facebook, Youtube, Mail, Phone, MapPin, Heart } from 'lucide-react';
+import Image from 'next/image';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -46,7 +47,19 @@ export default function Footer() {
           {/* Brand Section */}
           <div className="lg:col-span-2 space-y-6">
             <div>
-              <h3 className="text-3xl font-black text-white mb-2">MEMORA</h3>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="relative">
+                  <div className="absolute inset-0 bg-purple-600 blur-lg opacity-50"></div>
+                  <Image
+                    src="/logo.png"
+                    alt="Memora Logo"
+                    width={56}
+                    height={56}
+                    className="relative object-contain"
+                  />
+                </div>
+                <h3 className="text-3xl font-black text-white">MEMORA</h3>
+              </div>
               <p className="text-gray-400">
                 Creating unforgettable 3-day adventures in Cyprus for students who want to party hard and explore harder.
               </p>
