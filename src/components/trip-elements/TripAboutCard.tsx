@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { MapPin, Calendar, Users, Clock, Sparkles, Star, Zap } from 'lucide-react';
+import { MapPin, Calendar, Users, Sparkles, Star, Zap } from 'lucide-react';
 import NumberTicker from '@/components/magicui/number-ticker';
 import { BorderBeam } from '@/components/magicui/border-beam';
 import { TripDocument } from '@/types/trip';

@@ -5,14 +5,7 @@ import { extend, useFrame } from '@react-three/fiber';
 import { shaderMaterial, Sparkles } from '@react-three/drei';
 import { useRef } from 'react';
 
-// TypeScript declaration for the custom material
-declare global {
-  namespace JSX {
-    interface IntrinsicElements {
-      portalMaterial: any;
-    }
-  }
-}
+// Remove global namespace declaration - not needed with primitive approach
 
 const PortalMaterial = shaderMaterial(
   // Uniforms
@@ -127,7 +120,7 @@ const PortalMaterial = shaderMaterial(
 extend({ PortalMaterial });
 
 export default function GlowingPortal() {
-  const portalMaterialRef = useRef<any>(null);
+  const portalMaterialRef = useRef<THREE.ShaderMaterial>(null);
 
   useFrame((state, delta) => {
     if (portalMaterialRef.current && portalMaterialRef.current.uniforms) {
@@ -140,19 +133,22 @@ export default function GlowingPortal() {
       {/* Main Portal Disc */}
       <mesh rotation={[-Math.PI / 2, 0, 0]}>
         <circleGeometry args={[3, 64]} />
-        <portalMaterial 
-          ref={portalMaterialRef} 
-          transparent 
-          uTime={0}
-          uColorStart={new THREE.Color('#ec4899')}
-          uColorEnd={new THREE.Color('#8b5cf6')}
+        <primitive 
+          object={new PortalMaterial({
+            transparent: true,
+            uTime: 0,
+            uColorStart: new THREE.Color('#ec4899'),
+            uColorEnd: new THREE.Color('#8b5cf6')
+          })}
+          ref={portalMaterialRef}
+          attach="material"
         />
       </mesh>
       
       {/* Enhanced Glow Layers */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.05, 0]}>
         <circleGeometry args={[3.5, 64]} />
-        <meshBasicMaterial
+        <meshStandardMaterial
           color="#00ffff"
           transparent
           opacity={0.3}
@@ -163,7 +159,7 @@ export default function GlowingPortal() {
       
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.1, 0]}>
         <circleGeometry args={[4, 64]} />
-        <meshBasicMaterial
+        <meshStandardMaterial
           color="#8a2be2"
           transparent
           opacity={0.2}

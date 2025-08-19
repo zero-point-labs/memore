@@ -5,14 +5,7 @@ import { extend, useFrame } from '@react-three/fiber';
 import { shaderMaterial } from '@react-three/drei';
 import { useRef } from 'react';
 
-// TypeScript declaration for the custom material
-declare global {
-  namespace JSX {
-    interface IntrinsicElements {
-      smokeMaterial: any;
-    }
-  }
-}
+// Remove global namespace declaration - not needed with primitive approach
 
 const SmokeMaterial = shaderMaterial(
   // Uniforms
@@ -97,7 +90,7 @@ const SmokeMaterial = shaderMaterial(
 extend({ SmokeMaterial });
 
 export default function PortalSmoke() {
-  const smokeMaterialRef = useRef<any>(null);
+  const smokeMaterialRef = useRef<THREE.ShaderMaterial>(null);
 
   useFrame((state, delta) => {
     if (smokeMaterialRef.current && smokeMaterialRef.current.uniforms) {
@@ -108,12 +101,15 @@ export default function PortalSmoke() {
   return (
     <mesh position={[0, -1.0, 0]}>
       <cylinderGeometry args={[2.5, 2.5, 2, 64, 1, true]} />
-      <smokeMaterial 
-        ref={smokeMaterialRef} 
-        transparent 
-        side={THREE.DoubleSide}
-        uTime={0}
-        uColor={new THREE.Color('#8b5cf6')}
+      <primitive 
+        object={new SmokeMaterial({
+          transparent: true,
+          side: THREE.DoubleSide,
+          uTime: 0,
+          uColor: new THREE.Color('#8b5cf6')
+        })}
+        ref={smokeMaterialRef}
+        attach="material"
       />
     </mesh>
   );
