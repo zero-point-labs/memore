@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-// Header provided by ConditionalLayout
+import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { fadeInUp, fadeIn } from '@/utils/animationVariants';
 
@@ -10,7 +10,7 @@ export default function TermsPage() {
 
   return (
     <div className="min-h-screen bg-black">
-      {/* Header provided by ConditionalLayout */}
+      <Header />
       
       {/* Hero Section */}
       <section className="relative pt-32 pb-20 bg-gradient-to-br from-purple-950/30 to-pink-950/30">

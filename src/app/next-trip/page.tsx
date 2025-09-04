@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import { MapPin, Calendar, Users, Check, ArrowRight, Clock } from 'lucide-react';
 import Link from 'next/link';
+import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import BookingFormPopup from '@/components/BookingFormPopup';
 import TripImageCarousel from '@/components/trip-elements/TripImageCarousel';
@@ -613,8 +614,10 @@ export default function NextTripPage() {
 
   return (
     <div className="min-h-screen bg-black">
+      <Header />
+      
       {/* Hero Section */}
-      <section className="relative min-h-screen overflow-hidden pt-24 sm:pt-28">
+      <section className="relative min-h-screen overflow-hidden pt-20">
         {/* Video Background */}
         <div className="absolute inset-0 z-0">
           <video

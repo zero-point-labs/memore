@@ -3,7 +3,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
 import { Mail, MessageCircle, Phone, MapPin, Clock, Send, CheckCircle, AlertCircle, Globe, HelpCircle, CreditCard } from 'lucide-react';
-// Header provided by ConditionalLayout
+import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Meteors } from '@/components/magicui/meteors';
 import OrbitingCircles from '@/components/magicui/orbiting-circles';
@@ -486,7 +486,7 @@ function FAQSection() {
 export default function ContactPage() {
   return (
     <div className="min-h-screen bg-black">
-      {/* Header provided by ConditionalLayout */}
+      <Header />
       
       {/* Hero Section */}
       <section className="relative pt-32 pb-16 overflow-hidden">

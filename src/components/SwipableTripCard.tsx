@@ -374,7 +374,7 @@ export default function SwipableTripCard({ onBookingClick, className }: Swipable
         </div>
 
         {/* Animated Card Content */}
-        <div className="relative h-[850px] md:h-[950px]">
+        <div className="relative h-[1000px] sm:h-[950px] md:h-[950px]">
           <AnimatePresence initial={false} custom={direction === 'next' ? 1 : -1}>
             <motion.div
               key={currentTrip.$id}
@@ -396,7 +396,7 @@ export default function SwipableTripCard({ onBookingClick, className }: Swipable
               className="absolute inset-0 cursor-grab active:cursor-grabbing"
             >
               {/* Background Image - More prominent */}
-              <div className="absolute top-0 left-0 right-0 h-80 md:h-96">
+              <div className="absolute top-0 left-0 right-0 h-72 sm:h-80 md:h-96">
                 <img
                   src={(() => {
                     if (!Array.isArray(currentTrip.gallery) || currentTrip.gallery.length === 0) return '';
@@ -420,12 +420,12 @@ export default function SwipableTripCard({ onBookingClick, className }: Swipable
                 </div>
 
                 {/* Spacer to push content below image but show status badge */}
-                <div className="h-72 md:h-80 flex items-end">
+                <div className="h-60 sm:h-72 md:h-80 flex items-end">
                   <TripStatusBadge trip={currentTrip} />
                 </div>
 
                 {/* Main Content Section */}
-                <div className="bg-black/50 backdrop-blur-md rounded-2xl p-6 md:p-8 mt-4 relative z-20 border border-purple-500/20">
+                <div className="bg-black/50 backdrop-blur-md rounded-2xl p-4 sm:p-6 md:p-8 mt-4 relative z-20 border border-purple-500/20">
                   {/* Title */}
                   <motion.div
                     key={currentTrip.title}
@@ -434,14 +434,14 @@ export default function SwipableTripCard({ onBookingClick, className }: Swipable
                     transition={{ delay: 0.1 }}
                     className="text-center mb-6"
                   >
-                    <h3 className="text-3xl md:text-4xl font-black text-white mb-4">
+                    <h3 className="text-2xl sm:text-3xl md:text-4xl font-black text-white mb-3">
                       <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">
                         {currentTrip.location.split(',')[0]}
                       </span>{' '}
                       <span className="text-white">Experience</span>
                     </h3>
                     
-                    <p className="text-gray-300 text-lg leading-relaxed">
+                    <p className="text-gray-300 text-base sm:text-lg leading-relaxed">
                       An incredible {currentTrip.duration}-day journey through the Mediterranean paradise, 
                       designed for maximum adventure and unforgettable memories.
                     </p>
@@ -500,17 +500,17 @@ export default function SwipableTripCard({ onBookingClick, className }: Swipable
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.4 }}
-                    className="mb-6"
+                    className="mb-4 sm:mb-6"
                   >
                     {/* Mobile: Horizontal scroll, Desktop: 2x2 grid */}
-                    <div className="md:grid md:grid-cols-2 md:gap-3 flex md:flex-none gap-3 overflow-x-auto md:overflow-x-visible scrollbar-hide pb-2">
+                    <div className="md:grid md:grid-cols-2 md:gap-3 flex md:flex-none gap-2 sm:gap-3 overflow-x-auto md:overflow-x-visible scrollbar-hide pb-2">
                       {[
                         { icon: '🏖️', text: 'Beach Access' },
                         { icon: '🎉', text: 'VIP Clubs' },
                         { icon: '🛥️', text: 'Yacht Parties' },
                         { icon: '🌅', text: 'Sunset Views' }
                       ].map((feature, index) => (
-                        <div key={index} className="flex md:flex-col items-center gap-2 md:gap-1 text-xs text-gray-300 bg-white/5 rounded-lg p-2 md:p-3 min-w-[120px] md:min-w-0 text-center whitespace-nowrap md:whitespace-normal">
+                        <div key={index} className="flex md:flex-col items-center gap-1 md:gap-1 text-xs text-gray-300 bg-white/5 rounded-lg p-2 md:p-3 min-w-[100px] md:min-w-0 text-center whitespace-nowrap md:whitespace-normal">
                           <span className="text-sm md:text-base">{feature.icon}</span>
                           <span className="font-medium">{feature.text}</span>
                         </div>
