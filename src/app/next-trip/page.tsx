@@ -4,7 +4,6 @@ import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import { MapPin, Calendar, Users, Check, ArrowRight, Clock } from 'lucide-react';
 import Link from 'next/link';
-import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import BookingFormPopup from '@/components/BookingFormPopup';
 import TripImageCarousel from '@/components/trip-elements/TripImageCarousel';
@@ -19,6 +18,7 @@ import { fadeInUp, fadeIn } from '@/utils/animationVariants';
 import { cn } from '@/utils/cn';
 import TripAboutCard from '@/components/trip-elements/TripAboutCard';
 import { BorderBeam } from '@/components/magicui/border-beam';
+import EnhancedGetStartedButton from '@/components/EnhancedGetStartedButton';
 
 // Note: Trip data now comes from database via tripService.getNextTrip() (date-based)
 
@@ -613,10 +613,8 @@ export default function NextTripPage() {
 
   return (
     <div className="min-h-screen bg-black">
-      <Header />
-      
       {/* Hero Section */}
-      <section className="relative min-h-screen overflow-hidden pt-20">
+      <section className="relative min-h-screen overflow-hidden pt-24 sm:pt-28">
         {/* Video Background */}
         <div className="absolute inset-0 z-0">
           <video
@@ -676,21 +674,10 @@ export default function NextTripPage() {
               </div>
 
               <div className="flex justify-center">
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
+                <EnhancedGetStartedButton 
                   onClick={() => setIsBookingPopupOpen(true)}
-                  className="relative flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-purple-600/20 to-pink-600/20 border border-purple-500/30 rounded-full text-purple-300 hover:from-purple-600/30 hover:to-pink-600/30 hover:border-purple-500/50 transition-all duration-300 backdrop-blur-sm overflow-hidden font-medium text-lg"
-                >
-                <BorderBeam
-                  colorFrom="#8B5CF6"
-                  colorTo="#EC4899"
-                  borderWidth={2}
-                  duration={4}
+                  className="shadow-2xl hover:shadow-purple-500/25"
                 />
-                  <span>✨</span>
-                  <span>Get Started</span>
-                </motion.button>
               </div>
             </motion.div>
           </div>

@@ -334,56 +334,6 @@ export default function BlogSection() {
           </motion.div>
         )}
 
-        {/* Upcoming Events - Smaller Card */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.5 }}
-          className="mt-16"
-        >
-          <div className="max-w-4xl mx-auto">
-            <h3 className="text-xl font-bold text-white mb-6 text-center">
-              Upcoming Cyprus Events
-            </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {[
-                { date: 'Apr 15', title: 'Spring Break Takeover', location: 'Ayia Napa', spots: 12 },
-                { date: 'May 2', title: 'Sunset Yacht Party', location: 'Limassol', spots: 8 },
-                { date: 'May 20', title: 'Beach Club Weekend', location: 'Larnaca', spots: 15 },
-              ].map((event, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: index * 0.1 }}
-                  whileHover={{ y: -2 }}
-                  className="bg-white/5 backdrop-blur-sm border border-purple-500/20 rounded-xl p-4 hover:bg-white/10 transition-all duration-300"
-                >
-                  <div className="flex items-start justify-between mb-2">
-                    <div className="text-purple-400 text-sm font-semibold">{event.date}</div>
-                    <div className="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded-full">
-                      {event.spots} spots left
-                    </div>
-                  </div>
-                  <h4 className="text-white font-semibold mb-1">{event.title}</h4>
-                  <p className="text-gray-400 text-sm flex items-center gap-1">
-                    <span>📍</span> {event.location}
-                  </p>
-                </motion.div>
-              ))}
-            </div>
-            <div className="text-center mt-6">
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="text-purple-400 text-sm font-medium hover:text-purple-300 transition-colors"
-              >
-                View All Events →
-              </motion.button>
-            </div>
-          </div>
-        </motion.div>
       </div>
     </section>
   );

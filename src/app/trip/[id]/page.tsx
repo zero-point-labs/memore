@@ -5,7 +5,6 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { MapPin, Calendar, Users, Check, ArrowRight, Clock, ArrowLeft, Star } from 'lucide-react';
 import Link from 'next/link';
-import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import BookingFormPopup from '@/components/BookingFormPopup';
 import TripImageCarousel from '@/components/trip-elements/TripImageCarousel';
@@ -20,6 +19,7 @@ import { fadeInUp, fadeIn } from '@/utils/animationVariants';
 import { cn } from '@/utils/cn';
 import TripAboutCard from '@/components/trip-elements/TripAboutCard';
 import { BorderBeam } from '@/components/magicui/border-beam';
+import EnhancedGetStartedButton from '@/components/EnhancedGetStartedButton';
 
 // Note: Trip data now comes from database via tripService.getTrip() (ID-based)
 
@@ -613,8 +613,7 @@ export default function TripPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-black">
-        <Header />
-        <div className="flex items-center justify-center min-h-screen">
+        <div className="flex items-center justify-center min-h-screen pt-20">
           <div className="text-center">
             <div className="w-12 h-12 border-4 border-purple-500/30 border-t-purple-500 rounded-full animate-spin mx-auto mb-4" />
             <div className="text-white">Loading trip details...</div>
@@ -628,8 +627,7 @@ export default function TripPage() {
   if (error || !trip) {
     return (
       <div className="min-h-screen bg-black">
-        <Header />
-        <div className="flex items-center justify-center min-h-screen">
+        <div className="flex items-center justify-center min-h-screen pt-20">
           <div className="text-center">
             <div className="text-red-400 text-xl mb-4">{error || 'Trip not found'}</div>
             <Link
@@ -662,23 +660,8 @@ export default function TripPage() {
 
   return (
     <div className="min-h-screen bg-black">
-      <Header />
-      
-      {/* Back Navigation */}
-      <div className="relative z-10 pt-24 pb-8">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-12">
-          <Link
-            href="/next-trip"
-            className="inline-flex items-center gap-2 text-purple-300 hover:text-white transition-colors"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Back to All Trips
-          </Link>
-        </div>
-      </div>
-      
       {/* Hero Section */}
-      <section className="relative min-h-screen overflow-hidden">
+      <section className="relative min-h-screen overflow-hidden pt-24 sm:pt-28">
         {/* Video Background */}
         <div className="absolute inset-0 z-0">
           <video
@@ -751,21 +734,10 @@ export default function TripPage() {
 
               {isUpcoming && (
                 <div className="flex justify-center">
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
+                <EnhancedGetStartedButton 
                   onClick={() => setIsBookingPopupOpen(true)}
-                    className="relative flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-purple-600/20 to-pink-600/20 border border-purple-500/30 rounded-full text-purple-300 hover:from-purple-600/30 hover:to-pink-600/30 hover:border-purple-500/50 transition-all duration-300 backdrop-blur-sm overflow-hidden font-medium text-lg"
-                  >
-                  <BorderBeam
-                    colorFrom="#8B5CF6"
-                    colorTo="#EC4899"
-                    borderWidth={2}
-                    duration={4}
-                  />
-                    <span>✨</span>
-                    <span>Get Started</span>
-                </motion.button>
+                  className="shadow-2xl hover:shadow-purple-500/25"
+                />
                 </div>
               )}
               

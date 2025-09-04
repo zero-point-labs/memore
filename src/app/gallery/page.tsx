@@ -3,7 +3,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import { Calendar, MapPin, Users, Heart, Eye, Share2, Download, Search, Grid, List, Play, X } from 'lucide-react';
-import Header from '@/components/Header';
+// Header provided by ConditionalLayout
 import Footer from '@/components/Footer';
 import { Meteors } from '@/components/magicui/meteors';
 import NumberTicker from '@/components/magicui/number-ticker';
@@ -556,7 +556,7 @@ export default function GalleryPage() {
 
   return (
     <div className="min-h-screen bg-black">
-      <Header />
+      {/* Header provided by ConditionalLayout */}
       
       {/* Hero Section */}
       <section className="relative pt-32 pb-16 overflow-hidden">

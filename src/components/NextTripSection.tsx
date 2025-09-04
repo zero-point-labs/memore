@@ -5,7 +5,8 @@ import { useState, useEffect, useRef } from 'react';
 import { isMobile } from '@/utils/isMobile';
 import Mascot3D from '@/components/trip-elements/Mascot3D';
 import TripImageCarousel from '@/components/trip-elements/TripImageCarousel';
-import TripAboutCard from '@/components/trip-elements/TripAboutCard';
+// import TripAboutCard from '@/components/trip-elements/TripAboutCard';
+import SwipableTripCard from '@/components/SwipableTripCard';
 import BookingFormPopup from '@/components/BookingFormPopup';
 import { Meteors } from '@/components/magicui/meteors';
 import NumberTicker from '@/components/magicui/number-ticker';
@@ -144,7 +145,7 @@ const TripSectionContent = ({ isHomepage, featuredTrip }: { isHomepage: boolean,
                 size={3}
               />
               <motion.h2 className="text-4xl sm:text-5xl lg:text-6xl font-black mb-6 relative z-10">
-                <span className="text-white">{featuredTrip.title.toUpperCase()} </span>
+                <span className="text-white">CYPRUS </span>
                 <motion.span
                   className="text-transparent bg-clip-text"
                   animate={{ backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'] }}
@@ -156,17 +157,17 @@ const TripSectionContent = ({ isHomepage, featuredTrip }: { isHomepage: boolean,
                     textShadow: '0 0 20px rgba(236, 72, 153, 0.8)'
                   }}
                 >
-                  AWAITS
+                  ADVENTURES
                 </motion.span>
               </motion.h2>
               <p className="text-gray-300 text-lg max-w-3xl mx-auto leading-relaxed">
-                {featuredTrip.description}
+                Swipe through our incredible Cyprus experiences and find your perfect adventure
               </p>
             </motion.div>
 {isHomepage ? (
               // Homepage Layout: Desktop - Side by side (Harley left, About right), Mobile - Original stacked order
               <>
-                {/* Trip About Card - Top Center, Large */}
+                {/* Swipable Trip Card - Top Center, Large */}
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
@@ -175,7 +176,9 @@ const TripSectionContent = ({ isHomepage, featuredTrip }: { isHomepage: boolean,
                   className="flex justify-center mb-16"
                 >
                   <div className="w-full max-w-4xl">
-                    <TripAboutCard trip={featuredTrip} />
+                    <SwipableTripCard 
+                      onBookingClick={() => setIsBookingPopupOpen(true)}
+                    />
                   </div>
                 </motion.div>
 

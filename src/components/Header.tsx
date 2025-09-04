@@ -1,18 +1,19 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { User, Compass, Camera, MessageSquare, FileText } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { User, Compass, Camera, MessageSquare, FileText, X } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useAuth } from '@/contexts/AuthContext';
-import AnimatedHamburgerIcon from './AnimatedHamburgerIcon';
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const { user, loading } = useAuth();
+  const menuRef = useRef<HTMLDivElement>(null);
 
+  // Handle scroll effect
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
@@ -22,6 +23,31 @@ export default function Header() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Handle body scroll lock when menu is open
+  useEffect(() => {
+    if (isMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isMenuOpen]);
+
+  // Handle escape key press
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isMenuOpen) {
+        setIsMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [isMenuOpen]);
+
   const navItems = [
     { label: 'Next Trip', href: '/next-trip', icon: <Compass size={20} /> },
     { label: 'Gallery', href: '/gallery', icon: <Camera size={20} /> },
@@ -29,173 +55,224 @@ export default function Header() {
     { label: 'Contact', href: '/contact', icon: <MessageSquare size={20} /> },
   ];
 
-  const menuVariants = {
-    hidden: {
-      opacity: 0,
-      scale: 0.95,
-      transition: {
-        duration: 0.2,
-      },
-    },
-    visible: {
-      opacity: 1,
-      scale: 1,
-      transition: {
-        duration: 0.2,
-        staggerChildren: 0.1,
-      },
-    },
-  };
+  const closeMenu = () => setIsMenuOpen(false);
+  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
-  const navItemVariants = {
-    hidden: {
-      opacity: 0,
-      y: 20,
-    },
-    visible: {
-      opacity: 1,
-      y: 0,
-    },
-  };
+  // Modern hamburger component with better mobile UX
+  const HamburgerMenu = ({ isOpen, onClick }: { isOpen: boolean; onClick: () => void }) => (
+    <button
+      onClick={onClick}
+      className="relative w-14 h-14 flex items-center justify-center rounded-xl bg-black/90 backdrop-blur-md border-2 border-white/40 hover:bg-white/10 hover:border-purple-400/60 transition-all duration-200 touch-manipulation shadow-2xl ring-2 ring-purple-500/20"
+      aria-label={isOpen ? 'Close menu' : 'Open menu'}
+      aria-expanded={isOpen}
+      style={{ zIndex: 10000 }}
+    >
+      <div className="w-7 h-7 flex flex-col items-center justify-center">
+        <motion.span
+          className="block w-6 h-1 bg-white rounded-full shadow-lg border border-white/20"
+          animate={isOpen ? { rotate: 45, y: 2 } : { rotate: 0, y: -2 }}
+          transition={{ duration: 0.3, ease: 'easeInOut' }}
+          style={{ minHeight: '4px' }}
+        />
+        <motion.span
+          className="block w-6 h-1 bg-white rounded-full mt-1 shadow-lg border border-white/20"
+          animate={isOpen ? { opacity: 0 } : { opacity: 1 }}
+          transition={{ duration: 0.2 }}
+          style={{ minHeight: '4px' }}
+        />
+        <motion.span
+          className="block w-6 h-1 bg-white rounded-full mt-1 shadow-lg border border-white/20"
+          animate={isOpen ? { rotate: -45, y: -2 } : { rotate: 0, y: 2 }}
+          transition={{ duration: 0.3, ease: 'easeInOut' }}
+          style={{ minHeight: '4px' }}
+        />
+      </div>
+    </button>
+  );
 
   return (
-    <motion.header
-      initial={{ y: -100 }}
-      animate={{ y: 0 }}
-      transition={{ duration: 0.5 }}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled ? 'bg-black/80 backdrop-blur-xl border-b border-purple-500/20' : ''
-      }`}
-    >
-      <div className="container mx-auto px-4 sm:px-6 lg:px-12">
-        <div className="flex items-center justify-between h-20">
-          {/* Logo */}
-          <Link href="/">
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              className="flex items-center gap-3 cursor-pointer"
-            >
-              <div className="relative">
-                <div className="absolute inset-0 bg-purple-600 blur-lg opacity-50"></div>
-                <Image
-                  src="/logo.png"
-                  alt="Memora Logo"
-                  width={48}
-                  height={48}
-                  className="relative object-contain"
-                />
-              </div>
-              <span className="text-2xl font-black text-white">MEMORA</span>
-            </motion.div>
-          </Link>
-
-          {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-8">
-            {navItems.map((item, index) => (
+    <>
+      <motion.header
+        initial={{ y: -100 }}
+        animate={{ y: 0 }}
+        transition={{ duration: 0.5 }}
+        className={`fixed top-0 left-0 right-0 z-[9999] isolation-auto transition-all duration-300 ${
+          isScrolled || isMenuOpen 
+            ? 'bg-black/90 backdrop-blur-xl border-b border-purple-500/20' 
+            : 'bg-black/50 backdrop-blur-md'
+        }`}
+      >
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-20 w-full overflow-visible">
+            {/* Logo */}
+            <Link href="/" className="relative z-[9999]">
               <motion.div
-                key={item.label}
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.98 }}
+                className="flex items-center gap-2 sm:gap-3 cursor-pointer"
               >
-                <Link
-                  href={item.href}
-                  className="relative text-gray-300 hover:text-white transition-colors group"
-                >
-                  {item.label}
-                  <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-gradient-to-r from-purple-400 to-pink-400 group-hover:w-full transition-all duration-300"></span>
-                </Link>
+                <div className="relative">
+                  <div className="absolute inset-0 bg-purple-600 blur-lg opacity-50"></div>
+                  <Image
+                    src="/logo.png"
+                    alt="Memora Logo"
+                    width={40}
+                    height={40}
+                    className="relative object-contain sm:w-12 sm:h-12"
+                  />
+                </div>
+                <span className="text-xl sm:text-2xl font-black text-white tracking-wide">
+                  MEMORA
+                </span>
               </motion.div>
-            ))}
-          </nav>
+            </Link>
 
-          {/* CTA Button */}
-          {!loading && (
-            user ? (
-              <Link href="/account">
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="hidden lg:flex items-center gap-2 relative px-6 py-2.5 overflow-hidden rounded-lg font-bold text-sm"
+            {/* Desktop Navigation */}
+            <nav className="hidden lg:flex items-center gap-8">
+              {navItems.map((item, index) => (
+                <motion.div
+                  key={item.label}
+                  initial={{ opacity: 0, y: -20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
                 >
-                  <span className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600"></span>
-                  <span className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 blur-lg opacity-50"></span>
-                  <User className="relative w-4 h-4 text-white" />
-                  <span className="relative text-white">ACCOUNT</span>
-                </motion.button>
-              </Link>
-            ) : (
-              <Link href="/auth/signup">
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="hidden lg:block relative px-6 py-2.5 overflow-hidden rounded-lg font-bold text-sm"
-                >
-                  <span className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600"></span>
-                  <span className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 blur-lg opacity-50"></span>
-                  <span className="relative text-white">SIGN UP</span>
-                </motion.button>
-              </Link>
-            )
-          )}
-
-          {/* Mobile Menu Button */}
-          <div className="lg:hidden relative z-50">
-            <AnimatedHamburgerIcon
-              isOpen={isMenuOpen}
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Mobile Menu */}
-      <AnimatePresence>
-        {isMenuOpen && (
-          <motion.div
-            variants={menuVariants}
-            initial="hidden"
-            animate="visible"
-            exit="hidden"
-            className="lg:hidden fixed inset-0 bg-black/90 backdrop-blur-xl z-40 flex flex-col items-center justify-center"
-          >
-            <nav className="flex flex-col items-center gap-8">
-              {navItems.map((item) => (
-                <motion.div key={item.label} variants={navItemVariants}>
                   <Link
                     href={item.href}
-                    onClick={() => setIsMenuOpen(false)}
-                    className="flex items-center gap-4 text-2xl text-gray-300 hover:text-white transition-colors group w-full max-w-xs p-4 rounded-lg bg-white/5 border border-white/10"
+                    className="relative text-gray-300 hover:text-white transition-colors group font-medium"
                   >
-                    <span className="bg-gradient-to-r from-purple-500 to-pink-500 p-2 rounded-md">
-                      {item.icon}
-                    </span>
-                    <span>{item.label}</span>
+                    {item.label}
+                    <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-gradient-to-r from-purple-400 to-pink-400 group-hover:w-full transition-all duration-300"></span>
                   </Link>
                 </motion.div>
               ))}
-              <motion.div variants={navItemVariants} className="mt-8 w-full max-w-xs">
-                {!loading && (
-                  user ? (
-                    <Link href="/account" onClick={() => setIsMenuOpen(false)}>
-                      <button className="w-full px-6 py-4 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg font-bold text-white flex items-center justify-center gap-2 text-lg">
-                        <User size={20} />
-                        ACCOUNT
-                      </button>
-                    </Link>
-                  ) : (
-                    <Link href="/auth/signup" onClick={() => setIsMenuOpen(false)}>
-                      <button className="w-full px-6 py-4 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg font-bold text-white text-lg">
-                        SIGN UP
-                      </button>
-                    </Link>
-                  )
-                )}
-              </motion.div>
             </nav>
+
+            {/* Desktop CTA Button */}
+            <div className="hidden lg:flex items-center gap-4">
+              {!loading && (
+                user ? (
+                  <Link href="/account">
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl font-bold text-sm text-white shadow-lg hover:shadow-purple-500/25 transition-all duration-300"
+                    >
+                      <User className="w-4 h-4" />
+                      ACCOUNT
+                    </motion.button>
+                  </Link>
+                ) : (
+                  <Link href="/auth/signup">
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      className="px-6 py-2.5 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl font-bold text-sm text-white shadow-lg hover:shadow-purple-500/25 transition-all duration-300"
+                    >
+                      SIGN UP
+                    </motion.button>
+                  </Link>
+                )
+              )}
+            </div>
+
+            {/* Mobile Menu Button */}
+            <div className="flex md:hidden sm:flex xs:flex relative min-w-0 flex-shrink-0" style={{ zIndex: 10000 }}>
+              <HamburgerMenu isOpen={isMenuOpen} onClick={toggleMenu} />
+            </div>
+          </div>
+        </div>
+      </motion.header>
+
+      {/* Mobile Menu Overlay */}
+      <AnimatePresence>
+        {isMenuOpen && (
+          <motion.div
+            ref={menuRef}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="lg:hidden fixed inset-0 z-[9998]"
+            onClick={closeMenu}
+          >
+            {/* Backdrop */}
+            <div className="absolute inset-0 bg-black/80 backdrop-blur-md" />
+            
+            {/* Menu Content */}
+            <motion.div
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'tween', duration: 0.3, ease: 'easeInOut' }}
+              className="absolute right-0 top-0 h-full w-80 max-w-[85vw] bg-black/95 backdrop-blur-xl border-l border-purple-500/20"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Close Button */}
+              <div className="flex justify-end p-6">
+                <button
+                  onClick={closeMenu}
+                  className="w-10 h-10 flex items-center justify-center rounded-xl bg-white/10 hover:bg-white/20 transition-colors"
+                  aria-label="Close menu"
+                >
+                  <X size={20} className="text-white" />
+                </button>
+              </div>
+
+              {/* Navigation */}
+              <nav className="px-6 pb-8">
+                <div className="space-y-4">
+                  {navItems.map((item, index) => (
+                    <motion.div
+                      key={item.label}
+                      initial={{ opacity: 0, x: 50 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.1 + 0.2 }}
+                    >
+                      <Link
+                        href={item.href}
+                        onClick={closeMenu}
+                        className="flex items-center gap-4 p-4 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-purple-400/30 transition-all duration-300 group"
+                      >
+                        <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500">
+                          {item.icon}
+                        </div>
+                        <span className="text-lg font-medium text-white group-hover:text-purple-300 transition-colors">
+                          {item.label}
+                        </span>
+                      </Link>
+                    </motion.div>
+                  ))}
+                </div>
+
+                {/* Mobile CTA */}
+                <motion.div
+                  initial={{ opacity: 0, x: 50 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: navItems.length * 0.1 + 0.3 }}
+                  className="mt-8 pt-6 border-t border-white/10"
+                >
+                  {!loading && (
+                    user ? (
+                      <Link href="/account" onClick={closeMenu}>
+                        <button className="w-full flex items-center justify-center gap-2 p-4 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl font-bold text-white shadow-lg">
+                          <User size={20} />
+                          ACCOUNT
+                        </button>
+                      </Link>
+                    ) : (
+                      <Link href="/auth/signup" onClick={closeMenu}>
+                        <button className="w-full p-4 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl font-bold text-white shadow-lg">
+                          SIGN UP
+                        </button>
+                      </Link>
+                    )
+                  )}
+                </motion.div>
+              </nav>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
-    </motion.header>
+    </>
   );
 }

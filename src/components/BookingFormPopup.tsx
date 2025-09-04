@@ -1,9 +1,61 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { useState } from 'react';
-import { X } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { X, ChevronDown, Search } from 'lucide-react';
 import { cn } from '@/utils/cn';
+
+// Country data with flags and codes
+const countries = [
+  { code: '+357', name: 'Cyprus', flag: '🇨🇾', key: 'CY' },
+  { code: '+30', name: 'Greece', flag: '🇬🇷', key: 'GR' },
+  { code: '+1', name: 'United States', flag: '🇺🇸', key: 'US' },
+  { code: '+1', name: 'Canada', flag: '🇨🇦', key: 'CA' },
+  { code: '+44', name: 'United Kingdom', flag: '🇬🇧', key: 'GB' },
+  { code: '+49', name: 'Germany', flag: '🇩🇪', key: 'DE' },
+  { code: '+33', name: 'France', flag: '🇫🇷', key: 'FR' },
+  { code: '+39', name: 'Italy', flag: '🇮🇹', key: 'IT' },
+  { code: '+34', name: 'Spain', flag: '🇪🇸', key: 'ES' },
+  { code: '+31', name: 'Netherlands', flag: '🇳🇱', key: 'NL' },
+  { code: '+46', name: 'Sweden', flag: '🇸🇪', key: 'SE' },
+  { code: '+47', name: 'Norway', flag: '🇳🇴', key: 'NO' },
+  { code: '+45', name: 'Denmark', flag: '🇩🇰', key: 'DK' },
+  { code: '+41', name: 'Switzerland', flag: '🇨🇭', key: 'CH' },
+  { code: '+43', name: 'Austria', flag: '🇦🇹', key: 'AT' },
+  { code: '+32', name: 'Belgium', flag: '🇧🇪', key: 'BE' },
+  { code: '+351', name: 'Portugal', flag: '🇵🇹', key: 'PT' },
+  { code: '+90', name: 'Turkey', flag: '🇹🇷', key: 'TR' },
+  { code: '+7', name: 'Russia', flag: '🇷🇺', key: 'RU' },
+  { code: '+48', name: 'Poland', flag: '🇵🇱', key: 'PL' },
+  { code: '+420', name: 'Czech Republic', flag: '🇨🇿', key: 'CZ' },
+  { code: '+36', name: 'Hungary', flag: '🇭🇺', key: 'HU' },
+  { code: '+40', name: 'Romania', flag: '🇷🇴', key: 'RO' },
+  { code: '+359', name: 'Bulgaria', flag: '🇧🇬', key: 'BG' },
+  { code: '+385', name: 'Croatia', flag: '🇭🇷', key: 'HR' },
+  { code: '+386', name: 'Slovenia', flag: '🇸🇮', key: 'SI' },
+  { code: '+421', name: 'Slovakia', flag: '🇸🇰', key: 'SK' },
+  { code: '+370', name: 'Lithuania', flag: '🇱🇹', key: 'LT' },
+  { code: '+371', name: 'Latvia', flag: '🇱🇻', key: 'LV' },
+  { code: '+372', name: 'Estonia', flag: '🇪🇪', key: 'EE' }
+];
+
+// Cyprus Universities (Republic of Cyprus - Greek Cypriot controlled areas)
+const cyprusUniversities = [
+  // Public Universities
+  'University of Cyprus',
+  'Open University of Cyprus',
+  'Cyprus University of Technology',
+  // Private Universities  
+  'Frederick University',
+  'European University Cyprus',
+  'University of Nicosia',
+  'Neapolis University Paphos',
+  'UCLan Cyprus (University of Central Lancashire Cyprus)',
+  'Philips University',
+  'American University of Cyprus (AUCY)',
+  'University of Limassol',
+  'American University of Beirut – Mediterraneo (AUB Mediterraneo)'
+];
 
 interface BookingFormPopupProps {
   isOpen: boolean;
@@ -11,10 +63,13 @@ interface BookingFormPopupProps {
 }
 
 export default function BookingFormPopup({ isOpen, onClose }: BookingFormPopupProps) {
+  const cyprusCountry = countries.find(country => country.key === 'CY') || countries[0];
+  
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
     email: '',
+    phoneCountry: cyprusCountry, // Default to Cyprus
     phone: '',
     university: '',
     transportPreference: 'bus',
@@ -25,6 +80,32 @@ export default function BookingFormPopup({ isOpen, onClose }: BookingFormPopupPr
   });
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // Dropdown states
+  const [showCountryDropdown, setShowCountryDropdown] = useState(false);
+  const [showUniversityDropdown, setShowUniversityDropdown] = useState(false);
+  const [universitySearch, setUniversitySearch] = useState('');
+  const [countrySearch, setCountrySearch] = useState('');
+
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Element;
+      if (!target.closest('.country-dropdown-container')) {
+        setShowCountryDropdown(false);
+        setCountrySearch('');
+      }
+      if (!target.closest('.university-dropdown-container')) {
+        setShowUniversityDropdown(false);
+        setUniversitySearch('');
+      }
+    };
+
+    if (showCountryDropdown || showUniversityDropdown) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [showCountryDropdown, showUniversityDropdown]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     setFormData(prev => ({
@@ -48,12 +129,37 @@ export default function BookingFormPopup({ isOpen, onClose }: BookingFormPopupPr
   const nextStep = () => setCurrentStep(prev => Math.min(prev + 1, 3));
   const prevStep = () => setCurrentStep(prev => Math.max(prev - 1, 1));
 
+  // Filter functions for search
+  const filteredCountries = countries.filter(country =>
+    country.name.toLowerCase().includes(countrySearch.toLowerCase()) ||
+    country.code.includes(countrySearch)
+  );
+
+  const filteredUniversities = cyprusUniversities.filter(university =>
+    university.toLowerCase().includes(universitySearch.toLowerCase())
+  );
+
+  // Handle country selection
+  const handleCountrySelect = (country: typeof countries[0]) => {
+    setFormData(prev => ({ ...prev, phoneCountry: country }));
+    setShowCountryDropdown(false);
+    setCountrySearch('');
+  };
+
+  // Handle university selection
+  const handleUniversitySelect = (university: string) => {
+    setFormData(prev => ({ ...prev, university }));
+    setShowUniversityDropdown(false);
+    setUniversitySearch('');
+  };
+
   const handleClose = () => {
     setCurrentStep(1);
     setFormData({
       firstName: '',
       lastName: '',
       email: '',
+      phoneCountry: cyprusCountry, // Default to Cyprus
       phone: '',
       university: '',
       transportPreference: 'bus',
@@ -62,6 +168,11 @@ export default function BookingFormPopup({ isOpen, onClose }: BookingFormPopupPr
       emergencyContact: '',
       specialRequests: ''
     });
+    // Reset dropdown states
+    setShowCountryDropdown(false);
+    setShowUniversityDropdown(false);
+    setUniversitySearch('');
+    setCountrySearch('');
     onClose();
   };
 
@@ -170,26 +281,124 @@ export default function BookingFormPopup({ isOpen, onClose }: BookingFormPopupPr
                       
                       <div>
                         <label className="block text-white font-medium mb-2">Phone Number</label>
-                        <input
-                          type="tel"
-                          name="phone"
-                          value={formData.phone}
-                          onChange={handleInputChange}
-                          className="w-full px-4 py-3 bg-white/5 border border-purple-500/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-purple-500/40"
-                          required
-                        />
+                        <div className="flex gap-2">
+                          {/* Country selector */}
+                          <div className="relative country-dropdown-container">
+                            <button
+                              type="button"
+                              onClick={() => setShowCountryDropdown(!showCountryDropdown)}
+                              className="h-12 px-3 bg-white/5 border border-purple-500/20 rounded-lg text-white focus:outline-none focus:border-purple-500/40 flex items-center gap-2 min-w-[120px]"
+                            >
+                              <span className="text-lg">{formData.phoneCountry.flag}</span>
+                              <span className="text-sm">{formData.phoneCountry.code}</span>
+                              <ChevronDown className="w-4 h-4 text-gray-400" />
+                            </button>
+
+                            {/* Country dropdown */}
+                            {showCountryDropdown && (
+                              <div className="absolute top-full left-0 z-50 w-80 mt-1 bg-black/90 border border-purple-500/20 rounded-lg shadow-2xl max-h-60 overflow-hidden">
+                                {/* Search input */}
+                                <div className="p-3 border-b border-purple-500/20">
+                                  <div className="relative">
+                                    <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
+                                    <input
+                                      type="text"
+                                      placeholder="Search countries..."
+                                      value={countrySearch}
+                                      onChange={(e) => setCountrySearch(e.target.value)}
+                                      className="w-full pl-10 pr-4 py-2 bg-white/5 border border-purple-500/20 rounded text-white placeholder-gray-500 focus:outline-none focus:border-purple-500/40 text-sm"
+                                    />
+                                  </div>
+                                </div>
+                                
+                                {/* Country list */}
+                                <div className="max-h-40 overflow-y-auto">
+                                  {filteredCountries.map((country) => (
+                                    <button
+                                      key={country.key}
+                                      type="button"
+                                      onClick={() => handleCountrySelect(country)}
+                                      className="w-full px-4 py-3 text-left hover:bg-purple-500/20 flex items-center gap-3 text-sm transition-colors"
+                                    >
+                                      <span className="text-lg">{country.flag}</span>
+                                      <span className="text-gray-300">{country.code}</span>
+                                      <span className="text-white">{country.name}</span>
+                                    </button>
+                                  ))}
+                                  {filteredCountries.length === 0 && (
+                                    <div className="px-4 py-3 text-gray-400 text-sm">No countries found</div>
+                                  )}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Phone input */}
+                          <input
+                            type="tel"
+                            name="phone"
+                            value={formData.phone}
+                            onChange={handleInputChange}
+                            placeholder="Enter phone number"
+                            className="flex-1 px-4 py-3 bg-white/5 border border-purple-500/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-purple-500/40"
+                            required
+                          />
+                        </div>
                       </div>
                       
                       <div>
                         <label className="block text-white font-medium mb-2">University</label>
-                        <input
-                          type="text"
-                          name="university"
-                          value={formData.university}
-                          onChange={handleInputChange}
-                          className="w-full px-4 py-3 bg-white/5 border border-purple-500/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-purple-500/40"
-                          required
-                        />
+                        <div className="relative university-dropdown-container">
+                          <button
+                            type="button"
+                            onClick={() => setShowUniversityDropdown(!showUniversityDropdown)}
+                            className="w-full px-4 py-3 bg-white/5 border border-purple-500/20 rounded-lg text-white focus:outline-none focus:border-purple-500/40 flex items-center justify-between min-h-[48px]"
+                          >
+                            <span className={cn(
+                              formData.university ? "text-white" : "text-gray-500"
+                            )}>
+                              {formData.university || "Select your university"}
+                            </span>
+                            <ChevronDown className="w-4 h-4 text-gray-400" />
+                          </button>
+
+                          {/* University dropdown */}
+                          {showUniversityDropdown && (
+                            <div className="absolute top-full left-0 z-50 w-full mt-1 bg-black/90 border border-purple-500/20 rounded-lg shadow-2xl max-h-60 overflow-hidden">
+                              {/* Search input */}
+                              <div className="p-3 border-b border-purple-500/20">
+                                <div className="relative">
+                                  <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
+                                  <input
+                                    type="text"
+                                    placeholder="Search universities..."
+                                    value={universitySearch}
+                                    onChange={(e) => setUniversitySearch(e.target.value)}
+                                    className="w-full pl-10 pr-4 py-2 bg-white/5 border border-purple-500/20 rounded text-white placeholder-gray-500 focus:outline-none focus:border-purple-500/40 text-sm"
+                                    autoFocus
+                                  />
+                                </div>
+                              </div>
+                              
+                              {/* University list */}
+                              <div className="max-h-40 overflow-y-auto">
+                                {filteredUniversities.map((university) => (
+                                  <button
+                                    key={university}
+                                    type="button"
+                                    onClick={() => handleUniversitySelect(university)}
+                                    className="w-full px-4 py-3 text-left hover:bg-purple-500/20 text-white text-sm transition-colors"
+                                  >
+                                    {university}
+                                  </button>
+                                ))}
+                                {filteredUniversities.length === 0 && (
+                                  <div className="px-4 py-3 text-gray-400 text-sm">No universities found</div>
+                                )}
+                              </div>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </motion.div>
                   )}

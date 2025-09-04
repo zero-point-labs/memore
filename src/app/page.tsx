@@ -18,6 +18,7 @@ import { useSwipeGesture } from '@/hooks/useSwipeGesture';
 import { isMobile } from '@/utils/isMobile';
 import { viewportOnce, fadeInUp, fadeIn, slideInFromTop } from '@/utils/animationVariants';
 import { BorderBeam } from '@/components/magicui/border-beam';
+import EnhancedGetStartedButton from '@/components/EnhancedGetStartedButton';
 
 
 // Memoize VIPCard to prevent re-renders when title changes
@@ -306,20 +307,11 @@ export default function Home() {
                       <span className="font-medium">Next Trip</span>
                     </button>
 
-                    {/* Sign Up Button */}
-                    <button
+                    {/* Enhanced Sign Up Button */}
+                    <EnhancedGetStartedButton 
                       onClick={() => setIsBookingPopupOpen(true)}
-                      className="relative flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-purple-600/20 to-pink-600/20 border border-purple-500/30 rounded-full text-purple-300 hover:from-purple-600/30 hover:to-pink-600/30 hover:border-purple-500/50 transition-all duration-300 backdrop-blur-sm overflow-hidden"
-                    >
-                      <BorderBeam
-                        colorFrom="#8B5CF6"
-                        colorTo="#EC4899"
-                        borderWidth={2}
-                        duration={4}
-                      />
-                      <span>✨</span>
-                      <span className="font-medium">Get Started</span>
-                    </button>
+                      className="shadow-2xl hover:shadow-purple-500/25"
+                    />
                   </div>
                 </motion.div>
 
