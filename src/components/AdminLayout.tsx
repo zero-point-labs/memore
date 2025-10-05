@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Sparkles, FileText, LogOut, MapPin } from 'lucide-react';
+import { Sparkles, FileText, LogOut, MapPin, Calendar } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAdmin } from '@/contexts/AdminContext';
@@ -29,13 +29,19 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       label: 'Blogs',
       href: '/admin/blogs',
       icon: FileText,
-      active: pathname === '/admin/blogs'
+      active: pathname?.startsWith('/admin/blogs')
     },
     {
       label: 'Trips',
       href: '/admin/trips',
       icon: MapPin,
-      active: pathname === '/admin/trips'
+      active: pathname?.startsWith('/admin/trips')
+    },
+    {
+      label: 'Events',
+      href: '/admin/events',
+      icon: Calendar,
+      active: pathname?.startsWith('/admin/events')
     }
   ];
 

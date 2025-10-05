@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { User, Compass, Camera, MessageSquare, FileText, X } from 'lucide-react';
+import { User, Compass, Camera, MessageSquare, FileText, X, Calendar } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -50,6 +50,7 @@ export default function Header() {
 
   const navItems = [
     { label: 'Next Trip', href: '/next-trip', icon: <Compass size={20} /> },
+    { label: 'Events', href: '/events', icon: <Calendar size={20} /> },
     { label: 'Gallery', href: '/gallery', icon: <Camera size={20} /> },
     { label: 'Stories', href: '/blog', icon: <FileText size={20} /> },
     { label: 'Contact', href: '/contact', icon: <MessageSquare size={20} /> },

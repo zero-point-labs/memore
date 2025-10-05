@@ -1,0 +1,555 @@
+{
+  "master": {
+    "tasks": [
+      {
+        "id": 1,
+        "title": "Initialize Project Repository and Tooling",
+        "description": "Set up the main code repository, configure Next.js 15, TypeScript, Tailwind CSS, and install required dependencies.",
+        "details": "Create a new Git repository. Initialize Next.js 15 project with App Router. Install React 19, Tailwind CSS, Framer Motion, Shadcn UI, and configure Prettier/ESLint. Set up Vercel deployment pipeline.",
+        "testStrategy": "Verify project builds and runs locally and on Vercel preview. Lint and format codebase.",
+        "priority": "high",
+        "dependencies": [],
+        "status": "done",
+        "subtasks": []
+      },
+      {
+        "id": 2,
+        "title": "Design and Implement About Memora Section",
+        "description": "Create a new About Memora section with mascot, trust badges, and clear value proposition.",
+        "details": "Develop a two-column layout with light background (#F8F9FA), integrate mascot image, add headline, subheadline, description, trust badges, and CTA. Implement fade-in and mascot animation using Framer Motion. Ensure mobile responsiveness.\n<info added on 2025-10-05T08:42:53.709Z>\nImplementation complete: Added AboutMemoraSection component featuring a light gradient background (#F8F9FA with purple/pink undertones), two-column responsive layout (content left, mascot right), mascot bird image with floating animation, glow pulse, and rotating particles. Content includes a small tag (\"Your Cyprus Experience Partner\"), large headline (\"What is Memora?\"), subheadline, three descriptive paragraphs, four trust badges (500+ Students, 5+ Years, 100% Safe, All Cyprus), and a gradient CTA button that scrolls to the trips section. Added \"Why Choose Memora\" with six feature cards. All interactive elements have hover effects. Framer Motion powers fade-in on scroll, mascot floating (6s cycle), glow pulse, and particle rotation. Section is fully mobile responsive with stack layout and is integrated between the hero and trips sections on the homepage. No linting errors; ready for testing. Modified files: created src/components/AboutMemoraSection.tsx and updated src/app/page.tsx.\n</info added on 2025-10-05T08:42:53.709Z>",
+        "testStrategy": "Check section rendering, responsiveness, animation, and accessibility. Validate content clarity with user testing.",
+        "priority": "high",
+        "dependencies": [
+          1
+        ],
+        "status": "done",
+        "subtasks": []
+      },
+      {
+        "id": 3,
+        "title": "Implement Seamless Homepage Content Flow",
+        "description": "Reorganize homepage to follow new content flow: hero, About Memora, adventures, events, FAQ, contact, footer.",
+        "details": "Update Next.js page structure to match specified order. Ensure smooth transitions and visual consistency between sections.\n<info added on 2025-10-05T09:00:13.408Z>\nHero section improvements completed:\n- Enhanced top badge with palm tree emoji and gradient background\n- Simplified subtitle with all pulsing animations removed for improved readability\n- Feature badges updated to 4 items with icons: Beach Parties, Epic Clubs, Culture & History, Water Sports\n- CTAs redesigned with clear hierarchy: primary \"Book Your Adventure\" button and secondary \"View All Trips\" button\n- Visual hierarchy and overall design modernized\n- All animations are now subtle and professional\n\nHomepage content flow matches specified order:\n1. Hero (improved)\n2. About Memora\n3. 3-Day Adventures\n4. Events Section (pending; will be added after Events system is built in tasks 4-9)\n5. FAQ\n6. Contact\n7. Footer\n</info added on 2025-10-05T09:00:13.408Z>",
+        "testStrategy": "Visually inspect homepage flow on desktop and mobile. Confirm navigation and scroll behavior.",
+        "priority": "high",
+        "dependencies": [
+          2
+        ],
+        "status": "done",
+        "subtasks": []
+      },
+      {
+        "id": 4,
+        "title": "Define and Create Events Database Schema in Appwrite",
+        "description": "Implement the 'events' collection in Appwrite with all specified fields and types.",
+        "details": "Use Appwrite console or API to create 'events' collection. Define all fields as per PRD, including nested objects and enums. Add calculated fields for capacity.\n<info added on 2025-10-05T09:03:40.043Z>\nEvents database schema implementation complete. Added scripts/setup-events-collection.js to automate creation of the 'events' collection with all 30+ PRD-specified attributes, proper permissions, and 7 indexes (published, featured, eventType, city, eventDate, bookingStatus, slug). JSON fields (pricing, capacity, gallery, includes, etc.) are handled. TypeScript types (src/types/event.ts) define the complete Event interface, enums, helper types, and utility functions for capacity and status calculations. Event service (src/services/eventService.ts) provides full CRUD, advanced filtering, booking operations, view tracking, and automatic status management. Example event script (scripts/add-example-event.js) demonstrates all field types and structures. All files are ready for Appwrite collection creation and integration.\n</info added on 2025-10-05T09:03:40.043Z>",
+        "testStrategy": "Create, read, update, and delete event documents via Appwrite dashboard and API. Validate schema constraints.",
+        "priority": "high",
+        "dependencies": [
+          1
+        ],
+        "status": "done",
+        "subtasks": []
+      },
+      {
+        "id": 5,
+        "title": "Implement Events CRUD API Endpoints",
+        "description": "Develop Next.js API routes for creating, reading, updating, and deleting events.",
+        "details": "Create RESTful endpoints under /api/events. Validate input against schema. Integrate with Appwrite SDK for database operations. Implement authentication for admin routes.\n<info added on 2025-10-05T09:18:19.847Z>\nImplementation of the Events CRUD API endpoints is complete, with seven RESTful API routes created under /api/events. These routes include full filtering and pagination support for listing events, creation, retrieval, update, and deletion of events, as well as specialized routes for featured and upcoming events. All endpoints feature proper error handling, type-safe request/response handling, and JSON response format with a success flag. Integration with the eventService has been implemented. However, admin authentication remains pending for the admin-only routes. Unit and integration tests are required to ensure the functionality and reliability of these endpoints. Testing should include validation of API responses using tools like Postman and integration with the frontend.\n</info added on 2025-10-05T09:18:19.847Z>",
+        "testStrategy": "Write unit and integration tests for all endpoints. Test with Postman and frontend integration.",
+        "priority": "high",
+        "dependencies": [
+          4
+        ],
+        "status": "done",
+        "subtasks": []
+      },
+      {
+        "id": 6,
+        "title": "Develop Events Listing Page with Filters",
+        "description": "Create /events page displaying a grid of events with filters for type, date, city, and price.",
+        "details": "Fetch events from API. Implement filter bar, grid/list toggle, pagination. Use Shadcn UI and Tailwind for layout. Ensure accessibility.\n<info added on 2025-10-05T09:21:02.627Z>\nImplemented a comprehensive events listing experience:\n\n- Developed a dedicated /events page with a hero section, gradient title, and a responsive grid layout (3 columns on desktop, 2 on tablet, 1 on mobile).\n- Added a filter bar supporting event type and city filters, with real-time filtering from the API.\n- Integrated loading and empty states with clear, helpful messaging.\n- Utilized a reusable EventCard component displaying event image, type and booking status badges, date, time, venue, capacity, price, early bird indicator, and a gradient CTA button, with hover effects and image fallback.\n- Enabled navigation to event detail pages from each card.\n- Created an EventsSection component for the homepage, previewing 3 featured events in a grid with a section title animation and a \"View All Events\" button linking to /events.\n- Integrated EventsSection into the homepage between 3-Day Adventures and FAQ, ensuring seamless content flow and visual transitions.\n- All filtering, pagination, and UI components are fully functional and responsive.\n- Files created: src/app/events/page.tsx, src/components/EventCard.tsx, src/components/EventsSection.tsx; homepage updated in src/app/page.tsx.\n</info added on 2025-10-05T09:21:02.627Z>",
+        "testStrategy": "Test filtering, sorting, and pagination. Validate UI on all breakpoints.",
+        "priority": "high",
+        "dependencies": [
+          5
+        ],
+        "status": "done",
+        "subtasks": []
+      },
+      {
+        "id": 7,
+        "title": "Build Event Card Component",
+        "description": "Design reusable event card with image, badges, title, venue, price, status, and CTA.",
+        "details": "Create a React component for event cards. Support all required props and visual states. Add hover and focus effects.",
+        "testStrategy": "Render cards with various data. Test accessibility and keyboard navigation.",
+        "priority": "medium",
+        "dependencies": [
+          6
+        ],
+        "status": "done",
+        "subtasks": []
+      },
+      {
+        "id": 8,
+        "title": "Implement Single Event Detail Page",
+        "description": "Develop /event/[id] page with all event details, booking widget, gallery, map, and FAQ.",
+        "details": "Fetch event data by slug or ID. Display hero image/video, ticket types, inclusions, lineup, Google Maps integration, gallery, and sticky booking widget.\n<info added on 2025-10-05T09:43:14.803Z>\nSingle event detail page implementation completed in src/app/event/[id]/page.tsx with the following features: hero section with full-width image and gradient overlay, floating booking card on desktop, fallback gradient when no image is available, comprehensive booking widget (ticket type selection, real-time capacity, price comparison, VIP and early bird indicators, sold-out state, security badges), fixed mobile booking bar, breadcrumb navigation, large event title, 4-column key info grid, event description, venue card, inclusions checklist, event highlights, artist lineup chips, VIP benefits showcase, requirements and info, and cancellation policy. Additional features include real-time API data fetching, loading and error states, responsive mobile-first layout, smooth animations, and BookingFormPopup integration.\n</info added on 2025-10-05T09:43:14.803Z>",
+        "testStrategy": "Test page with different event types. Validate all sections render and booking widget is functional.",
+        "priority": "high",
+        "dependencies": [
+          7
+        ],
+        "status": "done",
+        "subtasks": []
+      },
+      {
+        "id": 9,
+        "title": "Create Admin Events Management Page",
+        "description": "Develop /admin/events for CRUD operations, capacity management, and stats.",
+        "details": "Implement authentication/authorization. List events, allow create/edit/delete, manage bookings and capacity, display quick stats.\n<info added on 2025-10-05T10:04:43.468Z>\nAdmin Events Management page implementation complete:\n\nCreated comprehensive admin interface in src/app/admin/events/page.tsx with the following features:\n\nDashboard displays five stat cards (Total Events, Published, Drafts, Upcoming, Sold Out) with color-coded icons and gradients, updating stats in real time from events data.\n\nFiltering system includes Published/Drafts/All filter buttons, event type and city dropdowns, and real-time API-integrated filtering.\n\nEvents table features columns for Event (with type icon), Date & Time, Venue, Capacity (with general/VIP breakdown), Price (general + VIP), Status, and Actions. Booking status badges (Open/Limited/Sold Out), published/draft toggle buttons, and row hover effects are included.\n\nAction buttons allow viewing (new tab), editing (navigate to edit page), deleting (with confirmation), and toggling published status inline.\n\nAdditional features: admin authentication check with redirect, loading states, empty state with \"Create First Event\" CTA, Create Event button in header, responsive table design, integration with AdminLayout, color-coded UI, and real-time stats updates.\n\nNote: Edit and Create pages are required for full CRUD and can be added later.\n</info added on 2025-10-05T10:04:43.468Z>",
+        "testStrategy": "Test all admin actions, permissions, and data integrity.",
+        "priority": "high",
+        "dependencies": [
+          5
+        ],
+        "status": "done",
+        "subtasks": []
+      },
+      {
+        "id": 10,
+        "title": "Define and Create Customers Database Schema in Appwrite",
+        "description": "Implement the 'customers' collection with all specified fields and types.",
+        "details": "Create 'customers' collection in Appwrite. Define fields for personal info, Stripe IDs, preferences, and metadata.",
+        "testStrategy": "CRUD operations via Appwrite dashboard and API. Validate schema and constraints.",
+        "priority": "high",
+        "dependencies": [
+          1
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 11,
+        "title": "Define and Create Bookings Database Schema in Appwrite",
+        "description": "Implement the 'bookings' collection with all specified fields and types.",
+        "details": "Create 'bookings' collection in Appwrite. Include references to customers, trips, events, payment info, and metadata.",
+        "testStrategy": "CRUD operations via Appwrite dashboard and API. Validate schema and constraints.",
+        "priority": "high",
+        "dependencies": [
+          10
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 12,
+        "title": "Define and Create Payment Schedules Schema in Appwrite",
+        "description": "Implement the 'payment_schedules' collection for managing scheduled and retried payments.",
+        "details": "Create collection with fields for booking, customer, payment details, scheduling, status, retries, and error handling.",
+        "testStrategy": "CRUD operations and status transitions. Simulate retry logic.",
+        "priority": "high",
+        "dependencies": [
+          11
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 13,
+        "title": "Define and Create Notifications Schema in Appwrite",
+        "description": "Implement the 'notifications' collection for tracking email/SMS notifications.",
+        "details": "Create collection with fields for booking, customer, type, method, content, status, provider IDs, and metadata.",
+        "testStrategy": "CRUD operations and status updates. Simulate notification logging.",
+        "priority": "high",
+        "dependencies": [
+          11
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 14,
+        "title": "Integrate Stripe SDK and Configure Test Environment",
+        "description": "Set up Stripe SDK in backend, configure test keys, and verify connectivity.",
+        "details": "Install Stripe Node.js SDK. Store API keys securely. Test connection and basic API calls.",
+        "testStrategy": "Run test payment intent creation and customer creation. Validate error handling.",
+        "priority": "high",
+        "dependencies": [
+          1
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 15,
+        "title": "Implement /api/payments/create-deposit Endpoint",
+        "description": "Create API route to handle deposit payments, customer creation, payment method saving, booking creation, and scheduling balance.",
+        "details": "Validate booking data, create Stripe customer if needed, create payment intent, save payment method, create booking and payment schedule in Appwrite, trigger notifications.",
+        "testStrategy": "Integration test with Stripe test cards. Validate booking and payment records.",
+        "priority": "high",
+        "dependencies": [
+          14,
+          11,
+          12,
+          13
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 16,
+        "title": "Implement /api/payments/process-balance Endpoint",
+        "description": "Create API route to process scheduled balance payments, handle retries, and update statuses.",
+        "details": "Query payment schedules due, charge saved payment method via Stripe, update booking/payment status, trigger notifications, handle retries.",
+        "testStrategy": "Simulate scheduled payments and failures. Validate retry logic and status updates.",
+        "priority": "high",
+        "dependencies": [
+          15
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 17,
+        "title": "Implement /api/payments/update-payment-method Endpoint",
+        "description": "Allow customers to update their saved payment method using Stripe Setup Intents.",
+        "details": "Create endpoint to initiate Stripe Setup Intent, update payment method in Stripe and Appwrite, validate ownership.",
+        "testStrategy": "Test updating payment method and subsequent charges.",
+        "priority": "medium",
+        "dependencies": [
+          14,
+          10
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 18,
+        "title": "Implement /api/webhooks/stripe Endpoint",
+        "description": "Handle Stripe webhook events for payment confirmations, failures, and refunds.",
+        "details": "Verify webhook signatures, process payment events, update Appwrite records, trigger notifications, handle errors.",
+        "testStrategy": "Test with Stripe CLI/webhook test events. Validate all event types.",
+        "priority": "high",
+        "dependencies": [
+          14,
+          11,
+          13
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 19,
+        "title": "Implement /api/payments/cancel-booking Endpoint",
+        "description": "Allow booking cancellation, refund processing, and notification sending.",
+        "details": "Cancel pending balance charges, update booking/payment status, process Stripe refunds if applicable, send notifications.",
+        "testStrategy": "Test cancellation flow for various booking/payment states.",
+        "priority": "medium",
+        "dependencies": [
+          15,
+          16,
+          18
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 20,
+        "title": "Integrate Resend Email Service",
+        "description": "Set up Resend for transactional emails, verify domain, and configure API integration.",
+        "details": "Register domain with Resend, configure API keys, implement email sending utility, handle bounces and analytics.",
+        "testStrategy": "Send test emails, verify delivery, check analytics and bounce handling.",
+        "priority": "high",
+        "dependencies": [
+          1
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 21,
+        "title": "Integrate Twilio SMS Service",
+        "description": "Set up Twilio for SMS notifications, configure Cyprus number, and implement API integration.",
+        "details": "Purchase Cyprus number, configure Twilio credentials, implement SMS sending utility, handle delivery confirmations and opt-outs.",
+        "testStrategy": "Send test SMS to verified numbers, check delivery and opt-out handling.",
+        "priority": "high",
+        "dependencies": [
+          1
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 22,
+        "title": "Develop Email Notification Templates",
+        "description": "Create HTML and plain text templates for all required email notifications using React Email or Handlebars.",
+        "details": "Design templates for booking confirmation, balance reminder, payment success, payment failed, and trip/event reminder. Ensure mobile responsiveness and branding.",
+        "testStrategy": "Send test emails for each template, verify rendering in major clients.",
+        "priority": "high",
+        "dependencies": [
+          20
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 23,
+        "title": "Develop SMS Notification Templates",
+        "description": "Create concise SMS templates for all required notification types.",
+        "details": "Implement templates for booking confirmation, balance reminder, payment success, payment failed, and event day. Use variables for personalization.",
+        "testStrategy": "Send test SMS for each template, verify content and length.",
+        "priority": "high",
+        "dependencies": [
+          21
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 24,
+        "title": "Implement Notification Sending Logic",
+        "description": "Develop backend logic to send emails via Resend and SMS via Twilio based on notification triggers.",
+        "details": "Create utility functions to send notifications, select templates, personalize content, log to Appwrite, and handle retries.",
+        "testStrategy": "Trigger notifications from API and webhooks, verify delivery and logging.",
+        "priority": "high",
+        "dependencies": [
+          22,
+          23,
+          13
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 25,
+        "title": "Develop Enhanced Booking Form Component",
+        "description": "Implement multi-step booking form with personal info, package selection, preferences, payment, and confirmation.",
+        "details": "Use React, Shadcn UI, and Stripe Elements. Validate all fields, display price breakdown, handle payment method saving, show confirmation and error states.",
+        "testStrategy": "Test form on desktop/mobile, validate all flows, simulate errors.",
+        "priority": "high",
+        "dependencies": [
+          8,
+          15
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 26,
+        "title": "Implement Booking Confirmation Page",
+        "description": "Create /booking/[bookingNumber] page showing booking details, payment status, and management options.",
+        "details": "Fetch booking by number, display all relevant info, allow download of itinerary, manage booking actions.",
+        "testStrategy": "Test with various booking states and types.",
+        "priority": "medium",
+        "dependencies": [
+          25
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 27,
+        "title": "Develop Customer Portal Page",
+        "description": "Implement /account page for users to view bookings, payment history, manage payment methods, and preferences.",
+        "details": "Authenticate user, fetch bookings and payments, allow payment method updates, manage communication preferences.",
+        "testStrategy": "Test all portal features, validate data accuracy and security.",
+        "priority": "medium",
+        "dependencies": [
+          17,
+          26
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 28,
+        "title": "Implement Admin Payments Dashboard",
+        "description": "Create /admin/payments for payment overview, scheduled charges, failed payments, analytics, and refunds.",
+        "details": "Display payment stats, list scheduled/failed payments, allow manual actions, show revenue analytics, process refunds.",
+        "testStrategy": "Test dashboard with real and mock data, validate admin actions.",
+        "priority": "medium",
+        "dependencies": [
+          16,
+          19
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 29,
+        "title": "Integrate Google Maps for Venue Display",
+        "description": "Add Google Maps integration to event detail pages for venue location.",
+        "details": "Use Google Maps API to display map with marker for event venue. Ensure mobile responsiveness.",
+        "testStrategy": "Test map rendering and marker accuracy for various venues.",
+        "priority": "low",
+        "dependencies": [
+          8
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 30,
+        "title": "Implement FAQ Section with Payment and Booking FAQs",
+        "description": "Update FAQ section to include new payment and booking process questions.",
+        "details": "Add new FAQ entries, organize by category, ensure accessibility and searchability.",
+        "testStrategy": "Verify FAQ content and search/filter functionality.",
+        "priority": "low",
+        "dependencies": [
+          3
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 31,
+        "title": "Set Up N8N Instance and Integrations",
+        "description": "Deploy N8N (self-hosted or cloud), configure credentials for Appwrite, Stripe, Resend, and Twilio.",
+        "details": "Provision N8N, set up secure access, store API keys, test connectivity to all services.",
+        "testStrategy": "Run test workflows for each integration.",
+        "priority": "medium",
+        "dependencies": [
+          14,
+          20,
+          21
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 32,
+        "title": "Develop N8N Payment Processing Workflow",
+        "description": "Create workflow to process scheduled balance payments daily, handle retries, and send admin reports.",
+        "details": "Trigger on cron, query Appwrite for due payments, process via Stripe, update statuses, trigger notifications, send summary.",
+        "testStrategy": "Simulate workflow with test data, validate all steps and error handling.",
+        "priority": "medium",
+        "dependencies": [
+          31,
+          16,
+          24
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 33,
+        "title": "Develop N8N Notification Workflow",
+        "description": "Create workflow to send notifications based on payment/booking events.",
+        "details": "Trigger on webhook, fetch customer preferences, select templates, send email/SMS, log results, handle failures.",
+        "testStrategy": "Test with various event types and preferences.",
+        "priority": "medium",
+        "dependencies": [
+          31,
+          24
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 34,
+        "title": "Develop N8N Payment Reminder Workflow",
+        "description": "Create workflow to send reminders for upcoming balance payments.",
+        "details": "Trigger daily, query bookings with balance due in 7 days, send reminders, update flags, send admin report.",
+        "testStrategy": "Simulate reminders, verify notifications and reporting.",
+        "priority": "medium",
+        "dependencies": [
+          31,
+          24
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 35,
+        "title": "Develop N8N Failed Payment Recovery Workflow",
+        "description": "Create workflow to handle failed payments, schedule retries, and escalate if needed.",
+        "details": "Trigger on failed payment event, increment retry, schedule next attempt, notify customer/admin, mark as failed if retries exceeded.",
+        "testStrategy": "Simulate failures and retries, validate escalation logic.",
+        "priority": "medium",
+        "dependencies": [
+          31,
+          16,
+          24
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 36,
+        "title": "Implement Security and Compliance Measures",
+        "description": "Ensure PCI DSS, GDPR, and other compliance requirements are met across the platform.",
+        "details": "Use Stripe Elements for card input, verify webhook signatures, encrypt API keys, enforce HTTPS, implement opt-in/opt-out, and data deletion features.",
+        "testStrategy": "Conduct security audit, penetration testing, and compliance checklist review.",
+        "priority": "high",
+        "dependencies": [
+          14,
+          20,
+          21
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 37,
+        "title": "Develop Unit Tests for Core Utilities",
+        "description": "Write unit tests for payment calculations, date/time utilities, notification content, and validation functions.",
+        "details": "Use Jest or similar framework. Cover all edge cases and error handling.",
+        "testStrategy": "Run tests with 90%+ coverage, validate against requirements.",
+        "priority": "medium",
+        "dependencies": [
+          15,
+          24
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 38,
+        "title": "Develop Integration and End-to-End Tests",
+        "description": "Implement integration and E2E tests for booking, payment, notification, and admin flows.",
+        "details": "Use Cypress or Playwright. Simulate real user journeys, payment flows, and admin operations.",
+        "testStrategy": "Automate test runs on CI, validate all critical paths.",
+        "priority": "medium",
+        "dependencies": [
+          25,
+          26,
+          28
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 39,
+        "title": "Prepare Documentation and User Guides",
+        "description": "Document API endpoints, workflows, admin operations, and user-facing features.",
+        "details": "Write markdown docs, include code samples, screenshots, and troubleshooting guides.",
+        "testStrategy": "Review documentation for completeness and clarity. Validate with team walkthrough.",
+        "priority": "low",
+        "dependencies": [
+          38
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 40,
+        "title": "Production Launch and Monitoring Setup",
+        "description": "Deploy to production, configure live API keys, set up monitoring (Sentry), and support soft launch.",
+        "details": "Switch to live Stripe/Resend/Twilio keys, enable error monitoring, monitor logs, support limited user rollout, and prepare for full launch.",
+        "testStrategy": "Monitor for errors, validate live transactions, and collect user feedback.",
+        "priority": "high",
+        "dependencies": [
+          39
+        ],
+        "status": "pending",
+        "subtasks": []
+      }
+    ],
+    "metadata": {
+      "created": "2025-10-05T08:22:09.882Z",
+      "updated": "2025-10-05T10:04:43.800Z",
+      "description": "Tasks for master context"
+    }
+  }
+}

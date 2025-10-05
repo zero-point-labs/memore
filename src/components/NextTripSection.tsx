@@ -1,9 +1,7 @@
 'use client';
 
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useState, useEffect, useRef } from 'react';
-import { isMobile } from '@/utils/isMobile';
-import Mascot3D from '@/components/trip-elements/Mascot3D';
 import TripImageCarousel from '@/components/trip-elements/TripImageCarousel';
 // import TripAboutCard from '@/components/trip-elements/TripAboutCard';
 import SwipableTripCard from '@/components/SwipableTripCard';
@@ -67,24 +65,6 @@ const studentReviews = [
 
 const TripSectionContent = ({ isHomepage, featuredTrip }: { isHomepage: boolean, featuredTrip: TripDocument }) => {
   const sectionRef = useRef(null);
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ['start end', 'end start'],
-  });
-  
-  // Device detection for responsive rotation
-  const [isMobileDevice, setIsMobileDevice] = useState(false);
-  
-  useEffect(() => {
-    setIsMobileDevice(isMobile());
-  }, []);
-  
-  // Responsive rotation: Both mobile and desktop start facing front (0)
-  const rotation = useTransform(
-    scrollYProgress, 
-    [0, 1], 
-    isMobileDevice ? [0, Math.PI * 2] : [0, Math.PI * 2]
-  );
 
   const [selectedDay, setSelectedDay] = useState(0);
   const [currentReview, setCurrentReview] = useState(0);
@@ -165,7 +145,7 @@ const TripSectionContent = ({ isHomepage, featuredTrip }: { isHomepage: boolean,
               </p>
             </motion.div>
 {isHomepage ? (
-              // Homepage Layout: Desktop - Side by side (Harley left, About right), Mobile - Original stacked order
+              // Homepage Layout: Swipable Trip Card centered
               <>
                 {/* Swipable Trip Card - Top Center, Large */}
                 <motion.div
@@ -181,189 +161,9 @@ const TripSectionContent = ({ isHomepage, featuredTrip }: { isHomepage: boolean,
                     />
                   </div>
                 </motion.div>
-
-                {/* 3D Mascot - Centered Below */}
-                <motion.div
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.8, delay: 0.3 }}
-                  className="flex flex-col items-center mb-20"
-                >
-                  <div className="relative max-w-4xl w-full">
-                    {/* 3D Mascot */}
-                    <Mascot3D 
-                      modelPath="/varley-queen-v2.glb" 
-                      characterName="Harley Queen" 
-                      scale={[2.0, 2.0, 2.0]} 
-                      rotation={rotation} 
-                    />
-                  </div>
-
-                  {/* Explore More Button - Below 3D Mascot */}
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.6, delay: 0.8 }}
-                    className="relative flex justify-center mt-8 z-20"
-                  >
-                      {/* Simplified Floating Particles around button */}
-                      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-                        {/* Minimal orbiting particles */}
-                        {Array.from({ length: 4 }).map((_, i) => {
-                          const angle = (i / 4) * Math.PI * 2;
-                          const radius = 90;
-                          return (
-                            <motion.div
-                              key={`orbit-${i}`}
-                              className="absolute"
-                              style={{
-                                left: '50%',
-                                top: '50%',
-                                width: 6,
-                                height: 6,
-                              }}
-                              animate={{
-                                x: [Math.cos(angle) * radius, Math.cos(angle + Math.PI * 2) * radius],
-                                y: [Math.sin(angle) * radius, Math.sin(angle + Math.PI * 2) * radius],
-                                opacity: [0.4, 0.8, 0.4],
-                              }}
-                              transition={{
-                                duration: 8 + i,
-                                repeat: Infinity,
-                                ease: "linear",
-                                delay: i * 0.5,
-                              }}
-                            >
-                              <div 
-                                className="w-full h-full rounded-full bg-gradient-to-r from-purple-500 to-pink-500"
-                                style={{
-                                  boxShadow: '0 0 12px rgba(139, 92, 246, 0.6)',
-                                }}
-                              />
-                            </motion.div>
-                          );
-                        })}
-                        
-                        {/* Minimal floating sparkles */}
-                        {Array.from({ length: 6 }).map((_, i) => {
-                          const positions = [
-                            { x: -50, y: -30 }, { x: 50, y: -30 }, 
-                            { x: -70, y: 0 }, { x: 70, y: 0 },
-                            { x: -50, y: 30 }, { x: 50, y: 30 }
-                          ];
-                          const pos = positions[i];
-                          
-                          return (
-                            <motion.div
-                              key={`sparkle-${i}`}
-                              className="absolute"
-                              style={{
-                                left: '50%',
-                                top: '50%',
-                                fontSize: '12px',
-                                color: i % 3 === 0 ? '#fbbf24' : i % 3 === 1 ? '#f472b6' : '#8b5cf6',
-                                textShadow: `0 0 8px currentColor`,
-                              }}
-                              animate={{
-                                x: [pos.x * 0.8, pos.x * 1.2, pos.x * 0.8],
-                                y: [pos.y * 0.8, pos.y * 1.2, pos.y * 0.8],
-                                opacity: [0.3, 0.9, 0.3],
-                                scale: [0.8, 1.1, 0.8],
-                              }}
-                              transition={{
-                                duration: 4 + (i % 2),
-                                repeat: Infinity,
-                                delay: i * 0.3,
-                                ease: "easeInOut",
-                              }}
-                            >
-                              ✨
-                            </motion.div>
-                          );
-                        })}
-                      </div>
-                      
-                      <motion.a
-                        href="/next-trip"
-                        whileHover={{ scale: 1.05, y: -3 }}
-                        whileTap={{ scale: 0.95 }}
-                        className="group relative inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-purple-600/30 to-pink-600/30 backdrop-blur-sm border border-purple-500/50 rounded-full text-white font-semibold text-lg shadow-2xl hover:from-purple-600/40 hover:to-pink-600/40 hover:border-purple-400/70 hover:shadow-purple-500/25 transition-all duration-300 overflow-hidden z-10"
-                      >
-                        {/* Animated background gradient */}
-                        <motion.div
-                          className="absolute inset-0 bg-gradient-to-r from-pink-600/20 to-purple-600/20"
-                          initial={{ x: '-100%' }}
-                          whileHover={{ x: '100%' }}
-                          transition={{ duration: 0.6 }}
-                        />
-                        
-                        {/* Icon with animation */}
-                        <motion.span 
-                          className="relative z-10 text-2xl"
-                          animate={{ 
-                            rotateY: [0, 360],
-                            scale: [1, 1.1, 1]
-                          }}
-                          transition={{ 
-                            duration: 3, 
-                            repeat: Infinity,
-                            ease: "easeInOut" 
-                          }}
-                        >
-                          🌟
-                        </motion.span>
-                        
-                        <span className="relative z-10">Explore More</span>
-                        
-                        {/* Animated arrow */}
-                        <motion.span
-                          className="relative z-10 text-purple-300 group-hover:text-white transition-colors"
-                          animate={{ x: [0, 5, 0] }}
-                          transition={{ duration: 2, repeat: Infinity }}
-                        >
-                          →
-                        </motion.span>
-                        
-                        {/* Enhanced sparkle effects */}
-                        <motion.div
-                          className="absolute inset-0 opacity-0 group-hover:opacity-100"
-                          transition={{ duration: 0.3 }}
-                        >
-                          <div className="absolute top-2 left-4 w-1 h-1 bg-white rounded-full animate-ping" />
-                          <div className="absolute bottom-3 right-6 w-1 h-1 bg-purple-300 rounded-full animate-ping" style={{ animationDelay: '0.5s' }} />
-                          <div className="absolute top-1/2 right-3 w-0.5 h-0.5 bg-pink-300 rounded-full animate-ping" style={{ animationDelay: '1s' }} />
-                          <div className="absolute top-3 right-8 w-0.5 h-0.5 bg-cyan-300 rounded-full animate-ping" style={{ animationDelay: '1.5s' }} />
-                        </motion.div>
-                      </motion.a>
-                    </motion.div>
-                </motion.div>
-                
-                {/* Gallery Section - Below both columns */}
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  whileInView={{ opacity: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.8, delay: 0.2 }}
-                  className="mb-20"
-                >
-                  <div className="text-center mb-8">
-                    <h3 className="text-2xl font-bold mb-2">
-                      <span className="text-white">Cyprus </span>
-                      <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">Adventure</span>
-                      <span className="text-white"> Gallery</span>
-                    </h3>
-                    <p className="text-gray-400">Get a taste of what awaits you in paradise</p>
-                  </div>
-                  <TripImageCarousel 
-                    images={featuredTrip.gallery} 
-                    className="max-w-full sm:max-w-lg lg:max-w-2xl mx-auto" 
-                  />
-                </motion.div>
               </>
             ) : (
-              // Subpage Layout: Gallery → 3D Mascot + Itinerary
+              // Subpage Layout: Gallery → Itinerary
               <>
                 <motion.div
                   initial={{ opacity: 0 }}
@@ -386,23 +186,13 @@ const TripSectionContent = ({ isHomepage, featuredTrip }: { isHomepage: boolean,
                   />
                 </motion.div>
                 
-                <div className="grid lg:grid-cols-2 gap-12 items-start">
-                  <motion.div
-                    initial={{ opacity: 0, x: -50 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.8 }}
-                    className="relative"
-                  >
-                    <Mascot3D rotation={rotation} />
-                  </motion.div>
-                  <motion.div
-                    initial={{ opacity: 0, x: 50 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.8 }}
-                    className="space-y-6"
-                  >
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.8 }}
+                  className="space-y-6 max-w-4xl mx-auto"
+                >
                     <h3 className="text-2xl font-bold text-white mb-6">Trip Itinerary</h3>
                     <div className="flex gap-4 mb-8 overflow-x-auto">
                       {featuredTrip.itinerary.map((day, index) => (
@@ -471,8 +261,7 @@ const TripSectionContent = ({ isHomepage, featuredTrip }: { isHomepage: boolean,
                         </div>
                       </motion.div>
                     )}
-                  </motion.div>
-                </div>
+                </motion.div>
               </>
             )}
             <motion.div

@@ -4,10 +4,11 @@ import { storage, account } from '@/lib/appwrite';
 // Bucket configuration - supports both single bucket (free plan) and separate buckets (paid plan)
 const BLOG_BUCKET_ID = process.env.NEXT_PUBLIC_APPWRITE_BLOG_BUCKET_ID || 'blog_images';
 const TRIP_BUCKET_ID = process.env.NEXT_PUBLIC_APPWRITE_TRIP_BUCKET_ID || 'blog_images'; // Falls back to same bucket
+const EVENT_BUCKET_ID = process.env.NEXT_PUBLIC_APPWRITE_EVENT_BUCKET_ID || 'blog_images'; // Falls back to same bucket
 const USE_SEPARATE_BUCKETS = process.env.NEXT_PUBLIC_USE_SEPARATE_BUCKETS === 'true';
 
 // Image types for organization
-export type ImageType = 'blog' | 'trip';
+export type ImageType = 'blog' | 'trip' | 'event';
 
 // Helper function to get bucket ID based on image type and plan
 function getBucketId(type: ImageType = 'blog'): string {
@@ -18,6 +19,8 @@ function getBucketId(type: ImageType = 'blog'): string {
         return BLOG_BUCKET_ID;
       case 'trip':
         return TRIP_BUCKET_ID;
+      case 'event':
+        return EVENT_BUCKET_ID;
       default:
         return BLOG_BUCKET_ID;
     }
@@ -28,19 +31,22 @@ function getBucketId(type: ImageType = 'blog'): string {
 }
 
 // Helper function to get file prefix (only used when using single bucket)
+// NOTE: Appwrite file IDs cannot contain slashes, so we use underscores instead
 function getFilePrefix(type: ImageType = 'blog'): string {
   if (USE_SEPARATE_BUCKETS) {
     // Separate buckets: no prefix needed
     return '';
   } else {
-    // Single bucket: use folder prefixes
+    // Single bucket: use underscore prefixes (no slashes - Appwrite limitation)
     switch (type) {
       case 'blog':
-        return 'blogs/';
+        return 'blog_';
       case 'trip':
-        return 'trips/';
+        return 'trip_';
+      case 'event':
+        return 'event_';
       default:
-        return 'blogs/';
+        return 'blog_';
     }
   }
 }

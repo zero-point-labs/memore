@@ -5,27 +5,24 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 // import VIPCard from '@/components/hero-elements/VIPCard';
 
 import GlitchText from '@/components/hero-elements/GlitchText';
+import AboutMemoraSection from '@/components/AboutMemoraSection';
 import FAQSection from '@/components/FAQSection';
 import NextTripSection from '@/components/NextTripSection';
-import GallerySection from '@/components/GallerySection';
-import BlogSection from '@/components/BlogSection';
+import EventsSection from '@/components/EventsSection';
 import ContactSection from '@/components/ContactSection';
 import Footer from '@/components/Footer';
 import BookingFormPopup from '@/components/BookingFormPopup';
-import HeroCountdown from '@/components/hero-elements/HeroCountdown';
 import { useParallax } from '@/hooks/useParallax';
 import { useSwipeGesture } from '@/hooks/useSwipeGesture';
 import { isMobile } from '@/utils/isMobile';
 import { viewportOnce, fadeInUp, fadeIn, slideInFromTop } from '@/utils/animationVariants';
-import { BorderBeam } from '@/components/magicui/border-beam';
-import EnhancedGetStartedButton from '@/components/EnhancedGetStartedButton';
 
 
 // Memoize VIPCard to prevent re-renders when title changes
 // const MemoizedVIPCard = memo(VIPCard);
 
 // Constants
-const words = ['PARTIES', 'MEMORIES', 'MADNESS'];
+const words = ['EXPERIENCES', 'MEMORIES', 'ADVENTURES'];
 
 export default function Home() {
 
@@ -155,7 +152,7 @@ export default function Home() {
           </video>
           
           {/* Dark Overlay for readability */}
-          <div className="absolute inset-0 bg-black/70" />
+          <div className="absolute inset-0 bg-black/50" />
           
           {/* Subtle gradient overlays */}
           <div className="absolute inset-0">
@@ -165,16 +162,16 @@ export default function Home() {
         </div>
 
         {/* Content */}
-        <div className="relative z-10 pt-32 pb-20 parallax-container">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-12">
-            <div className="flex flex-col items-center">
+        <div className="relative z-10 flex items-center justify-center min-h-screen parallax-container">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-12 py-20">
+            <div className="flex flex-col items-center justify-center">
               <motion.div
                 initial="hidden"
                 whileInView="visible"
                 viewport={viewportOnce}
                 variants={fadeInUp}
                 style={{
-                  transform: isMobileDevice ? 'none' : `translateX(${parallax.x * 0.3}px) translateY(${parallax.y * 0.3}px)`,
+                  transform: isMobileDevice ? 'none' : `translateX(${parallax.x * 0.1}px) translateY(${parallax.y * 0.1}px)`,
                 }}
                 className="space-y-6 sm:space-y-8 text-center max-w-6xl w-full px-2 sm:px-4">
                 {/* Small Label */}
@@ -183,10 +180,10 @@ export default function Home() {
                   whileInView="visible"
                   viewport={viewportOnce}
                   variants={slideInFromTop}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-purple-500/30 bg-purple-500/10 mx-auto backdrop-blur-sm"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-purple-500/40 bg-gradient-to-r from-purple-500/20 to-pink-500/20 mx-auto backdrop-blur-md shadow-lg"
                 >
-                  <span className="text-lg">🇨🇾</span>
-                  <span className="text-purple-300 text-sm font-medium">CYPRUS ADVENTURES</span>
+                  <span className="text-2xl">🌴</span>
+                  <span className="text-purple-200 text-sm font-bold tracking-wide">CYPRUS EXPERIENCES</span>
                 </motion.div>
 
                 {/* Main Title */}
@@ -194,10 +191,10 @@ export default function Home() {
                   <motion.h1 
                     className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-black leading-tight"
                     style={{
-                      transform: isMobileDevice ? 'none' : `perspective(1000px) rotateX(${parallax.rotateX * 0.5}deg) rotateY(${parallax.rotateY * 0.5}deg)`,
+                      transform: isMobileDevice ? 'none' : `perspective(1000px) rotateX(${parallax.rotateX * 0.2}deg) rotateY(${parallax.rotateY * 0.2}deg)`,
                     }}
                   >
-                    <span className="text-white neon-hover drop-shadow-2xl">3 DAYS OF</span>{' '}
+                    <span className="text-white neon-hover drop-shadow-2xl">UNFORGETTABLE</span>{' '}
                     <span className="relative inline-block">
                       <span className="absolute inset-0 blur-2xl bg-purple-600/50"></span>
                       <GlitchText 
@@ -209,77 +206,38 @@ export default function Home() {
                 </div>
 
                 {/* Subtitle */}
-                <p className="text-sm sm:text-base text-gray-300 leading-relaxed mx-auto max-w-2xl px-2 drop-shadow-lg">
-                  Let Memora take you on an incredible journey to experience{' '}
-                  <motion.span 
-                    className="text-purple-400 font-semibold relative inline-block"
-                    animate={{
-                      textShadow: [
-                        '0 0 10px rgba(139, 92, 246, 0.5)',
-                        '0 0 20px rgba(139, 92, 246, 0.8)',
-                        '0 0 10px rgba(139, 92, 246, 0.5)',
-                      ],
-                    }}
-                    transition={{ duration: 2, repeat: Infinity }}
-                  >
-                    Cyprus
-                  </motion.span>
-                  {' and its '}
-                  <motion.span 
-                    className="text-pink-400 font-semibold relative inline-block"
-                    animate={{
-                      textShadow: [
-                        '0 0 10px rgba(251, 113, 133, 0.5)',
-                        '0 0 20px rgba(251, 113, 133, 0.8)',
-                        '0 0 10px rgba(251, 113, 133, 0.5)',
-                      ],
-                    }}
-                    transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
-                  >
-                    legendary nightlife
-                  </motion.span>
-                  {' like '}
-                  <motion.span 
-                    className="text-cyan-400 font-semibold relative inline-block"
-                    animate={{
-                      textShadow: [
-                        '0 0 10px rgba(34, 211, 238, 0.5)',
-                        '0 0 20px rgba(34, 211, 238, 0.8)',
-                        '0 0 10px rgba(34, 211, 238, 0.5)',
-                      ],
-                    }}
-                    transition={{ duration: 2, repeat: Infinity, delay: 1 }}
-                  >
-                    never before
-                  </motion.span>
-                  .
+                <p className="text-base sm:text-lg md:text-xl text-gray-200 leading-relaxed mx-auto max-w-3xl px-2">
+                  Epic{' '}
+                  <span className="text-purple-400 font-bold">3-day adventures</span>
+                  {' and '}
+                  <span className="text-pink-400 font-bold">single-night events</span>
+                  {' across the most beautiful island in the Mediterranean'}
                 </p>
 
                 {/* Features */}
                 <motion.div 
-                  className="flex flex-wrap gap-3 sm:gap-6 justify-center"
+                  className="flex flex-wrap gap-4 justify-center"
                   initial="hidden"
                   whileInView="visible"
                   viewport={viewportOnce}
                   variants={fadeIn}
-                  transition={{ staggerChildren: 0.1 }}
                 >
-                  {['Beach Adventures', 'Epic Parties', 'Cultural Experiences'].map((feature, index) => (
+                  {[
+                    { icon: '🏖️', label: 'Beach Parties' },
+                    { icon: '🎉', label: 'Epic Clubs' },
+                    { icon: '🏛️', label: 'Culture & History' },
+                    { icon: '🌊', label: 'Water Sports' }
+                  ].map((feature, index) => (
                     <motion.div
-                      key={feature}
-                      variants={{
-                        hidden: { opacity: 0, scale: 0.8 },
-                        visible: { 
-                          opacity: 1, 
-                          scale: 1,
-                          transition: { delay: index * 0.1 }
-                        }
-                      }}
-                      whileHover={{ scale: 1.1, y: -5 }}
-                      className="flex items-center gap-2 text-gray-300 hover:text-purple-300 transition-colors cursor-pointer group backdrop-blur-sm bg-black/20 px-3 py-1 rounded-full"
+                      key={feature.label}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.7 + index * 0.1 }}
+                      whileHover={{ scale: 1.05, y: -3 }}
+                      className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-br from-purple-500/15 to-pink-500/15 border border-purple-500/30 rounded-full backdrop-blur-sm hover:border-purple-400/60 hover:from-purple-500/25 hover:to-pink-500/25 transition-all shadow-lg"
                     >
-                      <div className="w-2 h-2 bg-purple-500 rounded-full animate-pulse group-hover:bg-purple-400 group-hover:glow-pulse" />
-                      <span className="text-sm whitespace-nowrap">{feature}</span>
+                      <span className="text-xl">{feature.icon}</span>
+                      <span className="text-sm font-semibold text-white">{feature.label}</span>
                     </motion.div>
                   ))}
                 </motion.div>
@@ -293,131 +251,59 @@ export default function Home() {
                   className="mt-12"
                 >
                   <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                    {/* Scroll to Cyprus Map Button */}
-                    <button
+                    {/* Primary CTA */}
+                    <motion.button
+                      onClick={() => setIsBookingPopupOpen(true)}
+                      whileHover={{ scale: 1.05, y: -3 }}
+                      whileTap={{ scale: 0.95 }}
+                      className="group relative px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full text-white font-bold text-lg shadow-2xl hover:shadow-purple-500/50 transition-all overflow-hidden"
+                    >
+                      <motion.div
+                        className="absolute inset-0 bg-gradient-to-r from-pink-600 to-purple-600"
+                        initial={{ x: '-100%' }}
+                        whileHover={{ x: '100%' }}
+                        transition={{ duration: 0.6 }}
+                      />
+                      <span className="relative z-10 flex items-center gap-2">
+                        Book Your Adventure
+                        <span className="text-xl">🚀</span>
+                      </span>
+                    </motion.button>
+
+                    {/* Secondary CTA */}
+                    <motion.button
                       onClick={() => {
                         const nextTripElement = document.querySelector('#next-trip');
                         if (nextTripElement) {
                           nextTripElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
                         }
                       }}
-                      className="flex items-center gap-2 px-6 py-3 bg-black/20 border border-purple-500/30 rounded-full text-gray-300 hover:text-purple-300 hover:border-purple-500/50 transition-colors backdrop-blur-sm"
+                      whileHover={{ scale: 1.03, y: -2 }}
+                      whileTap={{ scale: 0.97 }}
+                      className="px-8 py-4 bg-black/40 backdrop-blur-sm border-2 border-purple-500/40 rounded-full text-white font-bold text-lg hover:bg-purple-500/10 hover:border-purple-400/60 transition-all shadow-lg"
                     >
-                      <span>✈️</span>
-                      <span className="font-medium">Next Trip</span>
-                    </button>
-
-                    {/* Enhanced Sign Up Button */}
-                    <EnhancedGetStartedButton 
-                      onClick={() => setIsBookingPopupOpen(true)}
-                      className="shadow-2xl hover:shadow-purple-500/25"
-                    />
+                      <span className="flex items-center gap-2">
+                        View All Trips
+                        <span>→</span>
+                      </span>
+                    </motion.button>
                   </div>
                 </motion.div>
 
-                {/* Dynamic Countdown Timer */}
-                <motion.div
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={viewportOnce}
-                  variants={fadeIn}
-                >
-                  <HeroCountdown />
-                </motion.div>
-
-                {/* Scroll Animation */}
-                <motion.div
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={viewportOnce}
-                  variants={fadeIn}
-                  className="mt-12 flex flex-col items-center"
-                >
-                  <motion.div
-                    className="cursor-pointer group"
-                    onClick={() => {
-                      const faqSection = document.querySelector('#faq');
-                      if (faqSection) {
-                        (faqSection as HTMLElement).scrollIntoView({ behavior: 'smooth', block: 'start' });
-                        return;
-                      }
-                      const fallbackSection = document.querySelector('[data-cyprus-map]') || document.querySelector('section:nth-child(2)');
-                      if (fallbackSection) {
-                        (fallbackSection as HTMLElement).scrollIntoView({ behavior: 'smooth', block: 'start' });
-                      } else {
-                        window.scrollTo({ top: window.innerHeight, behavior: 'smooth' });
-                      }
-                    }}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <motion.div
-                      className="flex flex-col items-center gap-3"
-                      animate={{ y: [0, 12, 0] }}
-                      transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
-                    >
-                      <motion.span
-                        className="text-purple-400 text-sm font-medium tracking-wider uppercase"
-                        animate={{
-                          textShadow: [
-                            '0 0 10px rgba(139, 92, 246, 0.3)',
-                            '0 0 15px rgba(139, 92, 246, 0.6)',
-                            '0 0 10px rgba(139, 92, 246, 0.3)',
-                          ],
-                        }}
-                        transition={{ duration: 3, repeat: Infinity }}
-                      >
-                        Got a Question?
-                      </motion.span>
-                      <motion.div
-                        className="flex flex-col gap-1"
-                        animate={{ y: [0, 6, 0] }}
-                        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                      >
-                        <motion.div 
-                          className="w-1 h-3 bg-purple-400 rounded-full"
-                          animate={{ opacity: [0.4, 1, 0.4] }}
-                          transition={{ duration: 2, repeat: Infinity, delay: 0 }}
-                        />
-                        <motion.div 
-                          className="w-1 h-3 bg-purple-400 rounded-full"
-                          animate={{ opacity: [0.4, 1, 0.4] }}
-                          transition={{ duration: 2, repeat: Infinity, delay: 0.3 }}
-                        />
-                        <motion.div 
-                          className="w-1 h-3 bg-purple-400 rounded-full"
-                          animate={{ opacity: [0.4, 1, 0.4] }}
-                          transition={{ duration: 2, repeat: Infinity, delay: 0.6 }}
-                        />
-                      </motion.div>
-                      <motion.div
-                        className="w-6 h-6 border-2 border-purple-400 rounded-full flex items-center justify-center"
-                        animate={{ y: [0, 8, 0] }}
-                        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                      >
-                        <motion.div
-                          className="w-1 h-1 bg-purple-400 rounded-full"
-                          animate={{ scale: [1, 1.5, 1] }}
-                          transition={{ duration: 2, repeat: Infinity }}
-                        />
-                      </motion.div>
-                    </motion.div>
-                  </motion.div>
-                </motion.div>
               </motion.div>
             </div>
           </div>
         </div>
       </section>
 
+      {/* About Memora Section */}
+      <AboutMemoraSection />
+
       {/* Next Trip Details Section */}
       <NextTripSection isHomepage={true} />
       
-      {/* Gallery Section */}
-      <GallerySection />
-      
-      {/* Blog Section */}
-      <BlogSection />
+      {/* Events Section */}
+      <EventsSection />
       
       {/* FAQ Section */}
       <FAQSection />

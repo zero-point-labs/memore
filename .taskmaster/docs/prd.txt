@@ -1,0 +1,1144 @@
+# Memora Experience Platform Enhancement - Product Requirements Document
+
+## Executive Summary
+
+Memora is a student-focused trip and event organizing company in Cyprus. This project enhances the platform by adding clarity about what Memora is, introducing a new events system for single-night parties, and implementing a complete payment and notification system with Stripe integration.
+
+---
+
+## Problem Statement
+
+### Current Issues
+1. **Unclear Value Proposition**: Visitors don't immediately understand what Memora is or what services they offer
+2. **Limited Event Types**: Only 3-day adventures are offered; no single-night events (parties, club nights, beach bars)
+3. **Manual Payment Processing**: No automated payment system, split payment capability, or booking management
+4. **No Notification System**: No automated email/SMS notifications for bookings and payments
+5. **Poor Information Architecture**: Content flow doesn't guide users through understanding → exploration → booking
+
+### Business Impact
+- Lost conversions due to confusion about services
+- Missed revenue opportunities from single-night events
+- Manual administrative overhead for payments
+- Poor customer experience due to lack of communication
+- Difficulty scaling operations
+
+---
+
+## Goals & Success Metrics
+
+### Primary Goals
+1. **Increase Understanding**: 80%+ of visitors should understand what Memora offers within 30 seconds
+2. **Expand Revenue Streams**: Launch events system to capture single-night party market
+3. **Automate Payments**: Implement split payment system (30% deposit + 70% before trip)
+4. **Improve Customer Experience**: Automated notifications at every booking stage
+5. **Reduce Manual Work**: 90% reduction in payment-related administrative tasks
+
+### Success Metrics
+- **Conversion Rate**: Increase by 40% (better clarity → more bookings)
+- **Average Booking Value**: Track separately for trips vs events
+- **Payment Success Rate**: >98% for automated charges
+- **Notification Delivery**: >95% for SMS, >98% for email
+- **Customer Satisfaction**: >4.5/5 rating on booking experience
+- **Administrative Time**: Reduce payment processing time by 90%
+
+---
+
+## Target Audience
+
+### Primary Users
+1. **Students (18-25 years old)**
+   - University/college students in Cyprus
+   - Looking for organized social experiences
+   - Budget-conscious but willing to pay for quality
+   - Tech-savvy, mobile-first users
+
+2. **Young Professionals (25-30 years old)**
+   - Recently graduated or early career
+   - Want hassle-free entertainment
+   - Higher disposable income than students
+
+### User Personas
+
+**Persona 1: "Party Enthusiast Elena"**
+- 21-year-old student at University of Cyprus
+- Loves nightlife and social events
+- Limited budget but prioritizes experiences
+- Uses Instagram for event discovery
+- Needs: Quick event booking, clear pricing, group discounts
+
+**Persona 2: "Adventure Seeker Marcus"**
+- 24-year-old working professional
+- Wants balanced experiences (party + culture)
+- Can afford premium packages
+- Values organization and reliability
+- Needs: Detailed itineraries, seamless payment, responsive support
+
+---
+
+## Product Requirements
+
+## 1. About Memora Section (NEW)
+
+### Purpose
+Immediately clarify what Memora is and build trust with first-time visitors.
+
+### Requirements
+
+#### 1.1 Visual Design
+- **Background**: Light background (#F8F9FA or similar) to contrast with dark hero
+- **Layout**: Two-column layout (content left, mascot right on desktop)
+- **Mascot Integration**: Display memora-mascot-bird.png prominently
+- **Mobile**: Stack vertically, mascot above content
+
+#### 1.2 Content Elements
+- **Headline**: "What is Memora?" or "Your Cyprus Experience Partner"
+- **Subheadline**: Brief value proposition (1-2 sentences)
+- **Description**: 2-3 paragraphs explaining:
+  - Who we are (student trip/event organizers)
+  - What we offer (3-day adventures + single-night events)
+  - Why choose us (all-inclusive, local expertise, safety-first)
+- **Trust Badges**: 
+  - Years in operation
+  - Happy customers count
+  - Safety certifications
+  - Partner logos (universities, venues)
+- **CTA Button**: "Explore Our Experiences" → scroll to trips/events
+
+#### 1.3 Placement
+- Positioned immediately after hero section
+- Before 3-day adventures section
+- Seamless transition between dark hero and dark content sections
+
+#### 1.4 Animation & Interaction
+- Fade-in animation on scroll
+- Mascot subtle floating/breathing animation
+- Hover effects on trust badges
+- Parallax effect on mascot (optional)
+
+---
+
+## 2. Events System (NEW)
+
+### Purpose
+Create a new category of single-night party/club events separate from 3-day adventures.
+
+### Event Types
+1. **Club Nights**: VIP access to nightclubs
+2. **Beach Bar Parties**: Sunset/daytime beach events
+3. **Boat Parties**: Short cruise parties
+4. **Festival Events**: Music festivals, themed parties
+5. **Bar Crawls**: Multi-venue nightlife tours
+
+### 2.1 Database Schema - Events Collection
+
+#### Collection: `events`
+
+**Core Fields:**
+```typescript
+{
+  // Identification
+  id: string (auto-generated)
+  title: string (required)
+  slug: string (auto-generated from title)
+  
+  // Basic Info
+  description: string (required, 200-500 chars)
+  longDescription: string (optional, markdown support)
+  eventType: "club-night" | "beach-party" | "boat-party" | "festival" | "bar-crawl"
+  
+  // Date & Time
+  eventDate: datetime (required)
+  startTime: string (e.g., "22:00")
+  endTime: string (e.g., "04:00")
+  duration: number (hours)
+  
+  // Location
+  venue: string (required, e.g., "Castle Club Ayia Napa")
+  venueAddress: string
+  city: "ayia-napa" | "limassol" | "paphos" | "larnaca" | "nicosia" | "protaras"
+  location: {
+    lat: number,
+    lng: number
+  } (optional)
+  
+  // Media
+  featuredImage: string (Appwrite file ID)
+  gallery: string[] (array of Appwrite file IDs)
+  videoUrl: string (optional, YouTube/Vimeo embed)
+  
+  // Pricing
+  pricing: {
+    general: {
+      price: number,
+      currency: string,
+      available: boolean
+    },
+    vip: {
+      price: number,
+      currency: string,
+      available: boolean,
+      benefits: string[] (e.g., ["Skip line", "Free drink", "VIP area"])
+    },
+    earlyBird: {
+      price: number,
+      deadline: datetime,
+      available: boolean
+    }
+  }
+  
+  // Availability
+  capacity: {
+    general: number,
+    vip: number,
+    generalTaken: number,
+    vipTaken: number,
+    generalRemaining: number (calculated),
+    vipRemaining: number (calculated)
+  }
+  
+  // What's Included
+  includes: string[] (e.g., ["Entry fee", "Welcome drink", "Transport from Limassol"])
+  
+  // Requirements & Restrictions
+  ageRestriction: number (default: 18)
+  dresscode: string (optional, e.g., "Smart casual")
+  requirements: string[] (e.g., ["Valid ID", "Vaccination certificate"])
+  
+  // Highlights
+  highlights: string[] (3-5 bullet points)
+  lineup: string[] (optional, for DJ/artist names)
+  
+  // Booking Settings
+  bookingStatus: "open" | "limited" | "sold-out" | "cancelled"
+  paymentType: "full-upfront" | "split-50-50" | "deposit-30-70"
+  cancellationPolicy: string
+  
+  // Admin
+  published: boolean
+  featured: boolean
+  category: string[] (tags like "nightlife", "beach", "luxury")
+  organizer: string (e.g., "Memora Team")
+  
+  // Metadata
+  createdAt: datetime (auto)
+  updatedAt: datetime (auto)
+  views: number (tracking)
+  bookingCount: number (tracking)
+}
+```
+
+### 2.2 Events Section Design
+
+#### Layout
+- **Section Title**: "Upcoming Events" or "Single Night Experiences"
+- **Filter Bar**: 
+  - Event type filter
+  - Date range picker
+  - City filter
+  - Price range slider
+- **Event Cards Grid**: 3 columns desktop, 2 tablet, 1 mobile
+- **View Toggle**: Grid view / List view
+
+#### Event Card Components
+- **Image**: Featured image with event type badge overlay
+- **Date Badge**: Prominent date display
+- **Title**: Event name
+- **Venue**: Location with city
+- **Price**: Starting from price with ticket types
+- **Status Badge**: "Selling Fast", "Few Spots Left", "Sold Out"
+- **CTA Button**: "Get Tickets" or "View Details"
+- **Quick Info Icons**: Time, capacity, age restriction
+
+#### Event Detail Page
+- **Hero Section**: Large image/video with floating booking card
+- **Key Info**: Date, time, venue, capacity
+- **Ticket Types**: General, VIP with benefits comparison
+- **Event Description**: Full details with markdown support
+- **What's Included**: Visual list of inclusions
+- **Lineup/Artists**: If applicable
+- **Venue Map**: Google Maps integration
+- **Gallery**: Photo gallery from previous similar events
+- **FAQ**: Event-specific questions
+- **Booking Widget**: Sticky sidebar on desktop
+
+---
+
+## 3. Payment System Integration
+
+### 3.1 Split Payment Architecture
+
+#### Payment Flow for 3-Day Trips
+1. **Initial Booking (30% Deposit)**
+   - Customer completes booking form
+   - Selects package and preferences
+   - Saves payment method with Stripe
+   - Pays 30% deposit immediately
+   - Payment method saved for future charge
+
+2. **Balance Collection (70% - Automated)**
+   - Scheduled charge 7 days before trip start date
+   - Automatic charge to saved payment method
+   - 3 retry attempts if first charge fails
+   - Customer notifications at each stage
+
+#### Payment Flow for Events (Flexible)
+- **Option A**: 100% upfront (recommended for single-night events)
+- **Option B**: 50% deposit, 50% 48 hours before event
+- **Option C**: Same as trips (30/70) for expensive events
+
+### 3.2 Required Stripe Components
+
+#### Stripe Products to Implement
+1. **Payment Intents**: For immediate charges (deposits)
+2. **Setup Intents**: For saving payment methods
+3. **Payment Methods**: Saved cards for future charges
+4. **Customers**: Stripe customer objects linked to Appwrite customers
+5. **Webhooks**: For payment event handling
+6. **Invoices**: For payment records and receipts
+
+#### New Appwrite Collections
+
+**Collection: `customers`**
+```typescript
+{
+  id: string
+  firstName: string
+  lastName: string
+  email: string
+  phone: string
+  phoneCountryCode: string (e.g., "+357")
+  university: string
+  stripeCustomerId: string (links to Stripe)
+  defaultPaymentMethodId: string
+  
+  // Communication Preferences
+  emailOptIn: boolean
+  smsOptIn: boolean
+  preferredLanguage: "en" | "el" | "tr"
+  
+  // Metadata
+  totalBookings: number
+  totalSpent: number
+  createdAt: datetime
+  updatedAt: datetime
+}
+```
+
+**Collection: `bookings`**
+```typescript
+{
+  id: string
+  bookingNumber: string (unique, e.g., "MEM-2025-001")
+  
+  // Reference IDs
+  customerId: string (Appwrite customer ID)
+  tripId: string (optional, if trip booking)
+  eventId: string (optional, if event booking)
+  bookingType: "trip" | "event"
+  
+  // Package Details
+  packageType: string (e.g., "standard", "premium", "vip")
+  numberOfPeople: number
+  
+  // Pricing
+  totalAmount: number
+  depositAmount: number (30% or full amount)
+  balanceAmount: number (70% or 0)
+  currency: string (default: "EUR")
+  
+  // Payment References
+  depositPaymentIntentId: string
+  balancePaymentIntentId: string (optional)
+  stripeCustomerId: string
+  paymentMethodId: string
+  
+  // Dates
+  balanceDueDate: datetime (trip start date - 7 days)
+  bookingDate: datetime
+  
+  // Status Tracking
+  bookingStatus: "pending" | "confirmed" | "paid" | "cancelled"
+  depositStatus: "pending" | "paid" | "failed"
+  balanceStatus: "scheduled" | "paid" | "failed" | "not-applicable"
+  
+  // Booking Details (for trips)
+  roomPreference: string (optional)
+  transportPreference: string (optional)
+  dietaryRequirements: string (optional)
+  emergencyContact: string
+  specialRequests: string (optional)
+  
+  // Event Details (for events)
+  ticketType: string (optional, e.g., "general", "vip")
+  ticketQuantity: number (optional)
+  
+  // Metadata
+  createdAt: datetime
+  updatedAt: datetime
+}
+```
+
+**Collection: `payment_schedules`**
+```typescript
+{
+  id: string
+  bookingId: string
+  customerId: string
+  
+  // Payment Details
+  paymentType: "deposit" | "balance"
+  amount: number
+  currency: string
+  
+  // Scheduling
+  scheduledDate: datetime
+  executedAt: datetime (optional)
+  
+  // Status
+  status: "pending" | "processing" | "completed" | "failed" | "cancelled"
+  
+  // Retry Logic
+  retryCount: number (default: 0)
+  maxRetries: number (default: 3)
+  lastAttemptAt: datetime (optional)
+  nextRetryAt: datetime (optional)
+  
+  // Error Handling
+  errorMessage: string (optional)
+  errorCode: string (optional)
+  
+  // References
+  paymentIntentId: string (optional)
+  
+  // Metadata
+  createdAt: datetime
+  updatedAt: datetime
+}
+```
+
+**Collection: `notifications`**
+```typescript
+{
+  id: string
+  bookingId: string
+  customerId: string
+  
+  // Notification Details
+  type: "booking-confirmation" | "deposit-success" | "balance-reminder" | "balance-success" | "payment-failed" | "trip-reminder"
+  method: "email" | "sms" | "both"
+  
+  // Content
+  recipient: string (email or phone)
+  subject: string (for emails)
+  content: string
+  
+  // Status
+  status: "pending" | "sent" | "delivered" | "failed" | "bounced"
+  sentAt: datetime (optional)
+  deliveredAt: datetime (optional)
+  
+  // Error Handling
+  errorMessage: string (optional)
+  retryCount: number (default: 0)
+  
+  // Provider Details
+  providerMessageId: string (optional, Twilio/Resend ID)
+  
+  // Metadata
+  createdAt: datetime
+}
+```
+
+### 3.3 Stripe API Endpoints
+
+**Required API Routes:**
+
+1. `/api/payments/create-deposit`
+   - Creates Stripe customer if new
+   - Creates payment intent for deposit
+   - Saves payment method for future use
+   - Creates booking in database
+   - Schedules balance payment
+   - Triggers confirmation notifications
+
+2. `/api/payments/process-balance`
+   - Retrieves scheduled balance payments
+   - Charges saved payment method
+   - Updates booking status
+   - Triggers success/failure notifications
+   - Schedules retries if failed
+
+3. `/api/payments/update-payment-method`
+   - Allows customer to update saved card
+   - Creates new setup intent
+   - Updates payment method in Stripe + database
+
+4. `/api/webhooks/stripe`
+   - Handles Stripe webhook events
+   - Processes payment confirmations
+   - Updates database statuses
+   - Triggers notifications
+
+5. `/api/payments/cancel-booking`
+   - Cancels pending balance charges
+   - Updates booking status
+   - Processes refunds (if applicable)
+   - Sends cancellation notifications
+
+---
+
+## 4. Notification System
+
+### 4.1 Email Notifications (Resend)
+
+#### Email Templates Required
+
+1. **Booking Confirmation Email**
+   - Trigger: After successful deposit payment
+   - Content:
+     - Booking confirmation number
+     - Trip/event details
+     - Payment summary (deposit paid, balance due)
+     - What to expect next
+     - Contact information
+     - PDF attachment with full itinerary (trips only)
+
+2. **Balance Due Reminder (7 days before)**
+   - Trigger: 7 days before trip start
+   - Content:
+     - Reminder of upcoming trip
+     - Balance amount to be charged
+     - Date of automatic charge
+     - Option to update payment method
+     - Contact for questions
+
+3. **Balance Payment Success**
+   - Trigger: After successful balance charge
+   - Content:
+     - Payment confirmation
+     - Final amount charged
+     - Trip preparation checklist
+     - Check-in details and meeting point
+     - Packing list
+     - Emergency contact
+
+4. **Payment Failed**
+   - Trigger: After failed balance charge
+   - Content:
+     - Payment failure notification
+     - Reason for failure
+     - Action required (update payment method)
+     - Deadline for resolution
+     - Link to update payment
+     - Support contact
+
+5. **Trip/Event Reminder (24-48 hours before)**
+   - Trigger: 1-2 days before trip/event
+   - Content:
+     - Excitement builder
+     - Final details and meeting point
+     - What to bring
+     - Weather forecast
+     - Emergency contacts
+     - Last-minute tips
+
+#### Email Service Setup
+- Service: **Resend** (recommended) or SendGrid
+- Domain: Custom domain verification for professional sender
+- Template Engine: React Email or Handlebars
+- Features:
+  - HTML + Plain text versions
+  - Mobile-responsive design
+  - Unsubscribe management
+  - Bounce handling
+  - Analytics tracking
+
+### 4.2 SMS Notifications (Twilio)
+
+#### SMS Templates Required
+
+1. **Booking Confirmation SMS**
+```
+🎉 Booking confirmed! Deposit €[amount] paid. 
+Balance €[balance] due [date]. 
+Trip: [trip-name] on [date]. 
+Booking #[number]. 
+Questions? Reply or call +357XXXXXXXX - Memora
+```
+
+2. **Balance Reminder SMS**
+```
+⏰ Hi [name]! Cyprus trip balance €[amount] 
+will be charged tomorrow [date]. 
+Card ending [last4]. 
+Update payment: [link] 
+Questions? +357XXXXXXXX - Memora
+```
+
+3. **Balance Payment Success SMS**
+```
+✅ Payment complete! €[amount] charged. 
+Your [trip-name] adventure starts [date]! 
+Check email for details. 
+Excited to see you! - Memora Team
+```
+
+4. **Payment Failed SMS**
+```
+❌ Payment failed for [trip-name]. 
+Update card ASAP: [short-link]
+Deadline: [date] 
+Support: +357XXXXXXXX - Memora
+```
+
+5. **Event Day SMS** (for events)
+```
+🎊 Tonight's the night! [event-name] at [venue]
+Entry: Show this SMS + ID
+Time: [time] | VIP: [instructions]
+See you there! - Memora
+```
+
+#### SMS Service Setup
+- Service: **Twilio**
+- Number: Cyprus (+357) number preferred
+- Features:
+  - International sending capability
+  - Delivery confirmation webhooks
+  - Opt-out management (STOP keyword)
+  - Two-way messaging for support
+  - Cost tracking per message
+
+#### SMS Best Practices
+- Keep under 160 characters when possible
+- Include branding (Memora)
+- Provide opt-out instructions
+- Use emojis sparingly but effectively
+- Include critical info: amount, date, action
+- Always provide phone support number
+- Use URL shorteners for links
+
+---
+
+## 5. N8N Automation Integration (Optional but Recommended)
+
+### Purpose
+N8N provides visual workflow automation to reduce custom code and improve maintainability.
+
+### N8N Workflows to Create
+
+#### 5.1 Payment Processing Workflow
+- **Trigger**: Scheduled cron (daily at 9 AM)
+- **Steps**:
+  1. Query Appwrite for balance payments due today
+  2. For each booking:
+     - Check payment schedule status
+     - Retrieve Stripe customer and payment method
+     - Create payment intent for balance amount
+     - Process charge
+     - Update booking status in Appwrite
+     - Trigger notification workflow
+  3. Handle failures with retry scheduling
+  4. Send admin summary report
+
+#### 5.2 Notification Workflow
+- **Trigger**: Webhook from payment processing
+- **Steps**:
+  1. Receive booking and event type
+  2. Fetch customer communication preferences
+  3. Select appropriate templates
+  4. Personalize content with booking data
+  5. Send email via Resend
+  6. Send SMS via Twilio (if opted in)
+  7. Log notifications in Appwrite
+  8. Track delivery status
+  9. Handle failures with retries
+
+#### 5.3 Payment Reminder Workflow
+- **Trigger**: Scheduled cron (daily at 10 AM)
+- **Steps**:
+  1. Query bookings with balance due in 7 days
+  2. For each booking:
+     - Fetch customer details
+     - Generate reminder content
+     - Send email reminder
+     - Send SMS reminder (if opted in)
+     - Update reminder sent flag
+  3. Send admin report of reminders sent
+
+#### 5.4 Failed Payment Recovery Workflow
+- **Trigger**: Webhook from failed payment event
+- **Steps**:
+  1. Receive failed payment details
+  2. Increment retry counter
+  3. If retries < max:
+     - Schedule next retry (24 hours later)
+     - Send customer notification with update payment link
+  4. If retries exceeded:
+     - Send final warning to customer
+     - Notify admin for manual intervention
+     - Mark booking as "payment-failed"
+
+### N8N Setup Requirements
+- Self-hosted or cloud instance
+- Integration credentials:
+  - Appwrite (endpoint, project ID, API key)
+  - Stripe (secret key)
+  - Resend (API key)
+  - Twilio (account SID, auth token, phone number)
+- Webhook endpoints exposed to internet
+- Cron scheduling configured
+
+---
+
+## 6. User Interface Updates
+
+### 6.1 Homepage Reorganization
+
+**New Content Flow:**
+```
+1. Hero Section (Dark - Existing)
+   - Video background
+   - Main headline
+   - CTA buttons
+
+2. About Memora Section (Light - NEW)
+   - What is Memora
+   - Mascot bird
+   - Trust indicators
+   - CTA: Explore experiences
+
+3. 3-Day Adventures Section (Dark - Existing)
+   - Featured trip card
+   - Upcoming trips carousel
+   - "View All Trips" CTA
+
+4. Events Section (Dark - NEW)
+   - Section title: "Upcoming Events"
+   - Event cards grid (3-4 events)
+   - Filter by type/date
+   - "View All Events" CTA
+
+5. FAQ Section (Dark - Existing)
+   - General FAQs
+   - Payment FAQs (NEW)
+   - Booking process FAQs (NEW)
+
+6. Contact Section (Dark - Existing)
+   - Contact form
+   - Social media
+   - Direct contacts
+
+7. Footer (Dark - Existing)
+```
+
+### 6.2 Enhanced Booking Form
+
+**Updates to BookingFormPopup Component:**
+
+#### Step 1: Personal Information
+- First name, last name
+- Email
+- Phone with country selector
+- University dropdown
+- Emergency contact
+
+#### Step 2: Package Selection (NEW)
+- Package type selection (Standard/Premium/VIP)
+- Number of people
+- Date selection (if multiple dates available)
+- Calculated total price display
+
+#### Step 3: Preferences
+- Transportation preference
+- Room preference (trips only)
+- Dietary requirements
+- Special requests
+
+#### Step 4: Payment Details (NEW)
+- Payment summary breakdown
+- Stripe Elements card input
+- "Save payment method" checkbox (required for split payment)
+- Terms acceptance
+  - Payment terms (30% now, 70% before trip)
+  - Cancellation policy
+  - Privacy policy
+
+#### Step 5: Confirmation
+- Booking summary
+- Submit button
+- Loading state during processing
+- Success animation
+- Booking confirmation number
+- Email/SMS confirmation notice
+
+### 6.3 New Pages Required
+
+1. **Events Listing Page** (`/events`)
+   - Grid of all events
+   - Filters and search
+   - Sorting options
+   - Load more / pagination
+
+2. **Single Event Page** (`/event/[id]`)
+   - Event details
+   - Ticket selection
+   - Booking widget
+   - Gallery
+   - Related events
+
+3. **Customer Portal** (`/account`)
+   - My bookings
+   - Upcoming trips/events
+   - Payment history
+   - Payment method management
+   - Communication preferences
+   - Profile settings
+
+4. **Booking Confirmation Page** (`/booking/[bookingNumber]`)
+   - Booking details
+   - Payment status
+   - Trip/event information
+   - Download itinerary
+   - Manage booking
+
+5. **Admin: Events Management** (`/admin/events`)
+   - Events CRUD
+   - Bookings per event
+   - Capacity management
+   - Quick stats
+
+6. **Admin: Payments Dashboard** (`/admin/payments`)
+   - Payment overview
+   - Scheduled charges
+   - Failed payments
+   - Revenue analytics
+   - Refund management
+
+---
+
+## 7. Technical Architecture
+
+### 7.1 Tech Stack (Current + New)
+
+**Frontend:**
+- Next.js 15 (App Router)
+- React 19
+- TypeScript
+- Tailwind CSS
+- Framer Motion
+- Shadcn UI components
+
+**Backend:**
+- Next.js API Routes
+- Appwrite (Database, Storage, Auth)
+- Stripe (Payments)
+- Resend (Email)
+- Twilio (SMS)
+- N8N (Workflow automation - optional)
+
+**Infrastructure:**
+- Vercel (Hosting + Serverless functions)
+- Appwrite Cloud or Self-hosted
+- Stripe (Payment processing)
+- External services (Resend, Twilio)
+
+### 7.2 Service Architecture
+
+```
+┌─────────────────┐
+│   Next.js App   │
+│   (Frontend)    │
+└────────┬────────┘
+         │
+    ┌────▼────┐
+    │  API    │
+    │ Routes  │
+    └────┬────┘
+         │
+    ┏━━━━┷━━━━━━━━━━━━━━━━━━━┓
+    ┃                         ┃
+┌───▼────┐  ┌────▼────┐  ┌───▼───┐
+│Appwrite│  │ Stripe  │  │ N8N   │
+│Database│  │Payments │  │Workflows│
+└────────┘  └─────┬───┘  └───┬───┘
+                  │           │
+            ┌─────▼───┐  ┌───▼────┐
+            │ Resend  │  │ Twilio │
+            │ (Email) │  │  (SMS) │
+            └─────────┘  └────────┘
+```
+
+### 7.3 Data Flow
+
+**Booking Flow:**
+```
+1. User submits booking form
+   ↓
+2. API creates Stripe customer (if new)
+   ↓
+3. API creates payment intent for deposit
+   ↓
+4. User completes payment with Stripe Elements
+   ↓
+5. Stripe webhook confirms payment
+   ↓
+6. API creates booking in Appwrite
+   ↓
+7. API schedules balance payment
+   ↓
+8. API triggers notifications (email + SMS)
+   ↓
+9. N8N workflow sends notifications
+   ↓
+10. User receives confirmation
+```
+
+**Balance Payment Flow:**
+```
+1. N8N cron job runs daily (9 AM)
+   ↓
+2. Queries bookings with balance due today
+   ↓
+3. For each booking:
+   ↓
+4. Retrieve saved payment method from Stripe
+   ↓
+5. Create and confirm payment intent
+   ↓
+6. Update booking status in Appwrite
+   ↓
+7. Trigger notification workflow
+   ↓
+8. Send success/failure email + SMS
+   ↓
+9. If failed: Schedule retry + send recovery email
+   ↓
+10. Admin dashboard updated with results
+```
+
+---
+
+## 8. Security & Compliance
+
+### 8.1 Payment Security
+- PCI DSS compliance via Stripe (Level 1)
+- No card data stored on our servers
+- Stripe Elements for secure card input
+- Webhook signature verification
+- API key encryption
+- HTTPS everywhere
+
+### 8.2 Data Protection
+- GDPR compliance for EU customers
+- Data minimization principle
+- Opt-in for marketing communications
+- Right to access/delete personal data
+- Secure password handling (Appwrite)
+- API rate limiting
+
+### 8.3 Fraud Prevention
+- Stripe Radar for fraud detection
+- 3D Secure authentication when required
+- Suspicious activity monitoring
+- IP and device fingerprinting
+- Manual review for large bookings
+
+---
+
+## 9. Testing Requirements
+
+### 9.1 Unit Tests
+- Payment calculation functions
+- Date/time utilities
+- Notification content generation
+- Validation functions
+
+### 9.2 Integration Tests
+- Stripe payment flow (with test mode)
+- Email sending (test addresses)
+- SMS sending (verified numbers)
+- Webhook processing
+- Database operations
+
+### 9.3 End-to-End Tests
+- Complete booking flow (trips)
+- Complete booking flow (events)
+- Balance payment processing
+- Failed payment recovery
+- Notification delivery
+- Admin dashboard operations
+
+### 9.4 User Acceptance Testing
+- Mobile booking experience
+- Desktop booking experience
+- Email readability across clients
+- SMS delivery across carriers
+- Payment method updates
+- Customer portal usability
+
+---
+
+## 10. Launch Plan
+
+### Phase 1: Foundation (Week 1-2)
+- Set up About Memora section
+- Create events database schema
+- Set up Stripe test environment
+- Configure email/SMS services
+- Create basic events CRUD
+
+### Phase 2: Events System (Week 2-3)
+- Build events listing page
+- Build single event page
+- Implement event booking form
+- Admin events management
+- Test event creation and display
+
+### Phase 3: Payment Integration (Week 3-4)
+- Implement deposit payment (30%)
+- Set up payment method saving
+- Create booking confirmation flow
+- Implement email notifications
+- Test payment processing
+
+### Phase 4: Automation (Week 4-5)
+- Set up balance payment scheduling
+- Configure N8N workflows (if used)
+- Implement SMS notifications
+- Create payment reminder system
+- Test automated charging
+
+### Phase 5: Admin & Monitoring (Week 5-6)
+- Build admin payment dashboard
+- Implement payment analytics
+- Set up error monitoring (Sentry)
+- Create admin notification system
+- Test admin operations
+
+### Phase 6: Testing & Refinement (Week 6-7)
+- Comprehensive testing
+- Bug fixes
+- Performance optimization
+- Security audit
+- Documentation
+
+### Phase 7: Production Launch (Week 7-8)
+- Production environment setup
+- Live API keys configuration
+- Production testing with small amounts
+- Soft launch with limited users
+- Monitor and support
+- Full public launch
+
+---
+
+## 11. Success Criteria
+
+### Must Have (P0)
+✅ About Memora section live and informative
+✅ Events collection created with proper schema
+✅ Events listing and detail pages functional
+✅ Event booking form working
+✅ Stripe deposit payment (30%) working
+✅ Email confirmation notifications working
+✅ Admin can create/edit/delete events
+✅ Booking data properly stored in database
+
+### Should Have (P1)
+✅ Automated balance payment (70%) working
+✅ SMS notifications functional
+✅ Payment method saving for future charges
+✅ Customer portal with booking history
+✅ Admin payment dashboard
+✅ Failed payment retry logic
+✅ Payment reminders (email + SMS)
+
+### Nice to Have (P2)
+✅ N8N workflow automation
+✅ Advanced analytics dashboard
+✅ QR code tickets for events
+✅ Guest list management
+✅ Push notifications (PWA)
+✅ Multi-language support
+✅ Discount codes system
+
+---
+
+## 12. Risks & Mitigation
+
+### Technical Risks
+1. **Stripe payment failures**
+   - Mitigation: Retry logic, customer notifications, admin alerts
+   
+2. **Automated charge timing issues**
+   - Mitigation: Buffer days, manual override capability, monitoring
+
+3. **Email/SMS delivery failures**
+   - Mitigation: Multiple provider options, retry logic, fallback methods
+
+4. **Database scaling issues**
+   - Mitigation: Proper indexing, query optimization, caching
+
+### Business Risks
+1. **Customer disputes over automated charges**
+   - Mitigation: Clear terms, advance reminders, easy contact support
+
+2. **Payment processing costs**
+   - Mitigation: Monitor transaction fees, optimize payment flow, bulk operations
+
+3. **Regulatory compliance**
+   - Mitigation: Legal review, proper disclosures, data protection measures
+
+---
+
+## 13. Future Enhancements
+
+### Phase 2 Features (After Launch)
+- Mobile app (React Native)
+- Group booking management
+- Referral program
+- Loyalty points system
+- Social features (friend invitations)
+- Chat support integration
+- Video content integration
+- AR venue previews
+- Dynamic pricing based on demand
+- Package customization
+- Gift vouchers
+
+---
+
+## 14. Appendices
+
+### A. Glossary
+- **Deposit**: 30% upfront payment at booking
+- **Balance**: 70% remaining payment charged before trip
+- **Event**: Single-night party or club experience
+- **Trip**: 3-day adventure package
+- **Payment Intent**: Stripe object for collecting payment
+- **Webhook**: Automated notification from external service
+
+### B. References
+- Stripe API Documentation: https://stripe.com/docs/api
+- Resend Documentation: https://resend.com/docs
+- Twilio API Documentation: https://www.twilio.com/docs
+- Appwrite Documentation: https://appwrite.io/docs
+- N8N Documentation: https://docs.n8n.io
+
+### C. Contact Information
+- Project Owner: Memora Team
+- Development Team: [To be filled]
+- Timeline: 7-8 weeks
+- Budget: [To be determined based on scope]
+
+---
+
+**Document Version**: 1.0
+**Last Updated**: 2025-10-05
+**Status**: Draft for Review
+**Next Review**: After initial feedback
+
+---
+
+END OF PRODUCT REQUIREMENTS DOCUMENT
