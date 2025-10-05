@@ -268,7 +268,7 @@ export default function EventDetailPage() {
               transition={{ delay: 0.2 }}
               className="mb-12"
             >
-              <h3 className="text-2xl font-bold text-white mb-6">What's Included</h3>
+              <h3 className="text-2xl font-bold text-white mb-6">What&apos;s Included</h3>
               <div className="grid sm:grid-cols-2 gap-3">
                 {event.eventContent.includes.map((item, index) => (
                   <div key={index} className="flex items-start gap-3 p-4 bg-green-500/5 border border-green-500/20 rounded-xl">

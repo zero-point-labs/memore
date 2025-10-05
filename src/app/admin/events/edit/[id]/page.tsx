@@ -397,7 +397,7 @@ export default function EditEventPage() {
 
             {/* What's Included */}
             <div className="space-y-4">
-              <h3 className="text-xl font-bold text-white border-b border-purple-500/20 pb-3">What's Included</h3>
+              <h3 className="text-xl font-bold text-white border-b border-purple-500/20 pb-3">What&apos;s Included</h3>
               <div className="flex gap-2">
                 <input
                   type="text"
