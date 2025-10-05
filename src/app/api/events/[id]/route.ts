@@ -5,10 +5,11 @@ import { UpdateEventData } from '@/types/event';
 // GET /api/events/[id] - Get single event by ID
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const event = await eventService.getEvent(params.id);
+    const resolvedParams = await params;
+    const event = await eventService.getEvent(resolvedParams.id);
 
     if (!event) {
       return NextResponse.json(
@@ -33,7 +34,7 @@ export async function GET(
 // PUT /api/events/[id] - Update event (admin only)
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // TODO: Add admin authentication check
@@ -42,10 +43,11 @@ export async function PUT(
     //   return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
     // }
 
+    const resolvedParams = await params;
     const body = await request.json();
     const updateData: UpdateEventData = body;
 
-    const event = await eventService.updateEvent(params.id, updateData);
+    const event = await eventService.updateEvent(resolvedParams.id, updateData);
 
     return NextResponse.json({
       success: true,
@@ -64,7 +66,7 @@ export async function PUT(
 // DELETE /api/events/[id] - Delete event (admin only)
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // TODO: Add admin authentication check
@@ -73,7 +75,8 @@ export async function DELETE(
     //   return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
     // }
 
-    await eventService.deleteEvent(params.id);
+    const resolvedParams = await params;
+    await eventService.deleteEvent(resolvedParams.id);
 
     return NextResponse.json({
       success: true,

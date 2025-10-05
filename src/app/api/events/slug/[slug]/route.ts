@@ -4,10 +4,11 @@ import { eventService } from '@/services/eventService';
 // GET /api/events/slug/[slug] - Get event by slug
 export async function GET(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
-    const event = await eventService.getEventBySlug(params.slug);
+    const resolvedParams = await params;
+    const event = await eventService.getEventBySlug(resolvedParams.slug);
 
     if (!event) {
       return NextResponse.json(
