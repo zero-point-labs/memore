@@ -15,15 +15,33 @@ const DATABASE_ID = process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID || 'memora_db';
 const COLLECTION_ID = 'events';
 
 export class EventService {
-  // Helper to parse event document
+  // Helper to parse event document with safe JSON parsing
   private parseEventDocument(doc: Models.Document): EventDocument {
+    const safeJsonParse = (jsonString: string | undefined, fallback: any = {}) => {
+      if (!jsonString) return fallback;
+      try {
+        return JSON.parse(jsonString);
+      } catch (error) {
+        console.error('JSON parse error for:', jsonString, error);
+        return fallback;
+      }
+    };
+
+    const docData = doc as unknown as { 
+      eventDetails: string; 
+      venueInfo: string; 
+      pricing: string; 
+      capacity: string; 
+      eventContent: string; 
+    };
+
     return {
       ...(doc as unknown as EventDocument),
-      eventDetails: JSON.parse((doc as unknown as { eventDetails: string }).eventDetails),
-      venueInfo: JSON.parse((doc as unknown as { venueInfo: string }).venueInfo),
-      pricing: JSON.parse((doc as unknown as { pricing: string }).pricing),
-      capacity: JSON.parse((doc as unknown as { capacity: string }).capacity),
-      eventContent: JSON.parse((doc as unknown as { eventContent: string }).eventContent),
+      eventDetails: safeJsonParse(docData.eventDetails, {}),
+      venueInfo: safeJsonParse(docData.venueInfo, {}),
+      pricing: safeJsonParse(docData.pricing, {}),
+      capacity: safeJsonParse(docData.capacity, {}),
+      eventContent: safeJsonParse(docData.eventContent, {}),
     };
   }
 
@@ -70,15 +88,47 @@ export class EventService {
         queries.push(Query.offset(options.offset));
       }
 
+      console.log('EventService: Fetching events with queries:', queries);
+      console.log('EventService: Using DATABASE_ID:', DATABASE_ID, 'COLLECTION_ID:', COLLECTION_ID);
+
       const response = await databases.listDocuments(
         DATABASE_ID,
         COLLECTION_ID,
         queries
       );
 
-      return response.documents.map(doc => this.parseEventDocument(doc));
+      console.log('EventService: Raw response:', {
+        total: response.total,
+        documentsCount: response.documents.length
+      });
+
+      const parsedEvents = response.documents.map((doc, index) => {
+        try {
+          return this.parseEventDocument(doc);
+        } catch (parseError) {
+          console.error(`EventService: Error parsing document ${index} (${doc.$id}):`, parseError);
+          // Return a minimal event object to prevent complete failure
+          return {
+            ...doc,
+            eventDetails: {},
+            venueInfo: {},
+            pricing: {},
+            capacity: {},
+            eventContent: {},
+          } as EventDocument;
+        }
+      });
+
+      console.log('EventService: Successfully parsed', parsedEvents.length, 'events');
+      return parsedEvents;
     } catch (error) {
-      console.error('Error fetching events:', error);
+      console.error('EventService: Error fetching events:', error);
+      console.error('EventService: Error details:', {
+        message: error instanceof Error ? error.message : 'Unknown error',
+        databaseId: DATABASE_ID,
+        collectionId: COLLECTION_ID,
+        queries
+      });
       throw error;
     }
   }
