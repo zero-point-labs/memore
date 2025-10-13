@@ -3,7 +3,8 @@
 import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import { EventDocument } from '@/types/event';
-import EventCard from '@/components/EventCard';
+import MainEventCard from '@/components/MainEventCard';
+import CompactEventCard from '@/components/CompactEventCard';
 import Sparkles from '@/components/ui/Sparkles';
 import Link from 'next/link';
 
@@ -17,11 +18,25 @@ export default function EventsSection() {
 
   const fetchFeaturedEvents = async () => {
     try {
-      const response = await fetch('/api/events/featured?limit=3');
+      // Fetch upcoming events sorted by date (closest first)
+      const response = await fetch('/api/events?limit=6&published=true');
       const result = await response.json();
       
       if (result.success) {
-        setEvents(result.data);
+        // Sort events by date to ensure closest upcoming event is first
+        const sortedEvents = result.data.sort((a: any, b: any) => {
+          const dateA = new Date(a.eventDate).getTime();
+          const dateB = new Date(b.eventDate).getTime();
+          const now = Date.now();
+          
+          // Filter out past events and sort by closest upcoming
+          const futureA = dateA > now ? dateA : Infinity;
+          const futureB = dateB > now ? dateB : Infinity;
+          
+          return futureA - futureB;
+        }).filter((event: any) => new Date(event.eventDate).getTime() > Date.now());
+        
+        setEvents(sortedEvents);
       }
     } catch (error) {
       console.error('Error fetching featured events:', error);
@@ -74,7 +89,7 @@ export default function EventsSection() {
           </p>
         </motion.div>
 
-        {/* Events Grid */}
+        {/* Events Layout */}
         {loading ? (
           <div className="text-center py-20">
             <div className="text-purple-400 text-lg">Loading events...</div>
@@ -86,10 +101,20 @@ export default function EventsSection() {
           </div>
         ) : (
           <>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-              {events.map((event, index) => (
-                <EventCard key={event.$id} event={event} index={index} />
-              ))}
+            <div className="space-y-8 mb-12">
+              {/* Main Featured Event */}
+              {events[0] && (
+                <MainEventCard event={events[0]} />
+              )}
+              
+              {/* Smaller Events Grid */}
+              {events.length > 1 && (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {events.slice(1, 4).map((event, index) => (
+                    <CompactEventCard key={event.$id} event={event} index={index} />
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* View All Button */}

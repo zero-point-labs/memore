@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Sparkles, FileText, LogOut, MapPin, Calendar } from 'lucide-react';
+import { Sparkles, FileText, LogOut, MapPin, Calendar, CreditCard, Settings, BarChart3 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAdmin } from '@/contexts/AdminContext';
@@ -26,6 +26,12 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
   const sidebarItems = [
     {
+      label: 'Dashboard',
+      href: '/admin/dashboard',
+      icon: BarChart3,
+      active: pathname === '/admin/dashboard'
+    },
+    {
       label: 'Blogs',
       href: '/admin/blogs',
       icon: FileText,
@@ -42,6 +48,18 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       href: '/admin/events',
       icon: Calendar,
       active: pathname?.startsWith('/admin/events')
+    },
+    {
+      label: 'Payments',
+      href: '/admin/payments',
+      icon: CreditCard,
+      active: pathname?.startsWith('/admin/payments')
+    },
+    {
+      label: 'Settings',
+      href: '/admin/settings',
+      icon: Settings,
+      active: pathname?.startsWith('/admin/settings')
     }
   ];
 

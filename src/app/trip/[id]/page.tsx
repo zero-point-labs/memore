@@ -7,7 +7,7 @@ import { MapPin, Calendar, Users, Check, ArrowRight, Clock, ArrowLeft, Star } fr
 import Link from 'next/link';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import BookingFormPopup from '@/components/BookingFormPopup';
+// import BookingFormPopup from '@/components/BookingFormPopup'; // Replaced with dedicated booking pages
 import TripImageCarousel from '@/components/trip-elements/TripImageCarousel';
 import TripDetailsCard from '@/components/trip-elements/TripDetailsCard';
 import { tripService } from '@/services/tripService';
@@ -552,7 +552,7 @@ export default function TripPage() {
   const tripId = params.id as string;
   
   const [selectedDay, setSelectedDay] = useState(0);
-  const [isBookingPopupOpen, setIsBookingPopupOpen] = useState(false);
+  // const [isBookingPopupOpen, setIsBookingPopupOpen] = useState(false); // Replaced with dedicated booking pages
   const [trip, setTrip] = useState<TripDocument | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -752,10 +752,11 @@ export default function TripPage() {
 
               {isUpcoming && (
                 <div className="flex justify-center">
-                <EnhancedGetStartedButton 
-                  onClick={() => setIsBookingPopupOpen(true)}
-                  className="shadow-2xl hover:shadow-purple-500/25"
-                />
+                  <Link href={`/book/${trip.$id}`}>
+                    <EnhancedGetStartedButton 
+                      className="shadow-2xl hover:shadow-purple-500/25"
+                    />
+                  </Link>
                 </div>
               )}
               
@@ -1042,13 +1043,7 @@ export default function TripPage() {
 
       <Footer />
       
-      {/* Booking Form Popup - Only for upcoming trips */}
-      {isUpcoming && (
-        <BookingFormPopup 
-          isOpen={isBookingPopupOpen}
-          onClose={() => setIsBookingPopupOpen(false)}
-        />
-      )}
+      {/* Booking now handled by dedicated /book/[tripId] pages */}
     </div>
   );
 }

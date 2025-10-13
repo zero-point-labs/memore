@@ -6,7 +6,7 @@ import { MapPin, Calendar, Users, Check, ArrowRight, Clock } from 'lucide-react'
 import Link from 'next/link';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import BookingFormPopup from '@/components/BookingFormPopup';
+// import BookingFormPopup from '@/components/BookingFormPopup'; // Replaced with dedicated booking pages
 import TripImageCarousel from '@/components/trip-elements/TripImageCarousel';
 import TripDetailsCard from '@/components/trip-elements/TripDetailsCard';
 import { tripService } from '@/services/tripService';
@@ -548,7 +548,7 @@ const ExpandableCardsSection = ({
 
 export default function NextTripPage() {
   const [selectedDay, setSelectedDay] = useState(0);
-  const [isBookingPopupOpen, setIsBookingPopupOpen] = useState(false);
+  // const [isBookingPopupOpen, setIsBookingPopupOpen] = useState(false); // Replaced with dedicated booking pages
   const [featuredTrip, setFeaturedTrip] = useState<TripDocument | null>(null);
   const [loading, setLoading] = useState(true);
   const [upcomingTrips, setUpcomingTrips] = useState<TripDocument[]>([]);
@@ -677,10 +677,11 @@ export default function NextTripPage() {
               </div>
 
               <div className="flex justify-center">
-                <EnhancedGetStartedButton 
-                  onClick={() => setIsBookingPopupOpen(true)}
-                  className="shadow-2xl hover:shadow-purple-500/25"
-                />
+                <Link href={`/book/${featuredTrip.$id}`}>
+                  <EnhancedGetStartedButton 
+                    className="shadow-2xl hover:shadow-purple-500/25"
+                  />
+                </Link>
               </div>
             </motion.div>
           </div>
@@ -946,11 +947,7 @@ export default function NextTripPage() {
 
       <Footer />
       
-      {/* Booking Form Popup */}
-      <BookingFormPopup 
-        isOpen={isBookingPopupOpen}
-        onClose={() => setIsBookingPopupOpen(false)}
-      />
+      {/* Booking now handled by dedicated /book/[tripId] pages */}
     </div>
   );
 }

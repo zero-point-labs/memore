@@ -3,13 +3,15 @@
 import { motion } from 'framer-motion';
 
 interface EnhancedGetStartedButtonProps {
-  onClick: () => void;
+  onClick?: () => void;
   className?: string;
+  asChild?: boolean; // For use with Link components
 }
 
 export default function EnhancedGetStartedButton({ 
   onClick, 
-  className = "" 
+  className = "",
+  asChild = false
 }: EnhancedGetStartedButtonProps) {
   return (
     <div className="relative inline-block">
@@ -40,6 +42,7 @@ export default function EnhancedGetStartedButton({
         whileHover={{ scale: 1.03 }}
         whileTap={{ scale: 0.97 }}
         className={`group relative px-14 py-5 bg-white/5 backdrop-blur-sm rounded-lg font-bold text-xl transition-all duration-300 hover:bg-white/10 hover:shadow-xl hover:shadow-purple-500/50 ${className}`}
+        type={asChild ? undefined : "button"}
       >
         {/* Button text */}
         <span className="relative z-10 flex items-center gap-3 justify-center text-white">

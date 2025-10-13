@@ -25,7 +25,7 @@ export default function AdminPage() {
 
   useEffect(() => {
     if (!adminLoading && isAdmin) {
-      router.push('/admin/blogs');
+      router.push('/admin/dashboard');
     }
   }, [isAdmin, adminLoading, router]);
 
@@ -36,7 +36,7 @@ export default function AdminPage() {
 
     const success = loginAdmin(password);
     if (success) {
-      router.push('/admin/blogs');
+      router.push('/admin/dashboard');
     } else {
       setError('Invalid admin password');
     }
@@ -56,7 +56,7 @@ export default function AdminPage() {
   }
 
   if (isAdmin) {
-    return null; // Will redirect to /admin/blogs
+    return null; // Will redirect to /admin/dashboard
   }
 
   return (
