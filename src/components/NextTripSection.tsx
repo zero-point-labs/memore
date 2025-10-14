@@ -10,7 +10,7 @@ import { Meteors } from '@/components/magicui/meteors';
 import NumberTicker from '@/components/magicui/number-ticker';
 import Sparkles from '@/components/ui/Sparkles';
 import { cn } from '@/utils/cn';
-import { tripService } from '@/services/tripService';
+import { clientTripService } from '@/services/tripService.client';
 import { TripDocument } from '@/types/trip';
 
 // Student Reviews
@@ -447,7 +447,7 @@ export default function NextTripSection({ isHomepage = false }: { isHomepage?: b
   useEffect(() => {
     const fetchNextTrip = async () => {
       try {
-        const trip = await tripService.getNextTrip();
+        const trip = await clientTripService.getNextTrip();
         setFeaturedTrip(trip);
       } catch (error) {
         console.error('Error fetching next trip:', error);

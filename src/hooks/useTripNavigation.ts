@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { tripService } from '@/services/tripService';
+import { clientTripService } from '@/services/tripService.client';
 import { TripDocument } from '@/types/trip';
 
 export interface TripNavigationState {
@@ -47,7 +47,7 @@ export function useTripNavigation(): TripNavigationState & TripNavigationActions
       setState(prev => ({ ...prev, isLoading: true }));
       
       // Get all trips organized by date
-      const { upcoming, previous } = await tripService.getAllTripsByDate();
+      const { upcoming, previous } = await clientTripService.getAllTripsByDate();
       
       // Combine trips: previous (reverse chronological), then upcoming (chronological)
       // This puts upcoming trips after previous ones, so the next trip is in the "middle"

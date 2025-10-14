@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { tripService } from '@/services/tripService';
+import { clientTripService } from '@/services/tripService.client';
 import { TripDocument } from '@/types/trip';
 
 interface TimeLeft {
@@ -21,7 +21,7 @@ export default function HeroCountdown() {
   useEffect(() => {
     const fetchTripData = async () => {
       try {
-        const trip = await tripService.getNextTrip();
+        const trip = await clientTripService.getNextTrip();
         
         if (trip) {
           // Countdown to trip start date only
