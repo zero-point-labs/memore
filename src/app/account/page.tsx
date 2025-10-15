@@ -26,6 +26,7 @@ import {
 } from 'lucide-react';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useUserBookings } from '@/hooks/useUserBookings';
+import { usePaymentSchedule } from '@/hooks/usePaymentSchedule';
 
 export default function AccountPage() {
   const { user, logout, loading } = useAuth();
@@ -35,6 +36,16 @@ export default function AccountPage() {
   // Use our new hooks
   const { profile, loading: profileLoading, isProfileComplete, profileCompletionPercentage } = useUserProfile();
   const { bookings, loading: bookingsLoading, stats, upcomingBookings, balanceDueSoon } = useUserBookings();
+  const { 
+    upcomingPayments, 
+    paymentHistory, 
+    totalUpcoming, 
+    summary: paymentSummary, 
+    loading: paymentsLoading,
+    hasOverduePayments,
+    hasDueSoonPayments,
+    getNextPayment
+  } = usePaymentSchedule();
 
   useEffect(() => {
     if (!loading && !user) {
@@ -222,6 +233,183 @@ export default function AccountPage() {
                 <div className="text-sm text-gray-400">Completed</div>
               </motion.div>
             </div>
+
+            {/* Payment Schedule Section */}
+            {!paymentsLoading && (hasOverduePayments || hasDueSoonPayments || upcomingPayments.length > 0) && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.7 }}
+                className="mb-8"
+              >
+                <div className="bg-black/40 backdrop-blur-xl border border-purple-500/20 rounded-2xl p-8">
+                  <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-2xl font-bold text-white flex items-center gap-3">
+                      <CreditCard className="w-8 h-8 text-purple-400" />
+                      Payment Schedule
+                    </h2>
+                    <div className="text-right">
+                      <div className="text-purple-400 font-bold text-xl">€{totalUpcoming}</div>
+                      <div className="text-gray-400 text-sm">Total Upcoming</div>
+                    </div>
+                  </div>
+
+                  {/* Overdue Payments Alert */}
+                  {hasOverduePayments && (
+                    <div className="bg-red-600/10 border border-red-500/30 rounded-lg p-4 mb-4">
+                      <div className="flex items-center gap-3">
+                        <AlertCircle className="w-5 h-5 text-red-400" />
+                        <div>
+                          <div className="text-red-400 font-semibold">Overdue Payments</div>
+                          <div className="text-gray-300 text-sm">
+                            {paymentSummary.overduePayments} payment{paymentSummary.overduePayments > 1 ? 's' : ''} require immediate attention
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Due Soon Payments Alert */}
+                  {hasDueSoonPayments && (
+                    <div className="bg-yellow-600/10 border border-yellow-500/30 rounded-lg p-4 mb-4">
+                      <div className="flex items-center gap-3">
+                        <Clock className="w-5 h-5 text-yellow-400" />
+                        <div>
+                          <div className="text-yellow-400 font-semibold">Due Soon</div>
+                          <div className="text-gray-300 text-sm">
+                            {paymentSummary.dueSoonPayments} payment{paymentSummary.dueSoonPayments > 1 ? 's' : ''} due within 7 days
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Upcoming Payments List */}
+                  <div className="space-y-3">
+                    {upcomingPayments.slice(0, 3).map((payment, index) => (
+                      <div key={`${payment.bookingId}-${payment.paymentType}`} className="flex items-center justify-between p-4 bg-black/30 rounded-lg">
+                        <div className="flex items-center gap-4">
+                          <div className={`w-3 h-3 rounded-full ${
+                            payment.status === 'overdue' ? 'bg-red-400' :
+                            payment.status === 'due_soon' ? 'bg-yellow-400' :
+                            'bg-blue-400'
+                          }`} />
+                          <div>
+                            <div className="text-white font-medium">{payment.tripTitle}</div>
+                            <div className="text-gray-400 text-sm">
+                              {payment.paymentType === 'deposit' ? 'Deposit' : 
+                               payment.paymentType === 'balance' ? 'Balance Payment' : 
+                               'Manual Charge'}
+                              {payment.dueDate && ` • Due ${new Date(payment.dueDate).toLocaleDateString('en-GB')}`}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-4">
+                          <div className="text-right">
+                            <div className="text-white font-bold">€{payment.amount}</div>
+                            {payment.daysUntilDue !== undefined && payment.daysUntilDue >= 0 && (
+                              <div className="text-gray-400 text-sm">
+                                {payment.daysUntilDue === 0 ? 'Today' : 
+                                 payment.daysUntilDue === 1 ? 'Tomorrow' :
+                                 `${payment.daysUntilDue} days`}
+                              </div>
+                            )}
+                          </div>
+                          {payment.canPayNow && payment.paymentLink && (
+                            <a 
+                              href={payment.paymentLink}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium"
+                            >
+                              Pay Now
+                            </a>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* View All Link */}
+                  {upcomingPayments.length > 3 && (
+                    <div className="mt-4 text-center">
+                      <Link href="/account/bookings">
+                        <button className="text-purple-400 hover:text-purple-300 transition-colors text-sm font-medium">
+                          View All Payments ({upcomingPayments.length})
+                        </button>
+                      </Link>
+                    </div>
+                  )}
+
+                  {upcomingPayments.length === 0 && (
+                    <div className="text-center py-8">
+                      <CheckCircle className="w-12 h-12 text-green-400 mx-auto mb-4" />
+                      <div className="text-green-400 font-semibold mb-2">All Payments Up to Date</div>
+                      <div className="text-gray-400 text-sm">No upcoming payments scheduled</div>
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+            )}
+
+            {/* Payment History Section */}
+            {!paymentsLoading && paymentHistory.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.8 }}
+                className="mb-8"
+              >
+                <div className="bg-black/40 backdrop-blur-xl border border-green-500/20 rounded-2xl p-8">
+                  <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-2xl font-bold text-white flex items-center gap-3">
+                      <CheckCircle className="w-8 h-8 text-green-400" />
+                      Payment History
+                    </h2>
+                    <div className="text-right">
+                      <div className="text-green-400 font-bold text-xl">{paymentHistory.length}</div>
+                      <div className="text-gray-400 text-sm">Completed</div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    {paymentHistory.slice(0, 5).map((payment, index) => (
+                      <div key={`${payment.bookingId}-${payment.paymentType}-${payment.paidDate}`} className="flex items-center justify-between p-4 bg-black/30 rounded-lg">
+                        <div className="flex items-center gap-4">
+                          <div className="w-3 h-3 rounded-full bg-green-400" />
+                          <div>
+                            <div className="text-white font-medium">{payment.tripTitle}</div>
+                            <div className="text-gray-400 text-sm">
+                              {payment.paymentType === 'deposit' ? 'Deposit' : 
+                               payment.paymentType === 'balance' ? 'Balance Payment' : 
+                               'Manual Charge'}
+                              {payment.paidDate && ` • Paid ${new Date(payment.paidDate).toLocaleDateString('en-GB')}`}
+                            </div>
+                            {payment.paymentIntentId && (
+                              <div className="text-gray-500 text-xs font-mono">ID: {payment.paymentIntentId}</div>
+                            )}
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-green-400 font-bold">€{payment.amount}</div>
+                          <div className="text-gray-400 text-sm">Completed</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {paymentHistory.length > 5 && (
+                    <div className="mt-4 text-center">
+                      <Link href="/account/bookings">
+                        <button className="text-green-400 hover:text-green-300 transition-colors text-sm font-medium">
+                          View All History ({paymentHistory.length})
+                        </button>
+                      </Link>
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+            )}
 
             {/* Main Content */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">

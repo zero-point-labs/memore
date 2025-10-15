@@ -2,10 +2,10 @@
 
 import { motion } from 'framer-motion';
 import { useState, useEffect, useRef } from 'react';
+import Link from 'next/link';
 import TripImageCarousel from '@/components/trip-elements/TripImageCarousel';
 // import TripAboutCard from '@/components/trip-elements/TripAboutCard';
 import SwipableTripCard from '@/components/SwipableTripCard';
-import BookingFormPopup from '@/components/BookingFormPopup';
 import { Meteors } from '@/components/magicui/meteors';
 import NumberTicker from '@/components/magicui/number-ticker';
 import Sparkles from '@/components/ui/Sparkles';
@@ -68,7 +68,6 @@ const TripSectionContent = ({ isHomepage, featuredTrip }: { isHomepage: boolean,
 
   const [selectedDay, setSelectedDay] = useState(0);
   const [currentReview, setCurrentReview] = useState(0);
-  const [isBookingPopupOpen, setIsBookingPopupOpen] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -156,9 +155,7 @@ const TripSectionContent = ({ isHomepage, featuredTrip }: { isHomepage: boolean,
                   className="flex justify-center mb-16"
                 >
                   <div className="w-full max-w-4xl">
-                    <SwipableTripCard 
-                      onBookingClick={() => setIsBookingPopupOpen(true)}
-                    />
+                    <SwipableTripCard />
                   </div>
                 </motion.div>
               </>
@@ -271,20 +268,21 @@ const TripSectionContent = ({ isHomepage, featuredTrip }: { isHomepage: boolean,
               transition={{ duration: 0.8, delay: 0.4 }}
               className="text-center mt-8"
             >
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setIsBookingPopupOpen(true)}
-                className="relative px-6 sm:px-12 py-3 sm:py-5 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full font-bold text-white text-sm sm:text-lg shadow-2xl hover:shadow-purple-500/25 transition-all duration-300 overflow-hidden group"
-              >
-                <motion.div
-                  className="absolute inset-0 bg-gradient-to-r from-pink-600 to-purple-600"
-                  initial={{ x: '-100%' }}
-                  whileHover={{ x: '100%' }}
-                  transition={{ duration: 0.8 }}
-                />
-                <span className="relative z-10">RESERVE YOUR ADVENTURE NOW</span>
-              </motion.button>
+              <Link href={`/book/${featuredTrip.$id}`}>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="relative px-4 sm:px-8 py-2 sm:py-3 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full font-bold text-white text-xs sm:text-sm shadow-2xl hover:shadow-purple-500/25 transition-all duration-300 overflow-hidden group"
+                >
+                  <motion.div
+                    className="absolute inset-0 bg-gradient-to-r from-pink-600 to-purple-600"
+                    initial={{ x: '-100%' }}
+                    whileHover={{ x: '100%' }}
+                    transition={{ duration: 0.8 }}
+                  />
+                  <span className="relative z-10">RESERVE YOUR ADVENTURE NOW</span>
+                </motion.button>
+              </Link>
               <motion.p 
                 className="text-gray-400 text-sm mt-4"
                 animate={{ opacity: [0.8, 1, 0.8] }}
@@ -431,10 +429,6 @@ const TripSectionContent = ({ isHomepage, featuredTrip }: { isHomepage: boolean,
             </motion.div>
           </div>
         </div>
-        <BookingFormPopup 
-          isOpen={isBookingPopupOpen}
-          onClose={() => setIsBookingPopupOpen(false)}
-        />
       </section>
   );
 }

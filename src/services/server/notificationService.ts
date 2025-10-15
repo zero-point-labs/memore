@@ -4,7 +4,7 @@ import {
   CreateNotificationData, 
   NotificationDocument
 } from '@/types/booking';
-import { sendServerEmail, generateBookingConfirmationEmail } from '@/lib/resend-server';
+import { sendServerEmail, generateBookingConfirmationEmail, generatePaymentLinkEmail } from '@/lib/resend-server';
 import { serverGlobalSettingsService } from './globalSettingsService';
 
 const DATABASE_ID = process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID || 'memora_db';
@@ -204,6 +204,81 @@ export class ServerNotificationService {
       return notification;
     } catch (error) {
       console.error('Error sending admin alert (server):', error);
+      throw error;
+    }
+  }
+
+  // Send payment link email
+  async sendPaymentLinkEmail({
+    userId,
+    bookingId,
+    customerEmail,
+    customerName,
+    tripTitle,
+    amount,
+    paymentType,
+    paymentLinkUrl,
+    expiresAt,
+    paymentAttemptStatus,
+    paymentAttemptMessage
+  }: {
+    userId: string;
+    bookingId: string;
+    customerEmail: string;
+    customerName: string;
+    tripTitle: string;
+    amount: number;
+    paymentType: 'deposit' | 'balance' | 'manual_charge';
+    paymentLinkUrl: string;
+    expiresAt: string;
+    paymentAttemptStatus?: 'success' | 'failed' | 'not_attempted';
+    paymentAttemptMessage?: string;
+  }): Promise<NotificationDocument> {
+    try {
+      const subject = `Payment Required - ${tripTitle}`;
+      
+      // Generate email template
+      const emailTemplate = generatePaymentLinkEmail({
+        customerName,
+        tripTitle,
+        amount,
+        paymentType,
+        paymentLinkUrl,
+        expiresAt,
+        paymentAttemptStatus,
+        paymentAttemptMessage
+      });
+
+      // Create notification record
+      const notification = await this.create({
+        userId,
+        bookingId,
+        type: 'payment_link',
+        method: 'email',
+        recipient: customerEmail,
+        subject,
+        content: `Payment link sent for ${paymentType} payment of €${amount}`,
+        template: 'payment-link'
+      });
+
+      // Send email
+      const result = await sendServerEmail({
+        to: customerEmail,
+        subject,
+        html: emailTemplate.html,
+        text: emailTemplate.text,
+        template: 'payment-link'
+      });
+
+      if (result.success) {
+        await this.markAsSent(notification.$id, result.id);
+      } else {
+        await this.markAsFailed(notification.$id, result.error?.toString() || 'Unknown error');
+      }
+
+      return notification;
+    } catch (error) {
+      console.error('Error sending payment link email (server):', error);
       throw error;
     }
   }

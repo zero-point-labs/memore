@@ -80,7 +80,7 @@ export default function AdminPaymentsPage() {
       const [bookingStats, scheduleStats, settings, bookings] = await Promise.all([
         bookingService.getStats(),
         paymentScheduleService.getStats(),
-        globalSettingsService.get(),
+        globalSettingsService.getOrCreate(),
         bookingService.getAll(10) // Get recent 10 bookings
       ]);
 
@@ -144,7 +144,7 @@ export default function AdminPaymentsPage() {
   };
 
   // Update global settings
-  const updateSettings = async (newSettings: GlobalSettingsDocument) => {
+  const updateSettings = async (newSettings: Partial<GlobalSettingsDocument>) => {
     try {
       await globalSettingsService.update(newSettings, 'admin');
       await loadDashboardData();
@@ -338,6 +338,32 @@ export default function AdminPaymentsPage() {
     }
   };
 
+  // Handle Stripe payment sync
+  const handleSyncStripePayments = async () => {
+    try {
+      setProcessing(true);
+      
+      const response = await fetch('/api/admin/payments/sync-stripe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        alert(`Stripe sync completed! ${result.syncedPayments} payments updated. ${result.errors > 0 ? `${result.errors} errors encountered.` : ''}`);
+        await loadDashboardData(); // Refresh data
+      } else {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to sync with Stripe');
+      }
+    } catch (error) {
+      console.error('Failed to sync with Stripe:', error);
+      alert(`Failed to sync with Stripe: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setProcessing(false);
+    }
+  };
+
   if (!isAdmin) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
@@ -518,6 +544,14 @@ export default function AdminPaymentsPage() {
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold text-white">Recent Bookings</h2>
             <div className="flex items-center gap-4">
+              <button 
+                onClick={handleSyncStripePayments}
+                disabled={processing}
+                className="px-4 py-2 bg-purple-600/20 border border-purple-500/30 rounded-lg text-purple-300 hover:bg-purple-600/30 transition-colors flex items-center gap-2 disabled:opacity-50"
+              >
+                <RefreshCw size={16} className={processing ? 'animate-spin' : ''} />
+                {processing ? 'Syncing...' : 'Sync Stripe'}
+              </button>
               <button className="px-4 py-2 bg-gray-600/20 border border-gray-500/30 rounded-lg text-gray-300 hover:bg-gray-600/30 transition-colors flex items-center gap-2">
                 <Search size={16} />
                 Search
@@ -581,14 +615,42 @@ export default function AdminPaymentsPage() {
                         </div>
                       </td>
                       <td className="py-4 px-4">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          booking.bookingStatus === 'fully_paid' ? 'bg-green-500/20 text-green-400' :
-                          booking.bookingStatus === 'deposit_paid' ? 'bg-yellow-500/20 text-yellow-400' :
-                          booking.bookingStatus === 'cancelled' ? 'bg-red-500/20 text-red-400' :
-                          'bg-gray-500/20 text-gray-400'
-                        }`}>
-                          {booking.bookingStatus.replace('_', ' ')}
-                        </span>
+                        <div className="flex flex-col gap-1">
+                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                            booking.bookingStatus === 'fully_paid' ? 'bg-green-500/20 text-green-400' :
+                            booking.bookingStatus === 'deposit_paid' ? 'bg-yellow-500/20 text-yellow-400' :
+                            booking.bookingStatus === 'cancelled' ? 'bg-red-500/20 text-red-400' :
+                            'bg-gray-500/20 text-gray-400'
+                          }`}>
+                            {booking.bookingStatus.replace('_', ' ')}
+                          </span>
+                          
+                          {/* Payment Link Indicators */}
+                          {booking.paymentInfo?.paymentLinks && booking.paymentInfo.paymentLinks.length > 0 && (
+                            <div className="flex items-center gap-1">
+                              <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                              <span className="text-blue-400 text-xs">
+                                {booking.paymentInfo.paymentLinks.filter(link => link.status === 'pending').length} active link{booking.paymentInfo.paymentLinks.filter(link => link.status === 'pending').length !== 1 ? 's' : ''}
+                              </span>
+                            </div>
+                          )}
+                          
+                          {/* Manual Intervention Indicator */}
+                          {booking.paymentInfo?.requiresManualIntervention && (
+                            <div className="flex items-center gap-1">
+                              <div className="w-2 h-2 bg-red-400 rounded-full"></div>
+                              <span className="text-red-400 text-xs">Intervention needed</span>
+                            </div>
+                          )}
+                          
+                          {/* Grace Period Indicator */}
+                          {booking.paymentInfo?.gracePeriodEnd && (
+                            <div className="flex items-center gap-1">
+                              <Clock className="w-3 h-3 text-yellow-400" />
+                              <span className="text-yellow-400 text-xs">Grace period</span>
+                            </div>
+                          )}
+                        </div>
                       </td>
                       <td className="py-4 px-4">
                         <div className="text-white text-sm">
@@ -795,6 +857,90 @@ export default function AdminPaymentsPage() {
                     </div>
                   </div>
                 </div>
+
+                {/* Payment Links & Grace Period Info */}
+                {selectedBooking.paymentInfo && (selectedBooking.paymentInfo.paymentLinks?.length > 0 || selectedBooking.paymentInfo.gracePeriodEnd || selectedBooking.paymentInfo.requiresManualIntervention) && (
+                  <div className="bg-black/40 rounded-xl p-4">
+                    <h3 className="text-lg font-semibold text-white mb-3">Payment Links & Status</h3>
+                    
+                    {/* Grace Period Warning */}
+                    {selectedBooking.paymentInfo.gracePeriodEnd && (
+                      <div className={`p-3 rounded-lg mb-3 ${
+                        selectedBooking.paymentInfo.requiresManualIntervention 
+                          ? 'bg-red-600/10 border border-red-500/30' 
+                          : 'bg-yellow-600/10 border border-yellow-500/30'
+                      }`}>
+                        <div className="flex items-center gap-2">
+                          <Clock className="w-4 h-4 text-yellow-400" />
+                          <span className="text-yellow-400 font-medium">
+                            Grace Period: {new Date(selectedBooking.paymentInfo.gracePeriodEnd).toLocaleString('en-GB')}
+                          </span>
+                        </div>
+                        {selectedBooking.paymentInfo.requiresManualIntervention && (
+                          <div className="text-red-400 text-sm mt-1">⚠️ Manual intervention required</div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Payment Links */}
+                    {selectedBooking.paymentInfo.paymentLinks && selectedBooking.paymentInfo.paymentLinks.length > 0 && (
+                      <div className="space-y-2">
+                        {selectedBooking.paymentInfo.paymentLinks.map((link, index) => (
+                          <div key={link.sessionId} className="p-3 bg-black/20 rounded-lg space-y-2">
+                            <div className="flex items-center justify-between">
+                              <div className="text-white text-sm font-medium">
+                                {link.paymentType === 'deposit' ? 'Deposit' : 
+                                 link.paymentType === 'balance' ? 'Balance' : 
+                                 'Manual Charge'} Payment Link
+                              </div>
+                              <div className="flex items-center gap-3">
+                                <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                  link.status === 'completed' ? 'bg-green-500/20 text-green-400' :
+                                  link.status === 'expired' ? 'bg-red-500/20 text-red-400' :
+                                  link.status === 'cancelled' ? 'bg-gray-500/20 text-gray-400' :
+                                  'bg-yellow-500/20 text-yellow-400'
+                                }`}>
+                                  {link.status}
+                                </span>
+                                <div className="text-white font-bold">€{link.amount}</div>
+                              </div>
+                            </div>
+                            
+                            <div className="text-gray-400 text-xs space-y-1">
+                              <div>Created: {new Date(link.createdAt).toLocaleString('en-GB')}</div>
+                              <div>Expires: {new Date(link.expiresAt).toLocaleString('en-GB')}</div>
+                              {link.completedAt && (
+                                <div className="text-green-400">Completed: {new Date(link.completedAt).toLocaleString('en-GB')}</div>
+                              )}
+                              {link.paymentIntentId && (
+                                <div className="font-mono">Transaction: {link.paymentIntentId}</div>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Payment Method Information */}
+                {selectedBooking.paymentMethodId && (
+                  <div className="bg-black/40 rounded-xl p-4">
+                    <h3 className="text-lg font-semibold text-white mb-3">Payment Method</h3>
+                    <div className="text-gray-400 text-sm space-y-1">
+                      <div>Payment Method ID: <span className="font-mono text-white">{selectedBooking.paymentMethodId}</span></div>
+                      {selectedBooking.stripeCustomerId && (
+                        <div>Stripe Customer: <span className="font-mono text-white">{selectedBooking.stripeCustomerId}</span></div>
+                      )}
+                      {selectedBooking.depositPaymentIntentId && (
+                        <div>Deposit Transaction: <span className="font-mono text-white">{selectedBooking.depositPaymentIntentId}</span></div>
+                      )}
+                      {selectedBooking.balancePaymentIntentId && (
+                        <div>Balance Transaction: <span className="font-mono text-white">{selectedBooking.balancePaymentIntentId}</span></div>
+                      )}
+                    </div>
+                  </div>
+                )}
 
                 {/* Special Requests */}
                 {selectedBooking.specialRequests && (

@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { useState, useEffect, useRef, useCallback } from 'react';
+import Link from 'next/link';
 // import VIPCard from '@/components/hero-elements/VIPCard';
 
 import GlitchText from '@/components/hero-elements/GlitchText';
@@ -11,7 +12,6 @@ import NextTripSection from '@/components/NextTripSection';
 import EventsSection from '@/components/EventsSection';
 import ContactSection from '@/components/ContactSection';
 import Footer from '@/components/Footer';
-import BookingFormPopup from '@/components/BookingFormPopup';
 import { useParallax } from '@/hooks/useParallax';
 import { useSwipeGesture } from '@/hooks/useSwipeGesture';
 import { isMobile } from '@/utils/isMobile';
@@ -28,7 +28,6 @@ export default function Home() {
 
   const [currentWord, setCurrentWord] = useState(0);
   const [isMobileDevice, setIsMobileDevice] = useState(false);
-  const [isBookingPopupOpen, setIsBookingPopupOpen] = useState(false);
   const heroRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const parallax = useParallax(isMobileDevice ? 0 : 0.5);
@@ -216,30 +215,31 @@ export default function Home() {
 
                 {/* Features */}
                 <motion.div 
-                  className="flex flex-wrap gap-4 justify-center"
+                  className="max-w-md mx-auto"
                   initial="hidden"
                   whileInView="visible"
                   viewport={viewportOnce}
                   variants={fadeIn}
                 >
-                  {[
-                    { icon: '🏖️', label: 'Beach Parties' },
-                    { icon: '🎉', label: 'Epic Clubs' },
-                    { icon: '🏛️', label: 'Culture & History' },
-                    { icon: '🌊', label: 'Water Sports' }
-                  ].map((feature, index) => (
-                    <motion.div
-                      key={feature.label}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.7 + index * 0.1 }}
-                      whileHover={{ scale: 1.05, y: -3 }}
-                      className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-br from-purple-500/15 to-pink-500/15 border border-purple-500/30 rounded-full backdrop-blur-sm hover:border-purple-400/60 hover:from-purple-500/25 hover:to-pink-500/25 transition-all shadow-lg"
-                    >
-                      <span className="text-xl">{feature.icon}</span>
-                      <span className="text-sm font-semibold text-white">{feature.label}</span>
-                    </motion.div>
-                  ))}
+                  <div className="grid grid-cols-2 gap-3 text-center">
+                    {[
+                      'Beach Parties',
+                      'Epic Clubs', 
+                      'Culture & History',
+                      'Water Sports'
+                    ].map((label, index) => (
+                      <motion.div
+                        key={label}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.7 + index * 0.1 }}
+                        className="flex items-center justify-center py-2 text-white/80 text-sm font-medium"
+                      >
+                        <span className="w-2 h-2 bg-purple-400 rounded-full mr-3"></span>
+                        {label}
+                      </motion.div>
+                    ))}
+                  </div>
                 </motion.div>
 
                 {/* Action Buttons */}
@@ -252,23 +252,23 @@ export default function Home() {
                 >
                   <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
                     {/* Primary CTA */}
-                    <motion.button
-                      onClick={() => setIsBookingPopupOpen(true)}
-                      whileHover={{ scale: 1.05, y: -3 }}
-                      whileTap={{ scale: 0.95 }}
-                      className="group relative px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full text-white font-bold text-lg shadow-2xl hover:shadow-purple-500/50 transition-all overflow-hidden"
-                    >
-                      <motion.div
-                        className="absolute inset-0 bg-gradient-to-r from-pink-600 to-purple-600"
-                        initial={{ x: '-100%' }}
-                        whileHover={{ x: '100%' }}
-                        transition={{ duration: 0.6 }}
-                      />
-                      <span className="relative z-10 flex items-center gap-2">
-                        Book Your Adventure
-                        <span className="text-xl">🚀</span>
-                      </span>
-                    </motion.button>
+                    <Link href="/next-trip">
+                      <motion.button
+                        whileHover={{ scale: 1.05, y: -3 }}
+                        whileTap={{ scale: 0.95 }}
+                        className="group relative px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full text-white font-bold text-base sm:text-lg shadow-2xl hover:shadow-purple-500/50 transition-all overflow-hidden"
+                      >
+                        <motion.div
+                          className="absolute inset-0 bg-gradient-to-r from-pink-600 to-purple-600"
+                          initial={{ x: '-100%' }}
+                          whileHover={{ x: '100%' }}
+                          transition={{ duration: 0.6 }}
+                        />
+                        <span className="relative z-10">
+                          Book Your Adventure
+                        </span>
+                      </motion.button>
+                    </Link>
 
                     {/* Secondary CTA */}
                     <motion.button
@@ -280,7 +280,7 @@ export default function Home() {
                       }}
                       whileHover={{ scale: 1.03, y: -2 }}
                       whileTap={{ scale: 0.97 }}
-                      className="px-8 py-4 bg-black/40 backdrop-blur-sm border-2 border-purple-500/40 rounded-full text-white font-bold text-lg hover:bg-purple-500/10 hover:border-purple-400/60 transition-all shadow-lg"
+                      className="px-6 sm:px-8 py-3 sm:py-4 bg-black/40 backdrop-blur-sm border-2 border-purple-500/40 rounded-full text-white font-bold text-base sm:text-lg hover:bg-purple-500/10 hover:border-purple-400/60 transition-all shadow-lg"
                     >
                       <span className="flex items-center gap-2">
                         View All Trips
@@ -313,12 +313,6 @@ export default function Home() {
       
       {/* Footer - no gap */}
       <Footer />
-      
-      {/* Booking Form Popup */}
-      <BookingFormPopup 
-        isOpen={isBookingPopupOpen}
-        onClose={() => setIsBookingPopupOpen(false)}
-      />
     </div>
   );
 }

@@ -271,7 +271,7 @@ export default function BookingsPage() {
                             <div className="text-gray-400 text-sm">
                               {booking.bookingStatus === 'fully_paid' 
                                 ? 'Payment completed' 
-                                : `Auto-charge: ${new Date(booking.balanceDueDate).toLocaleDateString('en-GB')}`
+                                : `Payment link: ${new Date(booking.balanceDueDate).toLocaleDateString('en-GB')}`
                               }
                             </div>
                           </div>

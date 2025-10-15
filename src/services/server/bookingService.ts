@@ -8,17 +8,33 @@ import {
   BookingStatus,
   PaymentStatus
 } from '@/types/booking';
-import { calculatePaymentAmounts } from '@/lib/stripe';
 
 const DATABASE_ID = process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID || 'memora_db';
 const COLLECTION_ID = 'bookings';
 
 export class ServerBookingService {
+  // Helper function to deserialize paymentInfo
+  private deserializeBooking(doc: any): BookingDocument {
+    const booking = doc as BookingDocument;
+    
+    // Deserialize paymentInfo if it exists
+    if (booking.paymentInfo && typeof booking.paymentInfo === 'string') {
+      try {
+        booking.paymentInfo = JSON.parse(booking.paymentInfo);
+      } catch (parseError) {
+        console.warn(`Failed to parse paymentInfo JSON for booking ${booking.$id}:`, parseError);
+        booking.paymentInfo = undefined;
+      }
+    }
+    
+    return booking;
+  }
+
   // Get booking by ID
   async getById(id: string): Promise<BookingDocument | null> {
     try {
       const document = await serverDatabases.getDocument(DATABASE_ID, COLLECTION_ID, id);
-      return document as BookingDocument;
+      return this.deserializeBooking(document);
     } catch (error) {
       console.error('Error fetching booking (server):', error);
       return null;
@@ -28,13 +44,9 @@ export class ServerBookingService {
   // Create new booking
   async create(data: CreateBookingData): Promise<BookingDocument> {
     try {
-      // Calculate payment amounts
-      const paymentAmounts = calculatePaymentAmounts(data.totalAmount);
-      
+      // Use the payment amounts passed from the API (already calculated with correct settings)
       const bookingData = {
         ...data,
-        depositAmount: paymentAmounts.depositAmount,
-        balanceAmount: paymentAmounts.balanceAmount,
         currency: data.currency || 'EUR',
         bookingStatus: data.bookingStatus || 'pending' as BookingStatus,
         paymentStatus: data.paymentStatus || 'pending' as PaymentStatus,
@@ -57,18 +69,17 @@ export class ServerBookingService {
   // Update booking
   async update(id: string, data: UpdateBookingData): Promise<BookingDocument> {
     try {
-      // Recalculate amounts if total amount changed
-      if (data.totalAmount) {
-        const paymentAmounts = calculatePaymentAmounts(data.totalAmount);
-        data.depositAmount = paymentAmounts.depositAmount;
-        data.balanceAmount = paymentAmounts.balanceAmount;
+      // Serialize paymentInfo if it exists
+      const updateData = { ...data };
+      if (updateData.paymentInfo) {
+        updateData.paymentInfo = JSON.stringify(updateData.paymentInfo);
       }
 
       const document = await serverDatabases.updateDocument(
         DATABASE_ID,
         COLLECTION_ID,
         id,
-        data
+        updateData
       );
 
       return document as BookingDocument;
@@ -122,6 +133,71 @@ export class ServerBookingService {
     }
   }
 
+  // Get booking statistics (server-side)
+  async getStats(): Promise<{
+    total: number;
+    pending: number;
+    depositPaid: number;
+    fullyPaid: number;
+    cancelled: number;
+    totalRevenue: number;
+    pendingRevenue: number;
+  }> {
+    try {
+      const response = await serverDatabases.listDocuments(
+        DATABASE_ID,
+        COLLECTION_ID,
+        [Query.limit(1000)]
+      );
+
+      const bookings = response.documents.map(doc => this.deserializeBooking(doc));
+      
+      const stats = {
+        total: bookings.length,
+        pending: 0,
+        depositPaid: 0,
+        fullyPaid: 0,
+        cancelled: 0,
+        totalRevenue: 0,
+        pendingRevenue: 0
+      };
+
+      bookings.forEach(booking => {
+        switch (booking.bookingStatus) {
+          case 'pending':
+            stats.pending++;
+            stats.pendingRevenue += booking.totalAmount;
+            break;
+          case 'deposit_paid':
+            stats.depositPaid++;
+            stats.totalRevenue += booking.depositAmount;
+            stats.pendingRevenue += booking.balanceAmount;
+            break;
+          case 'fully_paid':
+            stats.fullyPaid++;
+            stats.totalRevenue += booking.totalAmount;
+            break;
+          case 'cancelled':
+            stats.cancelled++;
+            break;
+        }
+      });
+
+      return stats;
+    } catch (error) {
+      console.error('Error fetching booking stats (server):', error);
+      return {
+        total: 0,
+        pending: 0,
+        depositPaid: 0,
+        fullyPaid: 0,
+        cancelled: 0,
+        totalRevenue: 0,
+        pendingRevenue: 0
+      };
+    }
+  }
+
   // Get all bookings (server-side)
   async getAll(limit: number = 50): Promise<{ bookings: BookingDocument[]; total: number }> {
     try {
@@ -135,7 +211,7 @@ export class ServerBookingService {
       );
 
       return {
-        bookings: response.documents as BookingDocument[],
+        bookings: response.documents.map(doc => this.deserializeBooking(doc)),
         total: response.total
       };
     } catch (error) {

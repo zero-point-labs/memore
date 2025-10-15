@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
@@ -27,7 +27,6 @@ import { useUserProfile } from '@/hooks/useUserProfile';
 import { tripService } from '@/services/tripService';
 import { TripDocument } from '@/types/trip';
 import { StudentStatus, RoomPreference, TransportPreference } from '@/types/booking';
-import { calculatePaymentAmounts } from '@/lib/stripe';
 
 // Country data for phone numbers
 const countries = [
@@ -84,7 +83,7 @@ interface BookingFormData {
 export default function BookTripPage() {
   const router = useRouter();
   const params = useParams();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const { profile, createProfile, isProfileComplete } = useUserProfile();
   
   const [trip, setTrip] = useState<TripDocument | null>(null);
@@ -92,6 +91,17 @@ export default function BookTripPage() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [currentStep, setCurrentStep] = useState(1);
+  const [paymentSettings, setPaymentSettings] = useState<{
+    depositPercentage: number;
+    balancePercentage: number;
+  } | null>(null);
+  const [paymentAmounts, setPaymentAmounts] = useState<{
+    totalAmount: number;
+    depositAmount: number;
+    balanceAmount: number;
+    depositPercentage: number;
+    balancePercentage: number;
+  } | null>(null);
   
   const [formData, setFormData] = useState<BookingFormData>({
     firstName: '',
@@ -110,6 +120,39 @@ export default function BookTripPage() {
     smsOptIn: true,
     marketingOptIn: false
   });
+
+  // Fetch payment amounts with current settings
+  const fetchPaymentAmounts = useCallback(async (totalAmount: number) => {
+    try {
+      const response = await fetch('/api/settings/payment-amounts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ totalAmount })
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setPaymentSettings({
+          depositPercentage: data.depositPercentage,
+          balancePercentage: data.balancePercentage
+        });
+        return data;
+      }
+    } catch (error) {
+      console.error('Error fetching payment amounts:', error);
+    }
+    
+    // Fallback to default calculation
+    const depositAmount = Math.round((totalAmount * 30) / 100);
+    const balanceAmount = totalAmount - depositAmount;
+    return {
+      totalAmount,
+      depositAmount,
+      balanceAmount,
+      depositPercentage: 30,
+      balancePercentage: 70
+    };
+  }, []);
 
   // Load trip data
   useEffect(() => {
@@ -134,6 +177,28 @@ export default function BookTripPage() {
       loadTrip();
     }
   }, [params.tripId]);
+
+  // Auth protection - redirect non-logged-in users to login
+  useEffect(() => {
+    if (!authLoading && !user) {
+      router.push(`/auth/login?redirect=/book/${params.tripId}`);
+    }
+  }, [user, authLoading, router, params.tripId]);
+
+  // Load payment amounts when trip or package type changes
+  useEffect(() => {
+    const loadPaymentAmounts = async () => {
+      if (trip && formData.packageType) {
+        const selectedPackagePrice = trip.pricing[formData.packageType as keyof typeof trip.pricing] as number;
+        if (selectedPackagePrice) {
+          const amounts = await fetchPaymentAmounts(selectedPackagePrice);
+          setPaymentAmounts(amounts);
+        }
+      }
+    };
+
+    loadPaymentAmounts();
+  }, [trip, formData.packageType, fetchPaymentAmounts]);
 
   // Pre-fill form with user data
   useEffect(() => {
@@ -228,7 +293,9 @@ export default function BookTripPage() {
         throw new Error('Invalid package selected');
       }
 
-      const paymentAmounts = calculatePaymentAmounts(selectedPackage);
+      if (!paymentAmounts) {
+        throw new Error('Payment amounts not loaded');
+      }
 
       // Redirect to payment processing
       const bookingData = {
@@ -280,7 +347,6 @@ export default function BookTripPage() {
   }
 
   const selectedPackagePrice = trip.pricing[formData.packageType as keyof typeof trip.pricing] as number;
-  const paymentAmounts = selectedPackagePrice ? calculatePaymentAmounts(selectedPackagePrice) : null;
 
   return (
     <div className="min-h-screen bg-black relative overflow-hidden">
@@ -352,11 +418,11 @@ export default function BookTripPage() {
                             <span className="text-white font-bold">€{selectedPackagePrice}</span>
                           </div>
                           <div className="flex justify-between text-sm mb-1">
-                            <span className="text-gray-400">Deposit (30%):</span>
+                            <span className="text-gray-400">Deposit ({paymentAmounts.depositPercentage}%):</span>
                             <span className="text-purple-400">€{paymentAmounts.depositAmount}</span>
                           </div>
                           <div className="flex justify-between text-sm">
-                            <span className="text-gray-400">Balance (70%):</span>
+                            <span className="text-gray-400">Balance ({paymentAmounts.balancePercentage}%):</span>
                             <span className="text-yellow-400">€{paymentAmounts.balanceAmount}</span>
                           </div>
                         </>
@@ -366,10 +432,10 @@ export default function BookTripPage() {
                     <div className="bg-purple-600/10 rounded-lg p-3">
                       <div className="flex items-center gap-2 text-purple-400 text-sm">
                         <CheckCircle size={16} />
-                        <span>Pay 30% now, 70% later</span>
+                        <span>Pay {paymentAmounts?.depositPercentage || 30}% now, {paymentAmounts?.balancePercentage || 70}% later</span>
                       </div>
                       <p className="text-xs text-gray-400 mt-1">
-                        Balance automatically charged 1 week before trip
+                        Balance payment link sent 1 week before trip
                       </p>
                     </div>
                   </div>

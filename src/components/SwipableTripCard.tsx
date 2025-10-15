@@ -11,7 +11,7 @@ import { cn } from '@/utils/cn';
 import { isMobile } from '@/utils/isMobile';
 
 interface SwipableTripCardProps {
-  onBookingClick: () => void;
+  onBookingClick?: () => void;
   className?: string;
 }
 
@@ -563,40 +563,31 @@ export default function SwipableTripCard({ onBookingClick, className }: Swipable
                         );
                       } else if (status === 'current') {
                         return (
-                          <motion.button
-                            onClick={onBookingClick}
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            className="px-8 py-4 bg-gradient-to-r from-green-600 to-emerald-600 rounded-xl font-bold text-lg text-white shadow-lg hover:shadow-xl transition-all duration-300"
-                          >
-                            Join Now
-                          </motion.button>
+                          <Link href={`/book/${currentTrip.$id}`}>
+                            <motion.button
+                              whileHover={{ scale: 1.05 }}
+                              whileTap={{ scale: 0.95 }}
+                              className="px-8 py-4 bg-gradient-to-r from-green-600 to-emerald-600 rounded-xl font-bold text-lg text-white shadow-lg hover:shadow-xl transition-all duration-300"
+                            >
+                              Join Now
+                            </motion.button>
+                          </Link>
                         );
                       } else {
                         // upcoming
                         return (
-                          <motion.button
-                            onClick={onBookingClick}
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            className="px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl font-bold text-lg text-white shadow-lg hover:shadow-xl transition-all duration-300"
-                          >
-                            Get Started
-                          </motion.button>
+                          <Link href={`/trip/${currentTrip.$id}`}>
+                            <motion.button
+                              whileHover={{ scale: 1.05 }}
+                              whileTap={{ scale: 0.95 }}
+                              className="px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl font-bold text-lg text-white shadow-lg hover:shadow-xl transition-all duration-300"
+                            >
+                              More Details
+                            </motion.button>
+                          </Link>
                         );
                       }
                     })()}
-
-                    {/* View More Link - Available for All Trips */}
-                    <Link href={`/trip/${currentTrip.$id}`}>
-                      <motion.div
-                        whileHover={{ x: 2 }}
-                        className="flex items-center gap-2 text-purple-300 hover:text-purple-200 transition-colors text-sm font-medium"
-                      >
-                        <span>View Full Details</span>
-                        <span>→</span>
-                      </motion.div>
-                    </Link>
                   </motion.div>
                 </div>
               </div>

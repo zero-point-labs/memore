@@ -209,8 +209,8 @@ export default function BookingConfirmationEmail({
           }}>
             <p style={{ margin: '8px 0' }}>
               Questions? Contact us at{' '}
-              <a href="mailto:info@zeropoint-labs.com" style={{ color: '#8B5CF6' }}>
-                info@zeropoint-labs.com
+              <a href="mailto:info@memora-experience.com" style={{ color: '#8B5CF6' }}>
+                info@memora-experience.com
               </a>
             </p>
             <p style={{ margin: '8px 0' }}>

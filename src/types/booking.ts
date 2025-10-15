@@ -83,6 +83,9 @@ export interface Booking {
   balancePaymentIntentId?: string;
   paymentMethodId?: string;
   
+  // Enhanced payment information
+  paymentInfo?: PaymentInfo;
+  
   // Scheduling
   balanceDueDate: string; // ISO date when balance is due
   
@@ -129,6 +132,54 @@ export interface PaymentSchedule {
   updatedAt?: string;
 }
 
+// Payment link interface
+export interface PaymentLink {
+  sessionId: string;     // Stripe Checkout Session ID
+  url: string;          // Payment link URL
+  amount: number;       // Amount in euros
+  paymentType: 'deposit' | 'balance' | 'manual_charge';
+  createdAt: string;    // ISO date when link was created
+  expiresAt: string;    // ISO date when link expires
+  status: 'pending' | 'completed' | 'expired' | 'cancelled';
+  completedAt?: string; // ISO date when payment was completed
+  paymentIntentId?: string; // Stripe Payment Intent ID after completion
+}
+
+// Manual charge record interface
+export interface ManualCharge {
+  amount: number;
+  description: string;
+  date: string;         // ISO date when charge was made
+  paymentIntentId?: string;
+  paymentLinkId?: string; // Reference to payment link if used
+  status: 'pending' | 'succeeded' | 'failed' | 'cancelled';
+  adminUserId?: string; // ID of admin who initiated the charge
+}
+
+// Payment reminder record interface
+export interface PaymentReminder {
+  type: 'balance_due' | 'trip_reminder' | 'payment_failed';
+  date: string;         // ISO date when reminder was sent
+  adminInitiated: boolean;
+  method: 'email' | 'sms';
+  status: 'sent' | 'failed';
+}
+
+// Enhanced payment info interface
+export interface PaymentInfo {
+  paymentLinks?: PaymentLink[];
+  manualCharges?: ManualCharge[];
+  reminders?: PaymentReminder[];
+  paymentMethodUpdates?: Array<{
+    date: string;
+    oldMethodId?: string;
+    newMethodId: string;
+    reason?: string;
+  }>;
+  gracePeriodEnd?: string; // ISO date when grace period expires
+  requiresManualIntervention?: boolean;
+}
+
 // Notification interface
 export interface Notification {
   id?: string;
@@ -138,7 +189,7 @@ export interface Notification {
   userId: string;
   
   // Notification details
-  type: 'booking_confirmation' | 'payment_success' | 'payment_reminder' | 'payment_failed' | 'trip_reminder' | 'admin_alert';
+  type: 'booking_confirmation' | 'payment_success' | 'payment_reminder' | 'payment_failed' | 'trip_reminder' | 'admin_alert' | 'payment_link';
   method: 'email' | 'sms';
   recipient: string;     // Email address or phone number
   

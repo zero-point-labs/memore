@@ -257,7 +257,7 @@ export default function BookingSuccessPage() {
                       €{booking.balanceAmount}
                     </div>
                     <div className="text-sm text-gray-400">
-                      Auto-charged on {new Date(bookingDetails.booking.balanceDueDate).toLocaleDateString('en-GB')}
+                      Payment link sent on {new Date(bookingDetails.booking.balanceDueDate).toLocaleDateString('en-GB')}
                     </div>
                   </div>
 
@@ -308,7 +308,7 @@ export default function BookingSuccessPage() {
                     </div>
                     <h3 className="font-semibold text-white mb-2">Balance Payment</h3>
                     <p className="text-sm text-gray-400">
-                      Automatic charge on {new Date(booking.balanceDueDate).toLocaleDateString()}
+                      Payment link sent on {new Date(booking.balanceDueDate).toLocaleDateString()}
                     </p>
                   </div>
                 </div>

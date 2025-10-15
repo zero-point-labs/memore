@@ -8,17 +8,33 @@ import {
   BookingStatus,
   PaymentStatus
 } from '@/types/booking';
-import { calculatePaymentAmounts, STRIPE_CONFIG } from '@/lib/stripe';
 
 const DATABASE_ID = process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID || 'memora_db';
 const COLLECTION_ID = 'bookings';
 
 export class BookingService {
+  // Helper function to deserialize paymentInfo
+  private deserializeBooking(doc: any): BookingDocument {
+    const booking = doc as BookingDocument;
+    
+    // Deserialize paymentInfo if it exists
+    if (booking.paymentInfo && typeof booking.paymentInfo === 'string') {
+      try {
+        booking.paymentInfo = JSON.parse(booking.paymentInfo);
+      } catch (parseError) {
+        console.warn(`Failed to parse paymentInfo JSON for booking ${booking.$id}:`, parseError);
+        booking.paymentInfo = undefined;
+      }
+    }
+    
+    return booking;
+  }
+
   // Get booking by ID
   async getById(id: string): Promise<BookingDocument | null> {
     try {
       const document = await databases.getDocument(DATABASE_ID, COLLECTION_ID, id);
-      return document as BookingDocument;
+      return this.deserializeBooking(document);
     } catch (error) {
       console.error('Error fetching booking:', error);
       return null;
@@ -38,7 +54,7 @@ export class BookingService {
         ]
       );
 
-      return response.documents as BookingDocument[];
+      return response.documents.map(doc => this.deserializeBooking(doc));
     } catch (error) {
       console.error('Error fetching user bookings:', error);
       return [];
@@ -58,7 +74,7 @@ export class BookingService {
         ]
       );
 
-      return response.documents as BookingDocument[];
+      return response.documents.map(doc => this.deserializeBooking(doc));
     } catch (error) {
       console.error('Error fetching trip bookings:', error);
       return [];
@@ -78,7 +94,7 @@ export class BookingService {
         ]
       );
 
-      return response.documents as BookingDocument[];
+      return response.documents.map(doc => this.deserializeBooking(doc));
     } catch (error) {
       console.error('Error fetching bookings by status:', error);
       return [];
@@ -103,7 +119,7 @@ export class BookingService {
         ]
       );
 
-      return response.documents as BookingDocument[];
+      return response.documents.map(doc => this.deserializeBooking(doc));
     } catch (error) {
       console.error('Error fetching bookings with balance due soon:', error);
       return [];
@@ -113,13 +129,9 @@ export class BookingService {
   // Create new booking
   async create(data: CreateBookingData): Promise<BookingDocument> {
     try {
-      // Calculate payment amounts
-      const paymentAmounts = calculatePaymentAmounts(data.totalAmount);
-      
+      // Use the payment amounts passed from the API (already calculated with correct settings)
       const bookingData = {
         ...data,
-        depositAmount: paymentAmounts.depositAmount,
-        balanceAmount: paymentAmounts.balanceAmount,
         currency: data.currency || 'EUR',
         bookingStatus: data.bookingStatus || 'pending' as BookingStatus,
         paymentStatus: data.paymentStatus || 'pending' as PaymentStatus,
@@ -149,11 +161,17 @@ export class BookingService {
         data.balanceAmount = paymentAmounts.balanceAmount;
       }
 
+      // Serialize paymentInfo if it exists
+      const updateData = { ...data };
+      if (updateData.paymentInfo) {
+        updateData.paymentInfo = JSON.stringify(updateData.paymentInfo);
+      }
+
       const document = await databases.updateDocument(
         DATABASE_ID,
         COLLECTION_ID,
         id,
-        data
+        updateData
       );
 
       return document as BookingDocument;
@@ -349,7 +367,7 @@ export class BookingService {
         ]
       );
 
-      return response.documents as BookingDocument[];
+      return response.documents.map(doc => this.deserializeBooking(doc));
     } catch (error) {
       console.error('Error searching bookings:', error);
       return [];

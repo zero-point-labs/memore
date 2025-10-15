@@ -31,6 +31,8 @@ interface PendingBooking {
     totalAmount: number;
     depositAmount: number;
     balanceAmount: number;
+    depositPercentage: number;
+    balancePercentage: number;
   };
 }
 
@@ -88,6 +90,10 @@ function PaymentForm({ pendingBooking }: { pendingBooking: PendingBooking }) {
       return;
     }
 
+    if (processing) {
+      return; // Prevent double submission
+    }
+
     setProcessing(true);
     setError(null);
 
@@ -102,6 +108,7 @@ function PaymentForm({ pendingBooking }: { pendingBooking: PendingBooking }) {
           tripId: pendingBooking.tripId,
           userId: user.$id,
           amount: pendingBooking.pricing.depositAmount,
+          totalAmount: pendingBooking.pricing.totalAmount,
           bookingData: pendingBooking.formData,
           savePaymentMethod
         }),
@@ -182,11 +189,11 @@ function PaymentForm({ pendingBooking }: { pendingBooking: PendingBooking }) {
             </div>
             <div className="border-t border-purple-500/20 pt-3">
               <div className="flex justify-between text-lg font-bold">
-                <span className="text-purple-400">Deposit (30%):</span>
+                <span className="text-purple-400">Deposit ({pendingBooking.pricing.depositPercentage}%):</span>
                 <span className="text-purple-400">€{pendingBooking.pricing.depositAmount}</span>
               </div>
               <div className="flex justify-between text-sm mt-1">
-                <span className="text-gray-400">Balance (70% - Auto-charged later):</span>
+                <span className="text-gray-400">Balance ({pendingBooking.pricing.balancePercentage}% - Payment link later):</span>
                 <span className="text-yellow-400">€{pendingBooking.pricing.balanceAmount}</span>
               </div>
             </div>
@@ -238,7 +245,7 @@ function PaymentForm({ pendingBooking }: { pendingBooking: PendingBooking }) {
                 Save payment method for balance payment
               </label>
               <p className="text-sm text-gray-400 mt-1">
-                We'll automatically charge the remaining 70% one week before your trip
+                We'll send you a payment link for the remaining {pendingBooking.pricing.balancePercentage}% one week before your trip
               </p>
             </div>
           </div>

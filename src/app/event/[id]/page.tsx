@@ -6,13 +6,11 @@ import { useParams } from 'next/navigation';
 import Image from 'next/image';
 import { EventDocument, EVENT_TYPES, EVENT_CITIES } from '@/types/event';
 import { Calendar, Clock, MapPin, Users, Euro, CheckCircle, AlertCircle } from 'lucide-react';
-import BookingFormPopup from '@/components/BookingFormPopup';
 
 export default function EventDetailPage() {
   const params = useParams();
   const [event, setEvent] = useState<EventDocument | null>(null);
   const [loading, setLoading] = useState(true);
-  const [isBookingOpen, setIsBookingOpen] = useState(false);
   const [selectedTicketType, setSelectedTicketType] = useState<'general' | 'vip'>('general');
 
   useEffect(() => {
@@ -421,11 +419,6 @@ export default function EventDetailPage() {
         </div>
       </div>
 
-      {/* Booking Form Popup */}
-      <BookingFormPopup 
-        isOpen={isBookingOpen}
-        onClose={() => setIsBookingOpen(false)}
-      />
     </div>
   );
 }

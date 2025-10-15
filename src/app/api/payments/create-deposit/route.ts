@@ -15,6 +15,7 @@ export async function POST(request: NextRequest) {
       tripId,
       userId,
       amount,
+      totalAmount,
       bookingData,
       savePaymentMethod = true
     } = body;
@@ -146,10 +147,31 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Calculate payment amounts
-    const paymentAmounts = await serverGlobalSettingsService.calculatePaymentAmounts(
-      trip.pricing[bookingData.packageType as keyof typeof trip.pricing] as number
-    );
+    // Check for existing pending bookings to prevent duplicates
+    try {
+      const existingBookings = await serverBookingService.getByUserId(userId);
+      const pendingBooking = existingBookings.find(b => 
+        b.tripId === tripId && 
+        (b.bookingStatus === 'pending' || b.paymentStatus === 'processing')
+      );
+      
+      if (pendingBooking) {
+        console.log(`Found existing pending booking: ${pendingBooking.$id}`);
+        return NextResponse.json(
+          { error: 'You already have a pending booking for this trip. Please complete or cancel it first.' },
+          { status: 409 }
+        );
+      }
+    } catch (error) {
+      console.warn('Could not check for existing bookings:', error);
+    }
+
+    // Calculate payment amounts using the total amount from the client
+    const paymentAmounts = totalAmount 
+      ? await serverGlobalSettingsService.calculatePaymentAmounts(totalAmount)
+      : await serverGlobalSettingsService.calculatePaymentAmounts(
+          trip.pricing[bookingData.packageType as keyof typeof trip.pricing] as number
+        );
 
     // Create booking record using server service
     const booking = await serverBookingService.create({

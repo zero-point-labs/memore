@@ -17,7 +17,7 @@ export class ServerGlobalSettingsService {
       const response = await serverDatabases.listDocuments(
         DATABASE_ID,
         COLLECTION_ID,
-        [Query.limit(1)]
+        [Query.orderDesc('$updatedAt'), Query.limit(1)]
       );
 
       if (response.documents.length === 0) {

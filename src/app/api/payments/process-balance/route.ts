@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerStripe, eurosToCents } from '@/lib/stripe';
+import { createBalancePaymentLink } from '@/lib/stripe-checkout';
 import { bookingService } from '@/services/bookingService';
 import { paymentScheduleService } from '@/services/paymentScheduleService';
 import { userProfileService } from '@/services/userProfileService';
 import { notificationService } from '@/services/notificationService';
 import { tripService } from '@/services/tripService';
+import { sendServerEmail, generatePaymentLinkEmail } from '@/lib/resend-server';
 
 export async function POST(request: NextRequest) {
   try {
@@ -60,123 +62,98 @@ export async function POST(request: NextRequest) {
     await paymentScheduleService.markAsProcessing(paymentScheduleId);
 
     try {
-      // Create off-session payment intent
-      const paymentIntent = await stripe.paymentIntents.create({
-        amount: eurosToCents(booking.balanceAmount),
-        currency: 'eur',
-        customer: booking.stripeCustomerId,
-        payment_method: booking.paymentMethodId,
-        confirmation_method: 'automatic',
-        confirm: true,
-        off_session: true, // This indicates it's an automated payment
-        metadata: {
-          bookingId: booking.$id,
-          tripId: booking.tripId,
-          userId: booking.userId,
-          paymentType: 'balance',
-          paymentScheduleId
-        },
-        description: `Balance payment for ${trip.title} - ${userProfile.firstName} ${userProfile.lastName}`,
-        receipt_email: userProfile.email,
+      // Generate payment link for customer (no automatic charges)
+      console.log('Generating payment link for balance payment...');
+      const paymentLink = await createBalancePaymentLink(
+        booking,
+        trip,
+        userProfile.email
+      );
+
+      // Set grace period (7 days from now for payment link completion)
+      const gracePeriodEnd = new Date();
+      gracePeriodEnd.setDate(gracePeriodEnd.getDate() + 7);
+
+      // Update booking with payment link
+      await bookingService.update(bookingId, {
+        paymentInfo: {
+          ...booking.paymentInfo,
+          paymentLinks: [
+            ...(booking.paymentInfo?.paymentLinks || []),
+            {
+              sessionId: paymentLink.sessionId,
+              url: paymentLink.url,
+              amount: booking.balanceAmount,
+              paymentType: 'balance',
+              createdAt: new Date().toISOString(),
+              expiresAt: paymentLink.expiresAt.toISOString(),
+              status: 'pending'
+            }
+          ],
+          gracePeriodEnd: gracePeriodEnd.toISOString(),
+          requiresManualIntervention: false
+        }
       });
 
-      if (paymentIntent.status === 'succeeded') {
-        // Mark payment schedule as succeeded
-        await paymentScheduleService.markAsSucceeded(paymentScheduleId, paymentIntent.id);
-        
-        // Update booking status
-        await bookingService.markBalancePaid(bookingId, paymentIntent.id);
+      // Send payment link email to customer
+      const emailTemplate = generatePaymentLinkEmail({
+        customerName: `${userProfile.firstName} ${userProfile.lastName}`,
+        tripTitle: trip.title,
+        amount: booking.balanceAmount,
+        paymentType: 'balance',
+        paymentLinkUrl: paymentLink.url,
+        expiresAt: paymentLink.expiresAt.toISOString(),
+        paymentAttemptStatus: 'scheduled',
+        paymentAttemptMessage: 'Your balance payment is now due. Please complete your payment using the secure link below.'
+      });
 
-        // Send success notification
-        await notificationService.sendPaymentSuccess({
-          userId: booking.userId,
-          bookingId,
-          customerEmail: userProfile.email,
-          customerName: `${userProfile.firstName} ${userProfile.lastName}`,
-          amount: booking.balanceAmount,
-          paymentType: 'balance',
-          tripTitle: trip.title
-        });
+      await sendServerEmail({
+        to: userProfile.email,
+        subject: `Balance Payment Due - ${trip.title}`,
+        html: emailTemplate.html,
+        text: emailTemplate.text,
+        template: 'payment-link'
+      });
 
-        return NextResponse.json({
-          success: true,
-          paymentIntentId: paymentIntent.id,
-          status: 'succeeded'
-        });
+      // Mark payment schedule as pending (waiting for customer action)
+      await paymentScheduleService.update(paymentScheduleId, {
+        status: 'pending',
+        notes: 'Payment link sent to customer'
+      });
 
-      } else if (paymentIntent.status === 'requires_action') {
-        // Payment requires additional authentication (3D Secure)
-        // For off-session payments, this usually means the payment failed
-        await paymentScheduleService.markAsFailedWithRetry(
-          paymentScheduleId,
-          'Payment requires additional authentication'
-        );
+      console.log(`Payment link sent successfully: ${paymentLink.sessionId}`);
 
-        // Send admin alert
-        await notificationService.sendAdminAlert({
-          type: 'Balance Payment Requires Action',
-          subject: `Balance payment requires customer action - Booking ${bookingId}`,
-          message: `Balance payment for ${userProfile.firstName} ${userProfile.lastName} requires additional authentication. Customer needs to complete payment manually.`,
-          bookingId,
-          userId: booking.userId
-        });
+      return NextResponse.json({
+        success: true,
+        paymentLinkSent: true,
+        paymentLinkId: paymentLink.sessionId,
+        gracePeriodEnd: gracePeriodEnd.toISOString(),
+        message: 'Payment link sent to customer'
+      });
 
-        return NextResponse.json({
-          success: false,
-          error: 'Payment requires additional authentication',
-          requiresAction: true
-        });
-
-      } else {
-        // Payment failed
-        await paymentScheduleService.markAsFailedWithRetry(
-          paymentScheduleId,
-          `Payment failed with status: ${paymentIntent.status}`
-        );
-
-        // Send admin alert
-        await notificationService.sendAdminAlert({
-          type: 'Balance Payment Failed',
-          subject: `Balance payment failed - Booking ${bookingId}`,
-          message: `Balance payment of €${booking.balanceAmount} failed for ${userProfile.firstName} ${userProfile.lastName}. Status: ${paymentIntent.status}`,
-          bookingId,
-          userId: booking.userId
-        });
-
-        return NextResponse.json({
-          success: false,
-          error: `Payment failed with status: ${paymentIntent.status}`
-        });
-      }
-
-    } catch (stripeError: any) {
-      console.error('Stripe payment error:', stripeError);
+    } catch (error: any) {
+      console.error('Error generating payment link:', error);
       
-      // Handle specific Stripe errors
-      let errorMessage = 'Payment processing failed';
-      
-      if (stripeError.type === 'StripeCardError') {
-        errorMessage = stripeError.message || 'Card was declined';
-      } else if (stripeError.type === 'StripeInvalidRequestError') {
-        errorMessage = 'Invalid payment request';
-      }
+      // Mark payment schedule as failed
+      await paymentScheduleService.markAsFailedWithRetry(
+        paymentScheduleId,
+        `Failed to generate payment link: ${error.message}`
+      );
 
-      // Mark payment schedule as failed with retry
-      await paymentScheduleService.markAsFailedWithRetry(paymentScheduleId, errorMessage);
-
-      // Send admin alert
+      // Send admin alert about the failure
       await notificationService.sendAdminAlert({
-        type: 'Balance Payment Error',
-        subject: `Balance payment error - Booking ${bookingId}`,
-        message: `Error processing balance payment: ${errorMessage}. Customer: ${userProfile.firstName} ${userProfile.lastName}`,
+        type: 'Balance Payment Link Generation Failed',
+        subject: `Failed to generate payment link - Booking ${bookingId}`,
+        message: `Failed to generate payment link for ${userProfile.firstName} ${userProfile.lastName}. Error: ${error.message}. Manual intervention required.`,
         bookingId,
         userId: booking.userId
       });
 
       return NextResponse.json({
         success: false,
-        error: errorMessage
-      });
+        error: 'Failed to generate payment link',
+        requiresManualIntervention: true
+      }, { status: 500 });
     }
 
   } catch (error) {

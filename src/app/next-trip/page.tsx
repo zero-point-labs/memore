@@ -6,7 +6,7 @@ import { MapPin, Calendar, Users, Check, ArrowRight, Clock } from 'lucide-react'
 import Link from 'next/link';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-// import BookingFormPopup from '@/components/BookingFormPopup'; // Replaced with dedicated booking pages
+//  // Replaced with dedicated booking pages
 import TripImageCarousel from '@/components/trip-elements/TripImageCarousel';
 import TripDetailsCard from '@/components/trip-elements/TripDetailsCard';
 import { tripService } from '@/services/tripService';
