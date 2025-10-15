@@ -9,7 +9,7 @@ import Footer from '@/components/Footer';
 //  // Replaced with dedicated booking pages
 import TripImageCarousel from '@/components/trip-elements/TripImageCarousel';
 import TripDetailsCard from '@/components/trip-elements/TripDetailsCard';
-import { tripService } from '@/services/tripService';
+import { clientTripService } from '@/services/tripService.client';
 import { TripDocument } from '@/types/trip';
 
 import { Meteors } from '@/components/magicui/meteors';
@@ -559,7 +559,7 @@ export default function NextTripPage() {
   useEffect(() => {
     const fetchNextTrip = async () => {
       try {
-        const trip = await tripService.getNextTrip();
+        const trip = await clientTripService.getNextTrip();
         setFeaturedTrip(trip);
       } catch (error) {
         console.error('Error fetching next trip:', error);
@@ -576,8 +576,8 @@ export default function NextTripPage() {
     const fetchOtherTrips = async () => {
       try {
         const [upcoming, previous] = await Promise.all([
-          tripService.getUpcomingTrips(true), // Exclude the next trip
-          tripService.getPreviousTrips(10)    // Get last 10 previous trips
+          clientTripService.getUpcomingTrips(true), // Exclude the next trip
+          clientTripService.getPreviousTrips(10)    // Get last 10 previous trips
         ]);
         setUpcomingTrips(upcoming);
         setPreviousTrips(previous);

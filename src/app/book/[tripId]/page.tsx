@@ -24,7 +24,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserProfile } from '@/hooks/useUserProfile';
-import { tripService } from '@/services/tripService';
+import { clientTripService } from '@/services/tripService.client';
 import { TripDocument } from '@/types/trip';
 import { StudentStatus, RoomPreference, TransportPreference } from '@/types/booking';
 
@@ -159,7 +159,7 @@ export default function BookTripPage() {
     const loadTrip = async () => {
       try {
         setLoading(true);
-        const tripData = await tripService.getTrip(params.tripId as string);
+        const tripData = await clientTripService.getTrip(params.tripId as string);
         if (!tripData) {
           setError('Trip not found');
           return;

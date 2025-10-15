@@ -17,7 +17,7 @@ import { Elements, CardElement, useStripe, useElements } from '@stripe/react-str
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { getStripe } from '@/lib/stripe';
-import { tripService } from '@/services/tripService';
+import { clientTripService } from '@/services/tripService.client';
 import { userProfileService } from '@/services/userProfileService';
 import { bookingService } from '@/services/bookingService';
 import { notificationService } from '@/services/notificationService';
@@ -71,7 +71,7 @@ function PaymentForm({ pendingBooking }: { pendingBooking: PendingBooking }) {
   useEffect(() => {
     const loadTrip = async () => {
       try {
-        const tripData = await tripService.getTrip(pendingBooking.tripId);
+        const tripData = await clientTripService.getTrip(pendingBooking.tripId);
         setTrip(tripData);
       } catch (err) {
         console.error('Error loading trip:', err);

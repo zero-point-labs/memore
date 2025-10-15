@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { bookingService } from '@/services/bookingService';
-import { tripService } from '@/services/tripService';
+import { clientTripService } from '@/services/tripService.client';
 // Notification service is handled server-side via API
 
 interface BookingDetails {
@@ -57,7 +57,7 @@ export default function BookingSuccessPage() {
         }
 
         // Get trip details
-        const trip = await tripService.getTrip(booking.tripId);
+        const trip = await clientTripService.getTrip(booking.tripId);
         if (!trip) {
           setError('Trip details not found');
           setLoading(false);

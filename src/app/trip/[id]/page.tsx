@@ -10,7 +10,7 @@ import Footer from '@/components/Footer';
 //  // Replaced with dedicated booking pages
 import TripImageCarousel from '@/components/trip-elements/TripImageCarousel';
 import TripDetailsCard from '@/components/trip-elements/TripDetailsCard';
-import { tripService } from '@/services/tripService';
+import { clientTripService } from '@/services/tripService.client';
 import { TripDocument } from '@/types/trip';
 
 import { Meteors } from '@/components/magicui/meteors';
@@ -22,7 +22,7 @@ import TripAboutCard from '@/components/trip-elements/TripAboutCard';
 import { BorderBeam } from '@/components/magicui/border-beam';
 import EnhancedGetStartedButton from '@/components/EnhancedGetStartedButton';
 
-// Note: Trip data now comes from database via tripService.getTrip() (ID-based)
+// Note: Trip data now comes from API via clientTripService.getTrip() (ID-based)
 
 
 
@@ -564,7 +564,7 @@ export default function TripPage() {
   useEffect(() => {
     const fetchTrip = async () => {
       try {
-        const tripData = await tripService.getTrip(tripId);
+        const tripData = await clientTripService.getTrip(tripId);
         if (!tripData) {
           setError('Trip not found');
         } else {
@@ -588,13 +588,13 @@ export default function TripPage() {
     const fetchOtherTrips = async () => {
       try {
         const [upcoming, previous] = await Promise.all([
-          tripService.getUpcomingTrips(false), // Get all upcoming trips (don't exclude next trip)
-          tripService.getPreviousTrips(10)     // Get last 10 previous trips
+          clientTripService.getUpcomingTrips(false), // Get all upcoming trips (don't exclude next trip)
+          clientTripService.getPreviousTrips(10)     // Get last 10 previous trips
         ]);
         
         // Filter out current trip from both lists
-        const filteredUpcoming = upcoming.filter(t => t.$id !== tripId);
-        const filteredPrevious = previous.filter(t => t.$id !== tripId);
+        const filteredUpcoming = upcoming.filter((t: TripDocument) => t.$id !== tripId);
+        const filteredPrevious = previous.filter((t: TripDocument) => t.$id !== tripId);
         
         setUpcomingTrips(filteredUpcoming);
         setPreviousTrips(filteredPrevious);
