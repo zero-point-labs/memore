@@ -49,12 +49,12 @@ export default function Header() {
   }, [isMenuOpen]);
 
   const navItems = [
-    { label: 'Next Trip', href: '/next-trip', icon: <Compass size={20} /> },
-    { label: 'Events', href: '/events', icon: <Calendar size={20} /> },
-    { label: 'Gallery', href: '/gallery', icon: <Camera size={20} /> },
-    { label: 'Stories', href: '/blog', icon: <FileText size={20} /> },
-    { label: 'About Us', href: '/about', icon: <Users size={20} /> },
-    { label: 'Contact', href: '/contact', icon: <MessageSquare size={20} /> },
+    { label: 'Next Trip', href: '/next-trip', icon: <Compass size={16} /> },
+    { label: 'Events', href: '/events', icon: <Calendar size={16} /> },
+    { label: 'Gallery', href: '/gallery', icon: <Camera size={16} /> },
+    { label: 'Stories', href: '/blog', icon: <FileText size={16} /> },
+    { label: 'About Us', href: '/about', icon: <Users size={16} /> },
+    { label: 'Contact', href: '/contact', icon: <MessageSquare size={16} /> },
   ];
 
   const closeMenu = () => setIsMenuOpen(false);
@@ -202,7 +202,7 @@ export default function Header() {
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'tween', duration: 0.3, ease: 'easeInOut' }}
-              className="absolute right-0 top-0 h-full w-80 max-w-[85vw] bg-black/95 backdrop-blur-xl border-l border-purple-500/20"
+              className="absolute right-0 top-0 h-full w-72 max-w-[80vw] bg-black/95 backdrop-blur-xl border-l border-purple-500/20"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Close Button */}
@@ -212,13 +212,15 @@ export default function Header() {
                   className="w-10 h-10 flex items-center justify-center rounded-xl bg-white/10 hover:bg-white/20 transition-colors"
                   aria-label="Close menu"
                 >
-                  <X size={20} className="text-white" />
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-white">
+                    <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
                 </button>
               </div>
 
               {/* Navigation */}
-              <nav className="px-6 pb-8">
-                <div className="space-y-4">
+              <nav className="px-4 pb-6">
+                <div className="space-y-2">
                   {navItems.map((item, index) => (
                     <motion.div
                       key={item.label}
@@ -229,12 +231,12 @@ export default function Header() {
                       <Link
                         href={item.href}
                         onClick={closeMenu}
-                        className="flex items-center gap-4 p-4 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-purple-400/30 transition-all duration-300 group"
+                        className="flex items-center gap-3 py-3 px-2 text-white hover:text-purple-300 transition-colors duration-200 group"
                       >
-                        <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500">
+                        <div className="text-purple-400 group-hover:text-purple-300 transition-colors">
                           {item.icon}
                         </div>
-                        <span className="text-lg font-medium text-white group-hover:text-purple-300 transition-colors">
+                        <span className="text-base font-medium">
                           {item.label}
                         </span>
                       </Link>
@@ -247,19 +249,19 @@ export default function Header() {
                   initial={{ opacity: 0, x: 50 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: navItems.length * 0.1 + 0.3 }}
-                  className="mt-8 pt-6 border-t border-white/10"
+                  className="mt-6 pt-4 border-t border-white/10"
                 >
                   {!loading && (
                     user ? (
                       <Link href="/account" onClick={closeMenu}>
-                        <button className="w-full flex items-center justify-center gap-2 p-4 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl font-bold text-white shadow-lg">
-                          <User size={20} />
+                        <button className="w-full flex items-center justify-center gap-2 p-3 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg font-bold text-sm text-white shadow-lg">
+                          <User size={16} />
                           ACCOUNT
                         </button>
                       </Link>
                     ) : (
                       <Link href="/auth/signup" onClick={closeMenu}>
-                        <button className="w-full p-4 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl font-bold text-white shadow-lg">
+                        <button className="w-full p-3 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg font-bold text-sm text-white shadow-lg">
                           SIGN UP
                         </button>
                       </Link>
