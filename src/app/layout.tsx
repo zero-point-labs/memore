@@ -18,6 +18,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Memora - Cyprus Adventures",
   description: "Unforgettable 3-day adventure trips in Cyprus with parties, exploration, and memories that last a lifetime",
+  viewport: "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no",
 };
 
 export default function RootLayout({

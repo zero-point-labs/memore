@@ -6,7 +6,6 @@ import Link from 'next/link';
 // import VIPCard from '@/components/hero-elements/VIPCard';
 
 import GlitchText from '@/components/hero-elements/GlitchText';
-import AboutMemoraSection from '@/components/AboutMemoraSection';
 import FAQSection from '@/components/FAQSection';
 import NextTripSection from '@/components/NextTripSection';
 import EventsSection from '@/components/EventsSection';
@@ -296,8 +295,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* About Memora Section */}
-      <AboutMemoraSection />
 
       {/* Next Trip Details Section */}
       <NextTripSection isHomepage={true} />
