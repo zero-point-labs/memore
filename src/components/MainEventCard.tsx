@@ -24,7 +24,7 @@ export default function MainEventCard({ event }: MainEventCardProps) {
           {/* Mobile Layout: Image + Separate Card */}
           <div className="sm:hidden">
             {/* Image Section */}
-            <div className="relative aspect-[4/3] overflow-hidden bg-gray-900 rounded-t-3xl">
+            <div className="relative aspect-[4/3] overflow-hidden bg-gray-900 rounded-t-3xl border border-purple-500/60 shadow-xl shadow-purple-500/20">
               {event.eventContent.featuredImage && !event.eventContent.featuredImage.includes('placeholder') ? (
                 <Image
                   src={event.eventContent.featuredImage}
@@ -62,7 +62,7 @@ export default function MainEventCard({ event }: MainEventCardProps) {
             </div>
 
             {/* Content Card */}
-            <div className="bg-black/40 border border-purple-500/20 border-t-0 rounded-b-3xl p-6 hover:border-purple-500/60 hover:shadow-2xl hover:shadow-purple-500/20 transition-all duration-300">
+            <div className="bg-black/40 border border-purple-500/60 border-t-0 rounded-b-3xl p-6 shadow-xl shadow-purple-500/20">
               {/* Date & Time */}
               <div className="flex items-center gap-3 mb-4">
                 <div className="flex items-center gap-2 text-purple-400">

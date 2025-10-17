@@ -14,6 +14,8 @@ import { clientTripService } from '@/services/tripService.client';
 import { TripDocument } from '@/types/trip';
 import { useAuth } from '@/contexts/AuthContext';
 import ReviewModal from '@/components/ReviewModal';
+import { clientReviewService } from '@/services/reviewService.client';
+import { ReviewDocument } from '@/types/review';
 
 // Student Reviews
 const studentReviews = [
@@ -65,10 +67,13 @@ const studentReviews = [
 ];
 
 
-const TripSectionContent = ({ isHomepage, featuredTrip, onShareStoryClick }: { 
+const TripSectionContent = ({ isHomepage, featuredTrip, onShareStoryClick, onReviewAdded, reviews, reviewsLoading }: { 
   isHomepage: boolean, 
   featuredTrip: TripDocument,
-  onShareStoryClick: () => void
+  onShareStoryClick: () => void,
+  onReviewAdded?: () => void,
+  reviews: ReviewDocument[],
+  reviewsLoading: boolean
 }) => {
   const sectionRef = useRef(null);
 
@@ -76,11 +81,13 @@ const TripSectionContent = ({ isHomepage, featuredTrip, onShareStoryClick }: {
   const [currentReview, setCurrentReview] = useState(0);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentReview((prev) => (prev + 1) % studentReviews.length);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, []);
+    if (reviews.length > 0) {
+      const interval = setInterval(() => {
+        setCurrentReview((prev) => (prev + 1) % reviews.length);
+      }, 5000);
+      return () => clearInterval(interval);
+    }
+  }, [reviews.length]);
 
   return (
     <section id="next-trip" ref={sectionRef} className="relative bg-black min-h-screen overflow-hidden">
@@ -314,100 +321,118 @@ const TripSectionContent = ({ isHomepage, featuredTrip, onShareStoryClick }: {
                 <p className="text-gray-400 text-lg">Real experiences from the Cyprus squad</p>
               </div>
               <div className="relative max-w-4xl mx-auto">
-                <div className="relative overflow-hidden">
-                  <div className="flex transition-transform duration-500 ease-out"
-                       style={{ transform: `translateX(-${currentReview * 100}%)` }}>
-                    {studentReviews.map((review) => (
-                      <div
-                        key={review.id}
-                        className="w-full flex-shrink-0 px-4"
-                      >
-                        <motion.div
-                          initial={{ opacity: 0, y: 20 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          className="bg-gradient-to-br from-purple-900/20 to-pink-900/20 backdrop-blur-sm border border-purple-500/20 rounded-2xl p-8 text-center relative overflow-hidden"
-                        >
-                          <div className="absolute inset-0 opacity-20">
-                            <Sparkles density={15} color="#a855f7" speed={0.5} />
-                          </div>
-                          <motion.div
-                            initial={{ rotate: -10 }}
-                            animate={{ rotate: 10 }}
-                            transition={{ duration: 2, repeat: Infinity, repeatType: "reverse" }}
-                            className="absolute top-4 left-4 text-purple-500/20 text-6xl"
-                          >
-                            &ldquo;
-                          </motion.div>
-                          <div className="flex justify-center gap-1 mb-4 relative z-10">
-                            {[...Array(5)].map((_, i) => (
-                              <motion.span
-                                key={i}
-                                initial={{ opacity: 0, scale: 0, rotate: -180 }}
-                                animate={{ opacity: 1, scale: 1, rotate: 0 }}
-                                transition={{ delay: 0.1 * i, type: "spring", stiffness: 200 }}
-                                className="text-yellow-400 text-xl"
-                              >
-                                ⭐
-                              </motion.span>
-                            ))}
-                          </div>
-                          <p className="text-gray-300 text-lg mb-6 italic relative z-10 max-w-2xl mx-auto">
-                            &ldquo;{review.review}&rdquo;
-                          </p>
-                          <div className="flex items-center justify-center gap-4 relative z-10">
-                            <motion.span 
-                              className="text-4xl"
-                              whileHover={{ scale: 1.2, rotate: 10 }}
-                              transition={{ type: "spring", stiffness: 300 }}
-                            >
-                              {review.avatar}
-                            </motion.span>
-                            <div className="text-left">
-                              <p className="text-white font-semibold">{review.name}</p>
-                              <p className="text-gray-400 text-sm">{review.university}</p>
-                              <p className="text-purple-400 text-xs flex items-center gap-1">
-                                <span>🌴</span> {review.tripDate}
-                              </p>
-                            </div>
-                          </div>
-                        </motion.div>
-                      </div>
-                    ))}
+                {reviewsLoading ? (
+                  <div className="text-center py-12">
+                    <div className="text-purple-400">Loading reviews...</div>
                   </div>
-                </div>
-                <div className="absolute top-1/2 -translate-y-1/2 left-0 right-0 flex justify-between px-2 pointer-events-none">
-                  <motion.button
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                    onClick={() => setCurrentReview((prev) => (prev - 1 + studentReviews.length) % studentReviews.length)}
-                    className="w-12 h-12 rounded-full bg-black/40 backdrop-blur-sm border border-purple-500/30 flex items-center justify-center text-purple-300 hover:bg-purple-500/20 transition-colors pointer-events-auto"
-                  >
-                    ←
-                  </motion.button>
-                  <motion.button
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                    onClick={() => setCurrentReview((prev) => (prev + 1) % studentReviews.length)}
-                    className="w-12 h-12 rounded-full bg-black/40 backdrop-blur-sm border border-purple-500/30 flex items-center justify-center text-purple-300 hover:bg-purple-500/20 transition-colors pointer-events-auto"
-                  >
-                    →
-                  </motion.button>
-                </div>
-                <div className="flex justify-center gap-2 mt-6">
-                  {studentReviews.map((_, index) => (
-                    <button
-                      key={index}
-                      onClick={() => setCurrentReview(index)}
-                      className={cn(
-                        "w-2 h-2 rounded-full transition-all duration-300",
-                        currentReview === index
-                          ? "w-8 bg-gradient-to-r from-purple-500 to-pink-500"
-                          : "bg-purple-500/30 hover:bg-purple-500/60"
-                      )}
-                      aria-label={`Go to review ${index + 1}`}
-                    />
-                  ))}
-                </div>
+                ) : reviews.length === 0 ? (
+                  <div className="text-center py-12">
+                    <div className="text-gray-400 mb-4">No reviews yet</div>
+                    <div className="text-gray-500 text-sm">Be the first to share your Cyprus story!</div>
+                  </div>
+                ) : (
+                  <div className="relative overflow-hidden">
+                    <div className="flex transition-transform duration-500 ease-out"
+                         style={{ transform: `translateX(-${currentReview * 100}%)` }}>
+                      {reviews.map((review) => (
+                        <div
+                          key={review.$id}
+                          className="w-full flex-shrink-0 px-4"
+                        >
+                          <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="bg-gradient-to-br from-purple-900/20 to-pink-900/20 backdrop-blur-sm border border-purple-500/20 rounded-2xl p-8 text-center relative overflow-hidden shadow-2xl shadow-purple-500/20"
+                          >
+                            <div className="absolute inset-0 opacity-20">
+                              <Sparkles density={15} color="#a855f7" speed={0.5} />
+                            </div>
+                            <motion.div
+                              initial={{ rotate: -10 }}
+                              animate={{ rotate: 10 }}
+                              transition={{ duration: 2, repeat: Infinity, repeatType: "reverse" }}
+                              className="absolute top-4 left-4 text-purple-500/20 text-6xl"
+                            >
+                              &ldquo;
+                            </motion.div>
+                            <div className="flex justify-center gap-1 mb-4 relative z-10">
+                              {[...Array((() => {
+                                const ratingMatch = review.content.match(/Rating: (\d+)\/\d+ stars/);
+                                return ratingMatch ? parseInt(ratingMatch[1]) : (review.rating || 5);
+                              })())].map((_, i) => (
+                                <motion.span
+                                  key={i}
+                                  initial={{ opacity: 0, scale: 0, rotate: -180 }}
+                                  animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                                  transition={{ delay: 0.1 * i, type: "spring", stiffness: 200 }}
+                                  className="text-yellow-400 text-xl"
+                                >
+                                  ⭐
+                                </motion.span>
+                              ))}
+                            </div>
+                            <p className="text-gray-300 text-lg mb-6 italic relative z-10 max-w-2xl mx-auto">
+                              &ldquo;{review.content.replace(/Rating: \d+\/\d+ stars\s*\n?/, '')}&rdquo;
+                            </p>
+                            <div className="flex items-center justify-center gap-4 relative z-10">
+                              <motion.span 
+                                className="text-4xl"
+                                whileHover={{ scale: 1.2, rotate: 10 }}
+                                transition={{ type: "spring", stiffness: 300 }}
+                              >
+                                👤
+                              </motion.span>
+                              <div className="text-left">
+                                <p className="text-white font-semibold">{review.title || 'Anonymous'}</p>
+                                <p className="text-gray-400 text-sm">Cyprus Adventure</p>
+                                <p className="text-purple-400 text-xs flex items-center gap-1">
+                                  <span>🌴</span> {new Date(review.$createdAt).toLocaleDateString()}
+                                </p>
+                              </div>
+                            </div>
+                          </motion.div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {reviews.length > 1 && (
+                  <>
+                    <div className="absolute top-1/2 -translate-y-1/2 left-0 right-0 flex justify-between px-2 pointer-events-none">
+                      <motion.button
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        onClick={() => setCurrentReview((prev) => (prev - 1 + reviews.length) % reviews.length)}
+                        className="w-12 h-12 rounded-full bg-black/40 backdrop-blur-sm border border-purple-500/30 flex items-center justify-center text-purple-300 hover:bg-purple-500/20 transition-colors pointer-events-auto"
+                      >
+                        ←
+                      </motion.button>
+                      <motion.button
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        onClick={() => setCurrentReview((prev) => (prev + 1) % reviews.length)}
+                        className="w-12 h-12 rounded-full bg-black/40 backdrop-blur-sm border border-purple-500/30 flex items-center justify-center text-purple-300 hover:bg-purple-500/20 transition-colors pointer-events-auto"
+                      >
+                        →
+                      </motion.button>
+                    </div>
+                    <div className="flex justify-center gap-2 mt-6">
+                      {reviews.map((_, index) => (
+                        <button
+                          key={index}
+                          onClick={() => setCurrentReview(index)}
+                          className={cn(
+                            "w-2 h-2 rounded-full transition-all duration-300",
+                            currentReview === index
+                              ? "w-8 bg-gradient-to-r from-purple-500 to-pink-500"
+                              : "bg-purple-500/30 hover:bg-purple-500/60"
+                          )}
+                          aria-label={`Go to review ${index + 1}`}
+                        />
+                      ))}
+                    </div>
+                  </>
+                )}
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
@@ -446,6 +471,45 @@ export default function NextTripSection({ isHomepage = false }: { isHomepage?: b
   const [featuredTrip, setFeaturedTrip] = useState<TripDocument | null>(null);
   const [loading, setLoading] = useState(true);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [reviews, setReviews] = useState<ReviewDocument[]>([]);
+  const [reviewsLoading, setReviewsLoading] = useState(true);
+
+  // Function to fetch reviews
+  const fetchReviews = async () => {
+    try {
+      setReviewsLoading(true);
+      const fetchedReviews = await clientReviewService.getAll();
+      setReviews(fetchedReviews);
+    } catch (error) {
+      console.error('Error fetching reviews:', error);
+      // Fallback to mock data if API fails
+      setReviews(studentReviews.map(review => ({
+        $id: review.id.toString(),
+        $createdAt: new Date().toISOString(),
+        $updatedAt: new Date().toISOString(),
+        $permissions: [],
+        $collectionId: 'reviews',
+        $databaseId: 'memora_db',
+        userId: 'mock-user',
+        userProfileId: 'mock-profile',
+        title: review.review.substring(0, 50) + '...',
+        content: review.review,
+        rating: review.rating,
+        tripId: featuredTrip?.$id,
+        published: true,
+        featured: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      })));
+    } finally {
+      setReviewsLoading(false);
+    }
+  };
+
+  // Function to refresh reviews (called when new review is added)
+  const handleReviewAdded = () => {
+    fetchReviews();
+  };
 
   const handleShareStoryClick = () => {
     if (!user) {
@@ -469,6 +533,13 @@ export default function NextTripSection({ isHomepage = false }: { isHomepage?: b
     };
     fetchNextTrip();
   }, []);
+
+  // Fetch reviews when featuredTrip changes
+  useEffect(() => {
+    if (featuredTrip) {
+      fetchReviews();
+    }
+  }, [featuredTrip?.$id]);
 
   useEffect(() => {
     setIsLoaded(true);
@@ -511,11 +582,15 @@ export default function NextTripSection({ isHomepage = false }: { isHomepage?: b
         isHomepage={isHomepage} 
         featuredTrip={featuredTrip} 
         onShareStoryClick={handleShareStoryClick}
+        onReviewAdded={handleReviewAdded}
+        reviews={reviews}
+        reviewsLoading={reviewsLoading}
       />
       <ReviewModal 
         isOpen={isReviewModalOpen} 
         onClose={() => setIsReviewModalOpen(false)}
         tripId={featuredTrip?.$id}
+        onReviewAdded={handleReviewAdded}
       />
     </>
   );

@@ -11,9 +11,10 @@ interface ReviewModalProps {
   isOpen: boolean;
   onClose: () => void;
   tripId?: string;
+  onReviewAdded?: () => void; // Add callback for when review is added
 }
 
-export default function ReviewModal({ isOpen, onClose, tripId }: ReviewModalProps) {
+export default function ReviewModal({ isOpen, onClose, tripId, onReviewAdded }: ReviewModalProps) {
   const { user } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
@@ -57,6 +58,11 @@ export default function ReviewModal({ isOpen, onClose, tripId }: ReviewModalProp
       // Reset form and close modal
       setFormData({ title: '', content: '', rating: 0 });
       onClose();
+      
+      // Notify parent component that a review was added
+      if (onReviewAdded) {
+        onReviewAdded();
+      }
       
       // Show success message (you could add a toast notification here)
       alert('Thank you for sharing your Cyprus story! Your review has been submitted.');

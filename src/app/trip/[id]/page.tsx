@@ -493,7 +493,7 @@ export default function TripPage() {
           </BlurFade>
 
           {/* Trip Details - Direct Display */}
-          <BlurFade delay={0.3}>
+            <BlurFade delay={0.3}>
             <div className="max-w-6xl mx-auto space-y-12">
               
               {/* Trip Header */}
@@ -503,10 +503,10 @@ export default function TripPage() {
                   <span className="px-4 py-2 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-full text-sm font-medium text-purple-300 border border-purple-500/30">
                     Adventure Trip
                   </span>
-                </div>
+              </div>
                 <h3 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white mb-4">{trip.title}</h3>
                 <p className="text-lg sm:text-xl text-gray-300 max-w-4xl mx-auto leading-relaxed">{trip.description}</p>
-              </div>
+          </div>
 
               {/* Key Information Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -521,7 +521,7 @@ export default function TripPage() {
                   <div className="flex items-center gap-3 mb-3">
                     <Calendar className="w-6 h-6 text-purple-400" />
                     <span className="text-sm font-semibold text-gray-300 uppercase tracking-wide">Dates</span>
-                  </div>
+        </div>
                   <div className="text-lg sm:text-xl font-bold text-white">
                     {new Date(trip.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - {new Date(trip.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                   </div>
@@ -603,7 +603,7 @@ export default function TripPage() {
                 <div className="flex flex-col sm:flex-row sm:justify-between gap-2 mt-4 text-sm text-gray-400">
                   <span>{trip.availability.totalSpots - trip.availability.spotsRemaining} students already joined</span>
                   <span>Total: {trip.availability.totalSpots} spots</span>
-                </div>
+            </div>
               </motion.div>
 
               {/* Experience Highlights */}
@@ -618,7 +618,7 @@ export default function TripPage() {
                   <div className="flex items-center gap-3 mb-6">
                     <Star className="w-8 h-8 text-yellow-400" />
                     <h4 className="text-2xl sm:text-3xl font-bold text-white">Experience Highlights</h4>
-                  </div>
+                </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {trip.highlights.map((highlight, index) => (
                       <motion.div
@@ -633,7 +633,7 @@ export default function TripPage() {
                         <span className="text-gray-300 font-medium">{highlight}</span>
                       </motion.div>
                     ))}
-                  </div>
+          </div>
                 </motion.div>
               )}
 

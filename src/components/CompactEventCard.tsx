@@ -19,7 +19,7 @@ export default function CompactEventCard({ event, index = 0 }: CompactEventCardP
       transition={{ delay: index * 0.1, duration: 0.5 }}
     >
       <Link href={`/event/${event.$id}`}>
-        <div className="group relative bg-black/40 border border-purple-500/20 rounded-2xl overflow-hidden hover:border-purple-500/60 hover:shadow-xl hover:shadow-purple-500/20 transition-all duration-300 cursor-pointer h-full">
+        <div className="group relative bg-black/40 border border-purple-500/20 rounded-2xl overflow-hidden sm:hover:border-purple-500/60 sm:hover:shadow-xl sm:hover:shadow-purple-500/20 border-purple-500/60 shadow-xl shadow-purple-500/20 sm:border-purple-500/20 sm:shadow-none transition-all duration-300 cursor-pointer h-full">
           {/* Header with Icon and Status */}
           <div className="relative p-6 pb-4">
             <div className="flex items-start justify-between mb-4">

@@ -55,17 +55,20 @@ export default function NextTripLink({ className, children, onClick }: NextTripL
   };
 
   return (
-    <button
+    <div
       onClick={handleClick}
       className={className}
-      disabled={isLoading}
+      style={{ cursor: isLoading ? 'not-allowed' : 'pointer' }}
     >
       {children || (
-        <>
+        <button
+          disabled={isLoading}
+          className="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+        >
           <Compass size={16} />
           Next Trip
-        </>
+        </button>
       )}
-    </button>
+    </div>
   );
 }
