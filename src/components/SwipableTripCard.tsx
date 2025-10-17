@@ -402,14 +402,11 @@ export default function SwipableTripCard({ onBookingClick, className }: Swipable
                 <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/30 to-black/80 rounded-t-3xl" />
                 
                 {/* Title and Status Badge - Bottom Right */}
-                <div className="absolute bottom-4 right-4 text-right">
+                <div className="absolute bottom-16 sm:bottom-20 md:bottom-24 lg:bottom-28 xl:bottom-32 right-4 text-right">
                   <TripStatusBadge trip={currentTrip} />
                   <div className="mt-2">
-                    <h3 className="text-lg sm:text-xl font-bold text-white">
-                      <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">
-                        {currentTrip.location.split(',')[0]}
-                      </span>{' '}
-                      <span className="text-white">Experience</span>
+                    <h3 className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold text-white">
+                      {currentTrip.title}
                     </h3>
                   </div>
                 </div>
@@ -426,7 +423,7 @@ export default function SwipableTripCard({ onBookingClick, className }: Swipable
                 </div>
 
                 {/* Spacer to push content below image */}
-                <div className="h-64 sm:h-68 md:h-72"></div>
+                <div className="h-64 sm:h-68 md:h-80 lg:h-96 xl:h-[28rem]"></div>
 
                 {/* Main Content Section */}
                 <div className="bg-black/50 backdrop-blur-md rounded-2xl p-3 sm:p-6 md:p-8 mt-4 relative z-20 border border-purple-500/20">

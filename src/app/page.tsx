@@ -195,10 +195,12 @@ export default function Home() {
                     <span className="text-white neon-hover drop-shadow-2xl">UNFORGETTABLE</span>{' '}
                     <span className="relative inline-block">
                       <span className="absolute inset-0 blur-2xl bg-purple-600/50"></span>
-                      <GlitchText 
-                        text={words[currentWord]}
-                        className="relative text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400 neon-purple drop-shadow-2xl"
-                      />
+                      <div className="relative h-[1.2em] flex items-center">
+                        <GlitchText 
+                          text={words[currentWord]}
+                          className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400 neon-purple drop-shadow-2xl"
+                        />
+                      </div>
                     </span>
                   </motion.h1>
                 </div>

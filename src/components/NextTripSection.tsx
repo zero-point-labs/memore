@@ -12,6 +12,8 @@ import Sparkles from '@/components/ui/Sparkles';
 import { cn } from '@/utils/cn';
 import { clientTripService } from '@/services/tripService.client';
 import { TripDocument } from '@/types/trip';
+import { useAuth } from '@/contexts/AuthContext';
+import ReviewModal from '@/components/ReviewModal';
 
 // Student Reviews
 const studentReviews = [
@@ -63,7 +65,11 @@ const studentReviews = [
 ];
 
 
-const TripSectionContent = ({ isHomepage, featuredTrip }: { isHomepage: boolean, featuredTrip: TripDocument }) => {
+const TripSectionContent = ({ isHomepage, featuredTrip, onShareStoryClick }: { 
+  isHomepage: boolean, 
+  featuredTrip: TripDocument,
+  onShareStoryClick: () => void
+}) => {
   const sectionRef = useRef(null);
 
   const [selectedDay, setSelectedDay] = useState(0);
@@ -410,6 +416,7 @@ const TripSectionContent = ({ isHomepage, featuredTrip }: { isHomepage: boolean,
                   className="text-center mt-8"
                 >
                   <motion.button
+                    onClick={onShareStoryClick}
                     whileHover={{ scale: 1.05, y: -2 }}
                     whileTap={{ scale: 0.95 }}
                     className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600/20 to-pink-600/20 border border-purple-500/30 rounded-full text-purple-300 font-medium hover:from-purple-600/30 hover:to-pink-600/30 hover:border-purple-500/50 transition-all duration-300 group"
@@ -434,9 +441,20 @@ const TripSectionContent = ({ isHomepage, featuredTrip }: { isHomepage: boolean,
 }
 
 export default function NextTripSection({ isHomepage = false }: { isHomepage?: boolean }) {
+  const { user } = useAuth();
   const [isLoaded, setIsLoaded] = useState(false);
   const [featuredTrip, setFeaturedTrip] = useState<TripDocument | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+
+  const handleShareStoryClick = () => {
+    if (!user) {
+      // Redirect to login or show login modal
+      window.location.href = '/auth/login';
+      return;
+    }
+    setIsReviewModalOpen(true);
+  };
 
   useEffect(() => {
     const fetchNextTrip = async () => {
@@ -487,5 +505,18 @@ export default function NextTripSection({ isHomepage = false }: { isHomepage?: b
     );
   }
 
-  return <TripSectionContent isHomepage={isHomepage} featuredTrip={featuredTrip} />;
+  return (
+    <>
+      <TripSectionContent 
+        isHomepage={isHomepage} 
+        featuredTrip={featuredTrip} 
+        onShareStoryClick={handleShareStoryClick}
+      />
+      <ReviewModal 
+        isOpen={isReviewModalOpen} 
+        onClose={() => setIsReviewModalOpen(false)}
+        tripId={featuredTrip?.$id}
+      />
+    </>
+  );
 }
