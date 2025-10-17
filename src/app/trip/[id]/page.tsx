@@ -3,13 +3,12 @@
 import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
-import { MapPin, Calendar, Users, Check, ArrowRight, Clock, ArrowLeft, Star } from 'lucide-react';
+import { MapPin, Calendar, Users, Check, ArrowRight, Clock, ArrowLeft, Star, Sparkles, Zap } from 'lucide-react';
 import Link from 'next/link';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 //  // Replaced with dedicated booking pages
 import TripImageCarousel from '@/components/trip-elements/TripImageCarousel';
-import TripDetailsCard from '@/components/trip-elements/TripDetailsCard';
 import { clientTripService } from '@/services/tripService.client';
 import { TripDocument } from '@/types/trip';
 
@@ -25,287 +24,6 @@ import EnhancedGetStartedButton from '@/components/EnhancedGetStartedButton';
 // Note: Trip data now comes from API via clientTripService.getTrip() (ID-based)
 
 
-
-// Booking form component
-function BookingForm() {
-  const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    phone: '',
-    university: '',
-    packageType: 'Standard',
-    roomPreference: 'twin',
-    dietaryRequirements: '',
-    emergencyContact: '',
-    specialRequests: ''
-  });
-  const [currentStep, setCurrentStep] = useState(1);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    setFormData(prev => ({
-      ...prev,
-      [e.target.name]: e.target.value
-    }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    
-    // Simulate form submission
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    alert('Booking submitted successfully! We\'ll contact you within 24 hours.');
-    setIsSubmitting(false);
-  };
-
-  const nextStep = () => setCurrentStep(prev => Math.min(prev + 1, 3));
-  const prevStep = () => setCurrentStep(prev => Math.max(prev - 1, 1));
-
-  return (
-    <div className="bg-black/40 backdrop-blur-sm border border-purple-500/20 rounded-2xl p-8">
-      <div className="mb-8">
-        <h3 className="text-2xl font-bold text-white mb-2">Book Your Adventure</h3>
-        <p className="text-gray-400">Secure your spot in just a few steps</p>
-        
-        {/* Progress indicator */}
-        <div className="flex items-center gap-4 mt-6">
-          {[1, 2, 3].map((step) => (
-            <div key={step} className="flex items-center">
-              <div className={cn(
-                "w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-colors",
-                currentStep >= step ? "bg-purple-600 text-white" : "bg-gray-600 text-gray-400"
-              )}>
-                {step}
-              </div>
-              {step < 3 && (
-                <div className={cn(
-                  "w-12 h-0.5 ml-2 transition-colors",
-                  currentStep > step ? "bg-purple-600" : "bg-gray-600"
-                )} />
-              )}
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <form onSubmit={handleSubmit}>
-        {currentStep === 1 && (
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="space-y-6"
-          >
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-white font-medium mb-2">First Name</label>
-                <input
-                  type="text"
-                  name="firstName"
-                  value={formData.firstName}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-3 bg-white/5 border border-purple-500/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-purple-500/40"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-white font-medium mb-2">Last Name</label>
-                <input
-                  type="text"
-                  name="lastName"
-                  value={formData.lastName}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-3 bg-white/5 border border-purple-500/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-purple-500/40"
-                  required
-                />
-              </div>
-            </div>
-            
-            <div>
-              <label className="block text-white font-medium mb-2">Email</label>
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleInputChange}
-                className="w-full px-4 py-3 bg-white/5 border border-purple-500/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-purple-500/40"
-                required
-              />
-            </div>
-            
-            <div>
-              <label className="block text-white font-medium mb-2">Phone Number</label>
-              <input
-                type="tel"
-                name="phone"
-                value={formData.phone}
-                onChange={handleInputChange}
-                className="w-full px-4 py-3 bg-white/5 border border-purple-500/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-purple-500/40"
-                required
-              />
-            </div>
-            
-            <div>
-              <label className="block text-white font-medium mb-2">University</label>
-              <input
-                type="text"
-                name="university"
-                value={formData.university}
-                onChange={handleInputChange}
-                className="w-full px-4 py-3 bg-white/5 border border-purple-500/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-purple-500/40"
-                required
-              />
-            </div>
-          </motion.div>
-        )}
-
-        {currentStep === 2 && (
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="space-y-6"
-          >
-            <div>
-              <label className="block text-white font-medium mb-2">Package Type</label>
-              <select
-                name="packageType"
-                value={formData.packageType}
-                onChange={handleInputChange}
-                className="w-full px-4 py-3 bg-white/5 border border-purple-500/20 rounded-lg text-white focus:outline-none focus:border-purple-500/40"
-              >
-                <option value="Standard">Standard Package</option>
-                <option value="Premium">Premium Package</option>
-                <option value="VIP">VIP Package</option>
-              </select>
-            </div>
-            
-            <div>
-              <label className="block text-white font-medium mb-2">Room Preference</label>
-              <select
-                name="roomPreference"
-                value={formData.roomPreference}
-                onChange={handleInputChange}
-                className="w-full px-4 py-3 bg-white/5 border border-purple-500/20 rounded-lg text-white focus:outline-none focus:border-purple-500/40"
-              >
-                <option value="twin">Twin Beds</option>
-                <option value="double">Double Bed</option>
-                <option value="single">Single Room (+€50/night)</option>
-              </select>
-            </div>
-            
-            <div>
-              <label className="block text-white font-medium mb-2">Dietary Requirements</label>
-              <textarea
-                name="dietaryRequirements"
-                value={formData.dietaryRequirements}
-                onChange={handleInputChange}
-                rows={3}
-                className="w-full px-4 py-3 bg-white/5 border border-purple-500/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-purple-500/40"
-                placeholder="Any allergies or dietary preferences..."
-              />
-            </div>
-            
-            <div>
-              <label className="block text-white font-medium mb-2">Emergency Contact</label>
-              <input
-                type="text"
-                name="emergencyContact"
-                value={formData.emergencyContact}
-                onChange={handleInputChange}
-                className="w-full px-4 py-3 bg-white/5 border border-purple-500/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-purple-500/40"
-                placeholder="Name and phone number"
-                required
-              />
-            </div>
-          </motion.div>
-        )}
-
-        {currentStep === 3 && (
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="space-y-6"
-          >
-            <div>
-              <label className="block text-white font-medium mb-2">Special Requests</label>
-              <textarea
-                name="specialRequests"
-                value={formData.specialRequests}
-                onChange={handleInputChange}
-                rows={4}
-                className="w-full px-4 py-3 bg-white/5 border border-purple-500/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-purple-500/40"
-                placeholder="Any special requests or preferences for your trip..."
-              />
-            </div>
-            
-            {/* Booking Summary */}
-            <div className="bg-purple-900/20 rounded-lg p-6">
-              <h4 className="text-white font-bold mb-4">Booking Summary</h4>
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between text-gray-300">
-                  <span>Package:</span>
-                  <span>{formData.packageType}</span>
-                </div>
-                <div className="flex justify-between text-gray-300">
-                  <span>Room:</span>
-                  <span>{formData.roomPreference}</span>
-                </div>
-                <div className="flex justify-between text-gray-300">
-                  <span>Duration:</span>
-                  <span>3 Days / 2 Nights</span>
-                </div>
-                <hr className="border-purple-500/20 my-3" />
-                <div className="flex justify-between text-white font-bold">
-                  <span>Status:</span>
-                  <span>Pricing available upon request</span>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        )}
-
-        {/* Navigation buttons */}
-        <div className="flex justify-between mt-8">
-          {currentStep > 1 && (
-            <motion.button
-              type="button"
-              onClick={prevStep}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="px-6 py-3 bg-gray-600 rounded-lg text-white font-medium hover:bg-gray-500 transition-colors"
-            >
-              Previous
-            </motion.button>
-          )}
-          
-          {currentStep < 3 ? (
-            <motion.button
-              type="button"
-              onClick={nextStep}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg text-white font-medium ml-auto"
-            >
-              Next Step
-            </motion.button>
-          ) : (
-            <motion.button
-              type="submit"
-              disabled={isSubmitting}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="px-8 py-3 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg text-white font-bold ml-auto disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isSubmitting ? 'Processing...' : 'Complete Booking'}
-            </motion.button>
-          )}
-        </div>
-      </form>
-    </div>
-  );
-}
 
 // Expandable Cards Component for Trip Information
 const ExpandableCardsSection = ({ 
@@ -456,11 +174,11 @@ const ExpandableCardsSection = ({
   ];
 
   return (
-    <section className="relative py-24 bg-gradient-to-br from-purple-950/20 to-pink-950/20">
-      <div className="absolute inset-0">
+    <section className="relative py-24 bg-gradient-to-br from-purple-950/20 to-pink-950/20 overflow-hidden">
+      <div className="absolute inset-0 overflow-hidden">
         <Meteors number={6} />
-        <div className="absolute top-20 left-20 w-[500px] h-[500px] bg-purple-600/15 rounded-full blur-[100px]" />
-        <div className="absolute bottom-20 right-20 w-[600px] h-[600px] bg-pink-600/15 rounded-full blur-[120px]" />
+        <div className="absolute top-20 left-20 w-[250px] h-[250px] sm:w-[400px] sm:h-[400px] lg:w-[500px] lg:h-[500px] bg-purple-600/15 rounded-full blur-[80px] sm:blur-[100px]" />
+        <div className="absolute bottom-20 right-20 w-[300px] h-[300px] sm:w-[500px] sm:h-[500px] lg:w-[600px] lg:h-[600px] bg-pink-600/15 rounded-full blur-[100px] sm:blur-[120px]" />
       </div>
 
       <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-12">
@@ -662,40 +380,20 @@ export default function TripPage() {
   };
 
   return (
-    <div className="min-h-screen bg-black">
+    <div className="min-h-screen bg-black overflow-x-hidden">
       <Header />
       
-      {/* Back Navigation */}
-      <div className="relative z-10 pt-24 pb-8">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-12">
-          <Link
-            href="/next-trip"
-            className="inline-flex items-center gap-2 text-purple-300 hover:text-white transition-colors"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Back to All Trips
-          </Link>
-        </div>
-      </div>
-      
       {/* Hero Section */}
-      <section className="relative min-h-screen overflow-hidden">
-        {/* Video Background */}
-        <div className="absolute inset-0 z-0">
-          <video
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="absolute inset-0 w-full h-full object-cover"
-          >
-            <source src="/0806.mov" type="video/mp4" />
-          </video>
-          <div className="absolute inset-0 bg-black/60" />
+      <section className="relative py-20 sm:py-32 bg-gradient-to-br from-purple-900 via-black to-pink-900 overflow-hidden">
+        {/* Background Effects */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute top-0 left-0 w-[300px] h-[300px] sm:w-[500px] sm:h-[500px] lg:w-[800px] lg:h-[800px] bg-purple-600/20 rounded-full blur-[100px] sm:blur-[150px]" />
+          <div className="absolute bottom-0 right-0 w-[250px] h-[250px] sm:w-[400px] sm:h-[400px] lg:w-[600px] lg:h-[600px] bg-pink-600/20 rounded-full blur-[100px] sm:blur-[150px]" />
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[200px] h-[200px] sm:w-[300px] sm:h-[300px] lg:w-[400px] lg:h-[400px] bg-cyan-600/15 rounded-full blur-[80px] sm:blur-[100px]" />
         </div>
 
         {/* Content */}
-        <div className="relative z-10 flex items-center justify-center min-h-screen">
+        <div className="relative z-10 flex items-center justify-center">
           <div className="text-center max-w-4xl mx-auto px-4">
             <motion.div
               initial="hidden"
@@ -726,10 +424,6 @@ export default function TripPage() {
                   {isUpcoming ? 'AWAITS YOU' : isPast ? 'MEMORIES' : 'HAPPENING NOW'}
                 </span>
               </h1>
-
-              <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-                {trip.description}
-              </p>
 
               <div className="flex flex-wrap gap-6 justify-center text-gray-300">
                 <span className="flex items-center gap-2">
@@ -778,11 +472,12 @@ export default function TripPage() {
       </section>
 
       {/* Trip Overview */}
-      <section className="relative py-32 bg-black overflow-hidden">
-        <div className="absolute inset-0">
-          <Meteors number={6} />
-          <div className="absolute top-20 left-20 w-[500px] h-[500px] bg-purple-600/20 rounded-full blur-[100px]" />
-          <div className="absolute bottom-20 right-20 w-[600px] h-[600px] bg-pink-600/20 rounded-full blur-[100px]" />
+      <section className="relative py-32 bg-gradient-to-br from-purple-950/30 via-black to-pink-950/30 overflow-hidden">
+        <div className="absolute inset-0 overflow-hidden">
+          <Meteors number={8} />
+          <div className="absolute top-20 left-20 w-[300px] h-[300px] sm:w-[500px] sm:h-[500px] lg:w-[600px] lg:h-[600px] bg-purple-600/25 rounded-full blur-[100px] sm:blur-[120px]" />
+          <div className="absolute bottom-20 right-20 w-[350px] h-[350px] sm:w-[600px] sm:h-[600px] lg:w-[700px] lg:h-[700px] bg-pink-600/25 rounded-full blur-[120px] sm:blur-[140px]" />
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[200px] h-[200px] sm:w-[300px] sm:h-[300px] lg:w-[400px] lg:h-[400px] bg-cyan-600/15 rounded-full blur-[80px] sm:blur-[100px]" />
         </div>
 
         <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-12">
@@ -802,14 +497,206 @@ export default function TripPage() {
             </div>
           </BlurFade>
 
-          <div className="flex justify-center">
-            {/* Trip Details Card - Full Width on Desktop */}
-            <BlurFade delay={0.3}>
-              <div className="w-full max-w-4xl">
-              <TripDetailsCard trip={trip} />
+          {/* Trip Details - Direct Display */}
+          <BlurFade delay={0.3}>
+            <div className="max-w-6xl mx-auto space-y-12">
+              
+              {/* Trip Header */}
+              <div className="text-center">
+                <div className="flex items-center justify-center gap-3 mb-4">
+                  <span className="text-4xl animate-pulse">🌟</span>
+                  <span className="px-4 py-2 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-full text-sm font-medium text-purple-300 border border-purple-500/30">
+                    Adventure Trip
+                  </span>
+                </div>
+                <h3 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white mb-4">{trip.title}</h3>
+                <p className="text-lg sm:text-xl text-gray-300 max-w-4xl mx-auto leading-relaxed">{trip.description}</p>
               </div>
-            </BlurFade>
-          </div>
+
+              {/* Key Information Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {/* Dates */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.1 }}
+                  className="bg-gradient-to-br from-purple-900/40 to-transparent rounded-2xl p-6 border border-purple-500/30 backdrop-blur-sm"
+                >
+                  <div className="flex items-center gap-3 mb-3">
+                    <Calendar className="w-6 h-6 text-purple-400" />
+                    <span className="text-sm font-semibold text-gray-300 uppercase tracking-wide">Dates</span>
+                  </div>
+                  <div className="text-lg sm:text-xl font-bold text-white">
+                    {new Date(trip.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - {new Date(trip.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                  </div>
+                </motion.div>
+
+                {/* Location */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.2 }}
+                  className="bg-gradient-to-br from-pink-900/40 to-transparent rounded-2xl p-6 border border-pink-500/30 backdrop-blur-sm"
+                >
+                  <div className="flex items-center gap-3 mb-3">
+                    <MapPin className="w-6 h-6 text-pink-400" />
+                    <span className="text-sm font-semibold text-gray-300 uppercase tracking-wide">Location</span>
+                  </div>
+                  <div className="text-lg sm:text-xl font-bold text-white">{trip.location}</div>
+                </motion.div>
+
+                {/* Duration */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.3 }}
+                  className="bg-gradient-to-br from-cyan-900/40 to-transparent rounded-2xl p-6 border border-cyan-500/30 backdrop-blur-sm sm:col-span-2 lg:col-span-1"
+                >
+                  <div className="flex items-center gap-3 mb-3">
+                    <Sparkles className="w-6 h-6 text-cyan-400" />
+                    <span className="text-sm font-semibold text-gray-300 uppercase tracking-wide">Duration</span>
+                  </div>
+                  <div className="text-lg sm:text-xl font-bold text-white">{trip.duration} Epic Days</div>
+                </motion.div>
+              </div>
+
+              {/* Availability Section */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.4 }}
+                className="bg-gradient-to-r from-purple-900/30 to-pink-900/30 rounded-2xl p-8 border border-purple-500/20 backdrop-blur-sm"
+              >
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 mb-6">
+                  <div className="flex items-center gap-4">
+                    <div className="relative">
+                      <Users className="w-8 h-8 text-purple-400" />
+                      <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full animate-pulse" />
+                    </div>
+                    <div>
+                      <h4 className="text-xl sm:text-2xl font-bold text-white">Availability</h4>
+                      <p className="text-sm text-gray-400">Limited spots available</p>
+                    </div>
+                  </div>
+                  <div className="text-center sm:text-right">
+                    <div className="text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">
+                      <NumberTicker value={trip.availability.spotsRemaining} /> spots left
+                    </div>
+                    <p className="text-sm text-gray-400 mt-1">Out of {trip.availability.totalSpots} total spots</p>
+                  </div>
+                </div>
+                
+                {/* Progress Bar */}
+                <div className="relative h-4 bg-black/50 rounded-full overflow-hidden">
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: `${((trip.availability.totalSpots - trip.availability.spotsRemaining) / trip.availability.totalSpots) * 100}%` }}
+                    transition={{ duration: 1.5, ease: "easeOut" }}
+                    className="absolute inset-y-0 left-0 bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500 rounded-full"
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="text-sm font-medium text-white/90">
+                      {Math.round(((trip.availability.totalSpots - trip.availability.spotsRemaining) / trip.availability.totalSpots) * 100)}% Booked
+                    </span>
+                  </div>
+                </div>
+                
+                <div className="flex flex-col sm:flex-row sm:justify-between gap-2 mt-4 text-sm text-gray-400">
+                  <span>{trip.availability.totalSpots - trip.availability.spotsRemaining} students already joined</span>
+                  <span>Total: {trip.availability.totalSpots} spots</span>
+                </div>
+              </motion.div>
+
+              {/* Experience Highlights */}
+              {trip.highlights && trip.highlights.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.5 }}
+                  className="space-y-6"
+                >
+                  <div className="flex items-center gap-3 mb-6">
+                    <Star className="w-8 h-8 text-yellow-400" />
+                    <h4 className="text-2xl sm:text-3xl font-bold text-white">Experience Highlights</h4>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {trip.highlights.map((highlight, index) => (
+                      <motion.div
+                        key={index}
+                        initial={{ opacity: 0, x: -20 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: index * 0.1 }}
+                        className="flex items-center gap-4 p-4 bg-white/5 rounded-xl border border-white/10 hover:bg-white/10 transition-all duration-300"
+                      >
+                        <Zap className="w-5 h-5 text-purple-400 flex-shrink-0" />
+                        <span className="text-gray-300 font-medium">{highlight}</span>
+                      </motion.div>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+
+              {/* Pricing Information */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.6 }}
+                className="bg-gradient-to-r from-purple-600/20 to-pink-600/20 rounded-2xl p-8 border border-purple-500/30 text-center"
+              >
+                <div className="mb-4">
+                  <span className="text-sm text-gray-400 uppercase tracking-wide">Starting from</span>
+                  <div className="text-4xl sm:text-5xl font-bold text-white mt-2">
+                    €{trip.pricing.standard || trip.pricing.premium || trip.pricing.vip || 'TBA'}
+                  </div>
+                  <p className="text-gray-400 mt-2">per person</p>
+                </div>
+                {trip.pricing.earlyBird && (
+                  <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border border-yellow-500/30 rounded-full">
+                    <span className="text-yellow-400 text-sm font-medium">EARLY BIRD DISCOUNT AVAILABLE</span>
+                  </div>
+                )}
+              </motion.div>
+
+              {/* Book Now Button */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.7 }}
+                className="text-center"
+              >
+                <Link href={`/book/${trip.$id}`}>
+                  <motion.button
+                    whileHover={{ scale: 1.05, y: -3 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="group relative px-12 py-5 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full text-white font-bold text-xl shadow-2xl hover:shadow-purple-500/50 transition-all overflow-hidden"
+                  >
+                    <motion.div
+                      className="absolute inset-0 bg-gradient-to-r from-pink-600 to-purple-600"
+                      initial={{ x: '-100%' }}
+                      whileHover={{ x: '100%' }}
+                      transition={{ duration: 0.6 }}
+                    />
+                    <span className="relative z-10 flex items-center gap-3">
+                      <span>Book Now</span>
+                      <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                    </span>
+                  </motion.button>
+                </Link>
+                <p className="text-gray-400 mt-4 text-sm">
+                  Limited spots available • Secure your place today
+                </p>
+              </motion.div>
+
+            </div>
+          </BlurFade>
         </div>
       </section>
 
@@ -820,34 +707,12 @@ export default function TripPage() {
         setSelectedDay={setSelectedDay} 
       />
 
-      {/* Booking Section - Only show for upcoming trips */}
-      {isUpcoming && (
-        <section id="booking" className="relative py-32 bg-gradient-to-br from-purple-950/30 to-pink-950/30">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-12">
-            <div className="max-w-4xl mx-auto">
-          <BlurFade delay={0.1}>
-                <div className="text-center mb-12">
-              <h2 className="text-4xl sm:text-5xl font-black text-white mb-6">
-                    SECURE YOUR <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">SPOT NOW</span>
-              </h2>
-                  <p className="text-xl text-gray-300">
-                    Only <NumberTicker value={trip.availability.spotsRemaining} className="text-purple-400 font-bold" /> spots remaining for this exclusive experience!
-              </p>
-            </div>
-          </BlurFade>
-
-              <BookingForm />
-                </div>
-          </div>
-        </section>
-      )}
-
       {/* Other Trips Section */}
-      <section className="relative py-32 bg-gradient-to-br from-black via-purple-950/10 to-black">
-        <div className="absolute inset-0">
+      <section className="relative py-32 bg-gradient-to-br from-black via-purple-950/10 to-black overflow-hidden">
+        <div className="absolute inset-0 overflow-hidden">
           <Meteors number={4} />
-          <div className="absolute top-20 right-20 w-[400px] h-[400px] bg-purple-600/10 rounded-full blur-[80px]" />
-          <div className="absolute bottom-20 left-20 w-[500px] h-[500px] bg-pink-600/10 rounded-full blur-[100px]" />
+          <div className="absolute top-20 right-20 w-[200px] h-[200px] sm:w-[300px] sm:h-[300px] lg:w-[400px] lg:h-[400px] bg-purple-600/10 rounded-full blur-[60px] sm:blur-[80px]" />
+          <div className="absolute bottom-20 left-20 w-[250px] h-[250px] sm:w-[400px] sm:h-[400px] lg:w-[500px] lg:h-[500px] bg-pink-600/10 rounded-full blur-[80px] sm:blur-[100px]" />
         </div>
 
         <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-12">

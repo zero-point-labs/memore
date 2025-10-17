@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import { Instagram, Facebook, Youtube, Mail, Phone, MapPin, Heart } from 'lucide-react';
 import Image from 'next/image';
+import NextTripLink from '@/components/NextTripLink';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -20,10 +21,10 @@ export default function Footer() {
       { label: 'Partner With Us', href: '#' },
     ],
     trip: [
-      { label: 'Next Trip', href: '/next-trip' },
+      { label: 'Next Trip', href: '/next-trip', isNextTrip: true },
       { label: 'Gallery', href: '/gallery' },
       { label: 'Stories', href: '/blog' },
-      { label: 'Book Now', href: '/next-trip' },
+      { label: 'Book Now', href: '/next-trip', isNextTrip: true },
     ],
   };
 
@@ -104,12 +105,18 @@ export default function Footer() {
               <ul className="space-y-3">
                 {footerLinks.trip.map((link) => (
                   <li key={link.label}>
-                    <a
-                      href={link.href}
-                      className="text-gray-400 hover:text-purple-400 transition-colors text-sm"
-                    >
-                      {link.label}
-                    </a>
+                    {link.isNextTrip ? (
+                      <NextTripLink className="text-gray-400 hover:text-purple-400 transition-colors text-sm">
+                        {link.label}
+                      </NextTripLink>
+                    ) : (
+                      <a
+                        href={link.href}
+                        className="text-gray-400 hover:text-purple-400 transition-colors text-sm"
+                      >
+                        {link.label}
+                      </a>
+                    )}
                   </li>
                 ))}
               </ul>

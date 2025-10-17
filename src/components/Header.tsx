@@ -6,6 +6,7 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useAuth } from '@/contexts/AuthContext';
+import NextTripLink from '@/components/NextTripLink';
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -49,7 +50,7 @@ export default function Header() {
   }, [isMenuOpen]);
 
   const navItems = [
-    { label: 'Next Trip', href: '/next-trip', icon: <Compass size={16} /> },
+    { label: 'Next Trip', href: null, icon: <Compass size={16} />, isNextTrip: true },
     { label: 'Events', href: '/events', icon: <Calendar size={16} /> },
     { label: 'Gallery', href: '/gallery', icon: <Camera size={16} /> },
     { label: 'Stories', href: '/blog', icon: <FileText size={16} /> },
@@ -134,13 +135,20 @@ export default function Header() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
                 >
-                  <Link
-                    href={item.href}
-                    className="relative text-gray-300 hover:text-white transition-colors group font-medium"
-                  >
-                    {item.label}
-                    <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-gradient-to-r from-purple-400 to-pink-400 group-hover:w-full transition-all duration-300"></span>
-                  </Link>
+                  {item.isNextTrip ? (
+                    <NextTripLink className="relative text-gray-300 hover:text-white transition-colors group font-medium">
+                      {item.label}
+                      <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-gradient-to-r from-purple-400 to-pink-400 group-hover:w-full transition-all duration-300"></span>
+                    </NextTripLink>
+                  ) : (
+                    <Link
+                      href={item.href!}
+                      className="relative text-gray-300 hover:text-white transition-colors group font-medium"
+                    >
+                      {item.label}
+                      <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-gradient-to-r from-purple-400 to-pink-400 group-hover:w-full transition-all duration-300"></span>
+                    </Link>
+                  )}
                 </motion.div>
               ))}
             </nav>
@@ -228,18 +236,32 @@ export default function Header() {
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: index * 0.1 + 0.2 }}
                     >
-                      <Link
-                        href={item.href}
-                        onClick={closeMenu}
-                        className="flex items-center gap-3 py-3 px-2 text-white hover:text-purple-300 transition-colors duration-200 group"
-                      >
-                        <div className="text-purple-400 group-hover:text-purple-300 transition-colors">
-                          {item.icon}
-                        </div>
-                        <span className="text-base font-medium">
-                          {item.label}
-                        </span>
-                      </Link>
+                      {item.isNextTrip ? (
+                        <NextTripLink
+                          onClick={closeMenu}
+                          className="flex items-center gap-3 py-3 px-2 text-white hover:text-purple-300 transition-colors duration-200 group"
+                        >
+                          <div className="text-purple-400 group-hover:text-purple-300 transition-colors">
+                            {item.icon}
+                          </div>
+                          <span className="text-base font-medium">
+                            {item.label}
+                          </span>
+                        </NextTripLink>
+                      ) : (
+                        <Link
+                          href={item.href!}
+                          onClick={closeMenu}
+                          className="flex items-center gap-3 py-3 px-2 text-white hover:text-purple-300 transition-colors duration-200 group"
+                        >
+                          <div className="text-purple-400 group-hover:text-purple-300 transition-colors">
+                            {item.icon}
+                          </div>
+                          <span className="text-base font-medium">
+                            {item.label}
+                          </span>
+                        </Link>
+                      )}
                     </motion.div>
                   ))}
                 </div>
