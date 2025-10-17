@@ -115,7 +115,7 @@ export default function EventCard({ event, index = 0 }: EventCardProps) {
             {/* CTA */}
             <div className="pt-2">
               <div className="w-full py-3 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full text-white font-bold text-center group-hover:from-purple-500 group-hover:to-pink-500 transition-all">
-                Get Tickets →
+                Book Now →
               </div>
             </div>
           </div>

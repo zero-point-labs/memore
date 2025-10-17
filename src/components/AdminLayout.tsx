@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Sparkles, FileText, LogOut, MapPin, Calendar, CreditCard, Settings, BarChart3 } from 'lucide-react';
+import { Sparkles, FileText, LogOut, MapPin, Calendar, CreditCard, Settings, BarChart3, Users } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAdmin } from '@/contexts/AdminContext';
@@ -48,6 +48,12 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       href: '/admin/events',
       icon: Calendar,
       active: pathname?.startsWith('/admin/events')
+    },
+    {
+      label: 'Bookings',
+      href: '/admin/bookings',
+      icon: Users,
+      active: pathname?.startsWith('/admin/bookings')
     },
     {
       label: 'Payments',

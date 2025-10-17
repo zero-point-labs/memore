@@ -106,7 +106,7 @@ export default function CompactEventCard({ event, index = 0 }: CompactEventCardP
 
               {/* CTA */}
               <div className="w-full py-2.5 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full text-white font-semibold text-sm text-center group-hover:from-purple-500 group-hover:to-pink-500 transition-all">
-                More Info →
+                Book Now →
               </div>
             </div>
           </div>

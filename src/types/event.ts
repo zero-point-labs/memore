@@ -5,6 +5,10 @@ export type EventCity = 'ayia-napa' | 'limassol' | 'paphos' | 'larnaca' | 'nicos
 export type BookingStatus = 'open' | 'limited' | 'sold-out' | 'cancelled';
 export type PaymentType = 'full-upfront' | 'split-50-50' | 'deposit-30-70';
 
+// Event Booking Types
+export type EventBookingStatus = 'confirmed' | 'cancelled';
+export type TicketType = 'general' | 'vip';
+
 export interface EventLocation {
   lat: number;
   lng: number;
@@ -169,4 +173,81 @@ export const generateSlug = (title: string): string => {
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '');
+};
+
+// Event Booking Interfaces
+export interface EventBooking {
+  id?: string;
+  
+  // References
+  eventId: string;           // Links to event
+  userId: string;           // Links to Appwrite user
+  userProfileId: string;    // Links to user profile
+  
+  // Booking details
+  ticketType: TicketType;
+  quantity: number;
+  totalPrice: number;       // 0 for free events
+  currency: string;         // 'EUR'
+  bookingStatus: EventBookingStatus;
+  specialRequests?: string;
+  bookingReference: string; // Unique booking reference
+  
+  // Metadata
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export type EventBookingDocument = Models.Document & EventBooking;
+
+export interface CreateEventBookingData {
+  eventId: string;
+  userId: string;
+  userProfileId: string;
+  ticketType: TicketType;
+  quantity: number;
+  totalPrice: number;
+  currency?: string;
+  bookingStatus?: EventBookingStatus;
+  specialRequests?: string;
+  bookingReference?: string;
+}
+
+export interface UpdateEventBookingData {
+  ticketType?: TicketType;
+  quantity?: number;
+  totalPrice?: number;
+  bookingStatus?: EventBookingStatus;
+  specialRequests?: string;
+}
+
+// Event Booking Status Options
+export const EVENT_BOOKING_STATUS_OPTIONS = [
+  { id: 'confirmed', label: 'Confirmed', color: 'text-green-400 bg-green-500/20' },
+  { id: 'cancelled', label: 'Cancelled', color: 'text-red-400 bg-red-500/20' },
+] as const;
+
+// Ticket Type Options
+export const TICKET_TYPE_OPTIONS = [
+  { id: 'general', label: 'General', color: 'text-blue-400 bg-blue-500/20' },
+  { id: 'vip', label: 'VIP', color: 'text-purple-400 bg-purple-500/20' },
+] as const;
+
+// Helper functions for event bookings
+export const generateBookingReference = (): string => {
+  const timestamp = Date.now().toString(36);
+  const random = Math.random().toString(36).substring(2, 8);
+  return `EVT-${timestamp}-${random}`.toUpperCase();
+};
+
+export const calculateEventBookingTotal = (
+  ticketType: TicketType,
+  quantity: number,
+  pricing: EventPricing
+): number => {
+  const price = ticketType === 'vip' && pricing.vip?.available 
+    ? pricing.vip.price 
+    : pricing.general.price;
+  
+  return price * quantity;
 };

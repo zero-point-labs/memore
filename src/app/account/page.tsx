@@ -499,8 +499,22 @@ export default function AccountPage() {
                     >
                       <CreditCard className="w-8 h-8 text-purple-400" />
                       <div>
-                        <div className="text-white font-semibold">My Bookings</div>
+                        <div className="text-white font-semibold">Trip Bookings</div>
                         <div className="text-gray-400 text-sm">View all trips and payments</div>
+                      </div>
+                    </motion.div>
+                  </Link>
+
+                  <Link href="/account/event-bookings">
+                    <motion.div
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      className="flex items-center gap-4 p-4 bg-gradient-to-r from-blue-600/20 to-cyan-600/20 border border-blue-500/30 rounded-lg hover:from-blue-600/30 hover:to-cyan-600/30 transition-all cursor-pointer"
+                    >
+                      <Calendar className="w-8 h-8 text-blue-400" />
+                      <div>
+                        <div className="text-white font-semibold">Event Bookings</div>
+                        <div className="text-gray-400 text-sm">Manage your event reservations</div>
                       </div>
                     </motion.div>
                   </Link>
