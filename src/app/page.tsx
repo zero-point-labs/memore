@@ -11,6 +11,7 @@ import NextTripSection from '@/components/NextTripSection';
 import EventsSection from '@/components/EventsSection';
 import ContactSection from '@/components/ContactSection';
 import Footer from '@/components/Footer';
+import NextTripLink from '@/components/NextTripLink';
 import { useParallax } from '@/hooks/useParallax';
 import { useSwipeGesture } from '@/hooks/useSwipeGesture';
 import { isMobile } from '@/utils/isMobile';
@@ -253,7 +254,7 @@ export default function Home() {
                 >
                   <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
                     {/* Primary CTA */}
-                    <Link href="/next-trip">
+                    <NextTripLink>
                       <motion.button
                         whileHover={{ scale: 1.05, y: -3 }}
                         whileTap={{ scale: 0.95 }}
@@ -269,7 +270,7 @@ export default function Home() {
                           Book Your Adventure
                         </span>
                       </motion.button>
-                    </Link>
+                    </NextTripLink>
 
                     {/* Secondary CTA */}
                     <motion.button
