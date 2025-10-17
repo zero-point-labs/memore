@@ -2,7 +2,8 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect } from 'react';
-import { Calendar, MapPin, Users, Heart, Eye, Share2, Download, Search, Grid, List, Play, X } from 'lucide-react';
+import Image from 'next/image';
+import { Calendar, MapPin, Users, Heart, Eye, Share2, Download, Search, Grid, List, Play, X, ChevronDown } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Meteors } from '@/components/magicui/meteors';
@@ -11,23 +12,25 @@ import OrbitingCircles from '@/components/magicui/orbiting-circles';
 import BlurFade from '@/components/ui/BlurFade';
 import { cn } from '@/utils/cn';
 
-// Extended Gallery Categories
+// Extended Gallery Categories - Cyprus Locations
 const categories = [
   { id: 'all', label: 'All Memories', icon: '✨', count: 234 },
-  { id: 'beach', label: 'Beach Vibes', icon: '🏖️', count: 67 },
-  { id: 'party', label: 'Night Life', icon: '🎉', count: 89 },
-  { id: 'adventure', label: 'Adventures', icon: '🏄', count: 45 },
-  { id: 'culture', label: 'Culture', icon: '🏛️', count: 23 },
-  { id: 'food', label: 'Food & Drinks', icon: '🍽️', count: 34 },
-  { id: 'yacht', label: 'Yacht Life', icon: '🛥️', count: 28 },
-  { id: 'sunset', label: 'Golden Hours', icon: '🌅', count: 41 },
+  { id: 'ayia-napa', label: 'Ayia Napa', icon: '🏖️', count: 67 },
+  { id: 'protaras', label: 'Protaras', icon: '🌊', count: 45 },
+  { id: 'limassol', label: 'Limassol', icon: '🏛️', count: 89 },
+  { id: 'nicosia', label: 'Nicosia', icon: '🏰', count: 34 },
+  { id: 'paphos', label: 'Paphos', icon: '🏺', count: 28 },
+  { id: 'troodos', label: 'Troodos', icon: '⛰️', count: 23 },
+  { id: 'larnaca', label: 'Larnaca', icon: '✈️', count: 41 },
+  { id: 'lofou', label: 'Lofou', icon: '🏘️', count: 15 },
+  { id: 'kyrenia', label: 'Kyrenia', icon: '🏔️', count: 18 },
 ];
 
 // Extended Gallery Items with more metadata
 const galleryItems = [
   {
     id: 1,
-    category: 'beach',
+    category: 'ayia-napa',
     type: 'image',
     src: '/gallery/nissibeach.jpg',
     title: 'Golden Hour at Nissi Beach',
@@ -43,7 +46,7 @@ const galleryItems = [
   },
   {
     id: 2,
-    category: 'party',
+    category: 'limassol',
     type: 'image',
     src: '/gallery/castleclub.jpg',
     thumbnail: '/gallery/castleclub.jpg',
@@ -61,11 +64,11 @@ const galleryItems = [
   },
   {
     id: 3,
-    category: 'adventure',
+    category: 'ayia-napa',
     type: 'image',
     src: '/gallery/cliffjump.jpg',
     title: 'Cliff Jumping Adventures',
-    location: 'Cape Greco',
+    location: 'Cape Greco, Ayia Napa',
     date: 'July 17, 2023',
     time: '14:20',
     likes: 423,
@@ -77,7 +80,7 @@ const galleryItems = [
   },
   {
     id: 4,
-    category: 'culture',
+    category: 'limassol',
     type: 'image',
     src: '/gallery/kourion.jpg',
     title: 'Exploring Ancient Kourion',
@@ -93,7 +96,7 @@ const galleryItems = [
   },
   {
     id: 5,
-    category: 'yacht',
+    category: 'larnaca',
     type: 'image',
     src: '/gallery/yatch.avif',
     thumbnail: '/gallery/yatch.avif',
@@ -111,11 +114,11 @@ const galleryItems = [
   },
   {
     id: 6,
-    category: 'party',
+    category: 'protaras',
     type: 'image',
     src: '/gallery/poolparty.jpg',
     title: 'Exclusive Pool Party',
-    location: 'Private Villa',
+    location: 'Private Villa, Protaras',
     date: 'July 20, 2023',
     time: '17:30',
     likes: 445,
@@ -165,14 +168,19 @@ function GalleryItem({ item, viewMode, onItemClick }: {
           {!imageLoaded && (
             <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 to-pink-500/20 animate-pulse" />
           )}
-          <img
+          <Image
             src={item.src}
             alt={item.title}
+            fill
             className={cn(
-              "absolute inset-0 w-full h-full object-cover transition-opacity duration-500",
+              "object-cover transition-opacity duration-500",
               imageLoaded ? "opacity-100" : "opacity-0"
             )}
             onLoad={() => setImageLoaded(true)}
+            onError={(e) => {
+              console.error('Image failed to load:', item.src, e);
+              setImageLoaded(true); // Still show the container even if image fails
+            }}
           />
           {item.type === 'video' && (
             <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
@@ -256,14 +264,19 @@ function GalleryItem({ item, viewMode, onItemClick }: {
             <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 to-pink-500/20 animate-pulse" />
           )}
           
-          <img
+          <Image
             src={item.src}
             alt={item.title}
+            fill
             className={cn(
-              "absolute inset-0 w-full h-full object-cover transition-all duration-500",
+              "object-cover transition-all duration-500",
               imageLoaded ? "opacity-100 scale-100" : "opacity-0 scale-110"
             )}
             onLoad={() => setImageLoaded(true)}
+            onError={(e) => {
+              console.error('Image failed to load:', item.src, e);
+              setImageLoaded(true); // Still show the container even if image fails
+            }}
           />
 
           {/* Video indicator */}
@@ -405,20 +418,22 @@ function MediaModal({ item, isOpen, onClose }: {
             <div className="relative bg-black flex items-center justify-center min-h-[400px] lg:min-h-[600px]">
               {item.type === 'video' ? (
                 <div className="w-full h-full relative">
-                  <img
+                  <Image
                     src={item.thumbnail || item.src}
                     alt={item.title}
-                    className="w-full h-full object-cover"
+                    fill
+                    className="object-cover"
                   />
                   <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
                     <Play className="w-16 h-16 text-white" />
                   </div>
                 </div>
               ) : (
-                <img
+                <Image
                   src={item.src}
                   alt={item.title}
-                  className="w-full h-full object-cover"
+                  fill
+                  className="object-cover"
                 />
               )}
             </div>
@@ -513,6 +528,10 @@ export default function GalleryPage() {
   const [filteredItems, setFilteredItems] = useState(galleryItems);
   const [selectedItem, setSelectedItem] = useState<typeof galleryItems[0] | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
+
+  // Get current category info
+  const currentCategory = categories.find(cat => cat.id === activeCategory) || categories[0];
 
   // Filter and sort items
   useEffect(() => {
@@ -553,6 +572,24 @@ export default function GalleryPage() {
     setSelectedItem(item);
     setIsModalOpen(true);
   };
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (!target.closest('.category-dropdown')) {
+        setIsCategoryDropdownOpen(false);
+      }
+    };
+
+    if (isCategoryDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isCategoryDropdownOpen]);
 
   return (
     <div className="min-h-screen bg-black">
@@ -689,31 +726,76 @@ export default function GalleryPage() {
         </div>
       </section>
 
-      {/* Category Filter */}
-      <section className="relative py-8">
+      {/* Category Filter - Mobile First Dropdown */}
+      <section className="relative py-8 z-50">
         <div className="container mx-auto px-4 sm:px-6 lg:px-12">
           <BlurFade delay={0.1}>
-            <div className="flex flex-wrap justify-center gap-3 mb-8">
-              {categories.map((category) => (
+            <div className="flex justify-center mb-8">
+              <div className="relative w-full max-w-sm category-dropdown z-50">
+                {/* Dropdown Button */}
                 <motion.button
-                  key={category.id}
-                  onClick={() => setActiveCategory(category.id)}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className={cn(
-                    "px-6 py-3 rounded-full font-medium transition-all duration-300 flex items-center gap-2",
-                    activeCategory === category.id
-                      ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-500/25"
-                      : "bg-white/5 text-gray-300 border border-white/10 hover:bg-white/10"
-                  )}
+                  onClick={() => setIsCategoryDropdownOpen(!isCategoryDropdownOpen)}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="w-full flex items-center justify-between px-4 py-3 bg-white/5 border border-purple-500/20 rounded-xl text-white hover:bg-white/10 hover:border-purple-500/40 transition-all duration-300"
                 >
-                  <span className="text-lg">{category.icon}</span>
-                  <span>{category.label}</span>
-                  <span className="text-xs bg-white/20 px-2 py-1 rounded-full">
-                    {category.count}
-                  </span>
+                  <div className="flex items-center gap-3">
+                    <span className="text-lg">{currentCategory.icon}</span>
+                    <span className="font-medium">{currentCategory.label}</span>
+                    <span className="text-xs bg-purple-500/20 text-purple-300 px-2 py-1 rounded-full">
+                      {currentCategory.count}
+                    </span>
+                  </div>
+                  <motion.div
+                    animate={{ rotate: isCategoryDropdownOpen ? 180 : 0 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <ChevronDown className="w-5 h-5 text-gray-400" />
+                  </motion.div>
                 </motion.button>
-              ))}
+
+                {/* Dropdown Menu */}
+                <AnimatePresence>
+                  {isCategoryDropdownOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                      transition={{ duration: 0.2 }}
+                      className="absolute top-full left-0 right-0 mt-2 bg-black/90 backdrop-blur-xl border border-purple-500/20 rounded-xl shadow-2xl z-[9999] overflow-hidden"
+                    >
+                      <div className="max-h-80 overflow-y-auto">
+                        {categories.map((category, index) => (
+                          <motion.button
+                            key={category.id}
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: index * 0.05 }}
+                            onClick={() => {
+                              setActiveCategory(category.id);
+                              setIsCategoryDropdownOpen(false);
+                            }}
+                            className={cn(
+                              "w-full flex items-center justify-between px-4 py-3 text-left hover:bg-white/5 transition-colors",
+                              activeCategory === category.id
+                                ? "bg-purple-600/20 text-purple-300"
+                                : "text-gray-300 hover:text-white"
+                            )}
+                          >
+                            <div className="flex items-center gap-3">
+                              <span className="text-lg">{category.icon}</span>
+                              <span className="font-medium">{category.label}</span>
+                            </div>
+                            <span className="text-xs bg-white/10 text-gray-400 px-2 py-1 rounded-full">
+                              {category.count}
+                            </span>
+                          </motion.button>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
             </div>
           </BlurFade>
         </div>

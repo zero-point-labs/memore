@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import NextTripLink from '@/components/NextTripLink';
 import { 
   ArrowLeft, 
   Calendar, 
@@ -336,11 +337,11 @@ export default function BookTripPage() {
           <AlertCircle className="w-12 h-12 text-red-400 mx-auto mb-4" />
           <h1 className="text-2xl font-bold text-white mb-2">Oops!</h1>
           <p className="text-gray-400 mb-6">{error || 'Trip not found'}</p>
-          <Link href="/next-trip">
+          <NextTripLink>
             <button className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
               Browse Other Trips
             </button>
-          </Link>
+          </NextTripLink>
         </div>
       </div>
     );
@@ -351,34 +352,34 @@ export default function BookTripPage() {
   return (
     <div className="min-h-screen bg-black relative overflow-hidden">
       {/* Background Elements */}
-      <div className="absolute inset-0">
-        <div className="absolute top-0 left-0 w-[800px] h-[800px] bg-purple-600/10 rounded-full blur-[150px]" />
-        <div className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-pink-600/10 rounded-full blur-[150px]" />
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-0 left-0 w-[400px] sm:w-[600px] lg:w-[800px] h-[400px] sm:h-[600px] lg:h-[800px] bg-purple-600/10 rounded-full blur-[100px] sm:blur-[150px]" />
+        <div className="absolute bottom-0 right-0 w-[300px] sm:w-[400px] lg:w-[600px] h-[300px] sm:h-[400px] lg:h-[600px] bg-pink-600/10 rounded-full blur-[100px] sm:blur-[150px]" />
       </div>
 
       <div className="relative z-10 min-h-screen">
         {/* Header */}
         <div className="border-b border-purple-500/20 bg-black/20 backdrop-blur-xl">
           <div className="container mx-auto px-4 sm:px-6 lg:px-12">
-            <div className="flex items-center justify-between h-20">
+            <div className="flex items-center justify-between h-16 sm:h-20">
               <Link href={`/trip/${trip.$id}`} className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors">
-                <ArrowLeft size={20} />
-                <span>Back to Trip Details</span>
+                <ArrowLeft size={18} className="sm:w-5 sm:h-5" />
+                <span className="text-sm sm:text-base">Back to Trip Details</span>
               </Link>
               
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">{currentStep}</span>
+                <div className="w-6 h-6 sm:w-8 sm:h-8 bg-purple-600 rounded-full flex items-center justify-center">
+                  <span className="text-white font-bold text-xs sm:text-sm">{currentStep}</span>
                 </div>
-                <span className="text-white font-medium">Step {currentStep} of 4</span>
+                <span className="text-white font-medium text-sm sm:text-base">Step {currentStep} of 4</span>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="container mx-auto px-4 sm:px-6 lg:px-12 py-12">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-12 py-6 sm:py-12">
           <div className="max-w-4xl mx-auto">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
               {/* Trip Summary Sidebar */}
               <div className="lg:col-span-1">
                 <div className="bg-black/40 backdrop-blur-xl border border-purple-500/20 rounded-2xl p-6 sticky top-8">
@@ -447,32 +448,32 @@ export default function BookTripPage() {
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="bg-black/40 backdrop-blur-xl border border-purple-500/20 rounded-2xl p-8"
+                  className="bg-black/40 backdrop-blur-xl border border-purple-500/20 rounded-2xl p-4 sm:p-6 lg:p-8"
                 >
-                  <div className="mb-8">
-                    <h1 className="text-3xl font-bold text-white mb-2">Book Your Adventure</h1>
-                    <p className="text-gray-400">Complete your booking in just a few steps</p>
+                  <div className="mb-6 sm:mb-8">
+                    <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">Book Your Adventure</h1>
+                    <p className="text-gray-400 text-sm sm:text-base">Complete your booking in just a few steps</p>
                   </div>
 
                   {/* Progress Bar */}
-                  <div className="mb-8">
-                    <div className="flex items-center gap-4 mb-4">
+                  <div className="mb-6 sm:mb-8">
+                    <div className="flex items-center gap-2 sm:gap-4 mb-4">
                       {[1, 2, 3, 4].map((step) => (
                         <div key={step} className="flex items-center">
-                          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-colors ${
+                          <div className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs sm:text-sm font-bold transition-colors ${
                             currentStep >= step ? 'bg-purple-600 text-white' : 'bg-gray-600 text-gray-400'
                           }`}>
                             {step}
                           </div>
                           {step < 4 && (
-                            <div className={`w-12 h-0.5 ml-2 transition-colors ${
+                            <div className={`w-6 sm:w-12 h-0.5 ml-1 sm:ml-2 transition-colors ${
                               currentStep > step ? 'bg-purple-600' : 'bg-gray-600'
                             }`} />
                           )}
                         </div>
                       ))}
                     </div>
-                    <div className="text-sm text-gray-400">
+                    <div className="text-xs sm:text-sm text-gray-400">
                       {currentStep === 1 && 'Personal Information'}
                       {currentStep === 2 && 'Student Status & Preferences'}
                       {currentStep === 3 && 'Trip Details & Emergency Contact'}

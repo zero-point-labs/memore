@@ -40,8 +40,8 @@ export default function NextTripLink({ className, children, onClick }: NextTripL
     }
 
     if (isLoading) {
-      // If still loading, redirect to the general next trip page as fallback
-      router.push('/next-trip');
+      // If still loading, redirect to homepage as fallback
+      router.push('/');
       return;
     }
 
@@ -49,8 +49,8 @@ export default function NextTripLink({ className, children, onClick }: NextTripL
       // Redirect to the specific trip page
       router.push(`/trip/${nextTrip.$id}`);
     } else {
-      // If no next trip found, redirect to the general next trip page
-      router.push('/next-trip');
+      // If no next trip found, redirect to homepage
+      router.push('/');
     }
   };
 

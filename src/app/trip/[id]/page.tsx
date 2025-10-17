@@ -7,6 +7,7 @@ import { MapPin, Calendar, Users, Check, ArrowRight, Clock, ArrowLeft, Star, Spa
 import Link from 'next/link';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import NextTripLink from '@/components/NextTripLink';
 //  // Replaced with dedicated booking pages
 import TripImageCarousel from '@/components/trip-elements/TripImageCarousel';
 import { clientTripService } from '@/services/tripService.client';
@@ -351,13 +352,10 @@ export default function TripPage() {
         <div className="flex items-center justify-center min-h-screen">
           <div className="text-center">
             <div className="text-red-400 text-xl mb-4">{error || 'Trip not found'}</div>
-            <Link
-              href="/next-trip"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-purple-600 rounded-lg text-white font-medium hover:bg-purple-700 transition-colors"
-            >
+            <NextTripLink className="inline-flex items-center gap-2 px-6 py-3 bg-purple-600 rounded-lg text-white font-medium hover:bg-purple-700 transition-colors">
               <ArrowLeft className="w-4 h-4" />
               Back to Trips
-            </Link>
+            </NextTripLink>
           </div>
         </div>
       </div>
@@ -457,13 +455,10 @@ export default function TripPage() {
               {isPast && (
                 <div className="text-center">
                   <p className="text-gray-400 mb-4">This amazing adventure has concluded</p>
-                  <Link
-                    href="/next-trip"
-                    className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-purple-600/20 to-pink-600/20 border border-purple-500/30 rounded-full text-purple-300 font-medium hover:from-purple-600/30 hover:to-pink-600/30 hover:border-purple-500/50 transition-all duration-300"
-                  >
+                  <NextTripLink className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-purple-600/20 to-pink-600/20 border border-purple-500/30 rounded-full text-purple-300 font-medium hover:from-purple-600/30 hover:to-pink-600/30 hover:border-purple-500/50 transition-all duration-300">
                     <Star className="w-4 h-4" />
                     Explore Upcoming Trips
-                  </Link>
+                  </NextTripLink>
                 </div>
               )}
             </motion.div>

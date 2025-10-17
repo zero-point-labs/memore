@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import NextTripLink from '@/components/NextTripLink';
 import { 
   ArrowLeft,
   Calendar,
@@ -180,7 +181,7 @@ export default function BookingsPage() {
                 <CreditCard className="w-16 h-16 text-gray-600 mx-auto mb-6" />
                 <h2 className="text-2xl font-bold text-white mb-4">No Bookings Yet</h2>
                 <p className="text-gray-400 mb-8">Ready to start your Cyprus adventure?</p>
-                <Link href="/next-trip">
+                <NextTripLink>
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
@@ -188,7 +189,7 @@ export default function BookingsPage() {
                   >
                     Book Your First Trip
                   </motion.button>
-                </Link>
+                </NextTripLink>
               </motion.div>
             ) : (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

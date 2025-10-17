@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
 import Footer from '@/components/Footer';
+import NextTripLink from '@/components/NextTripLink';
 import { viewportOnce, fadeInUp, fadeIn, slideInFromTop } from '@/utils/animationVariants';
 
 export default function AboutPage() {
@@ -114,7 +115,7 @@ export default function AboutPage() {
               className="pt-4 sm:pt-6 md:pt-8"
             >
               <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 md:gap-6 justify-center items-center px-2">
-                <Link href="/next-trip" className="w-full sm:w-auto">
+                <NextTripLink className="w-full sm:w-auto">
                   <motion.button
                     whileHover={{ scale: 1.05, y: -3 }}
                     whileTap={{ scale: 0.95 }}
@@ -130,7 +131,7 @@ export default function AboutPage() {
                       Book Your Adventure
                     </span>
                   </motion.button>
-                </Link>
+                </NextTripLink>
 
                 <Link href="/events" className="w-full sm:w-auto">
                   <motion.button

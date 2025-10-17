@@ -22,7 +22,7 @@ export default function SignupPage() {
   // Redirect logged-in users
   useEffect(() => {
     if (!authLoading && user) {
-      router.push('/account');
+      router.push('/account/profile');
     }
   }, [user, authLoading, router]);
 
@@ -44,7 +44,7 @@ export default function SignupPage() {
 
     try {
       await register(email, password, name);
-      router.push('/account');
+      router.push('/account/profile');
     } catch (error: unknown) {
       setError((error as Error)?.message || 'Failed to create account');
     } finally {

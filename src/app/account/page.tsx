@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import NextTripLink from '@/components/NextTripLink';
 import { 
   User, 
   Mail, 
@@ -438,7 +439,7 @@ export default function AccountPage() {
                     <Plane className="w-12 h-12 text-gray-600 mx-auto mb-4" />
                     <h3 className="text-lg font-semibold text-gray-400 mb-2">No bookings yet</h3>
                     <p className="text-gray-500 mb-6">Ready for your first Cyprus adventure?</p>
-                    <Link href="/next-trip">
+                    <NextTripLink>
                       <motion.button
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
@@ -446,7 +447,7 @@ export default function AccountPage() {
                       >
                         Book Your First Trip
                       </motion.button>
-                    </Link>
+                    </NextTripLink>
                   </div>
                 ) : (
                   <div className="space-y-4">
@@ -532,7 +533,7 @@ export default function AccountPage() {
                     </motion.div>
                   </Link>
 
-                  <Link href="/next-trip">
+                  <NextTripLink>
                     <motion.div
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
@@ -544,7 +545,7 @@ export default function AccountPage() {
                         <div className="text-gray-400 text-sm">Explore Cyprus adventures</div>
                       </div>
                     </motion.div>
-                  </Link>
+                  </NextTripLink>
                 </div>
               </motion.div>
             </div>

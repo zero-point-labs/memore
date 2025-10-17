@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import NextTripLink from '@/components/NextTripLink';
 import { 
   ArrowLeft,
   User,
@@ -13,7 +14,9 @@ import {
   CheckCircle,
   AlertCircle,
   ChevronDown,
-  Search
+  Search,
+  Home,
+  Compass
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserProfile } from '@/hooks/useUserProfile';
@@ -341,6 +344,36 @@ export default function ProfilePage() {
                   )}
                 </div>
               </form>
+            </motion.div>
+
+            {/* Navigation Buttons */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="mt-8 space-y-4"
+            >
+              <NextTripLink className="w-full">
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="w-full flex items-center justify-center gap-3 px-6 py-4 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl text-white font-bold text-lg shadow-lg hover:shadow-purple-500/25 transition-all"
+                >
+                  <Compass className="w-5 h-5" />
+                  Book Your Adventure
+                </motion.button>
+              </NextTripLink>
+
+              <Link href="/" className="w-full">
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="w-full flex items-center justify-center gap-3 px-6 py-4 bg-gradient-to-r from-gray-600 to-gray-700 rounded-xl text-white font-bold text-lg shadow-lg hover:shadow-gray-500/25 transition-all"
+                >
+                  <Home className="w-5 h-5" />
+                  Go to Homepage
+                </motion.button>
+              </Link>
             </motion.div>
           </div>
         </div>
