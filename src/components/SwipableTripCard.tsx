@@ -345,7 +345,7 @@ export default function SwipableTripCard({ onBookingClick, className }: Swipable
   return (
     <div className={cn("relative", className)}>
       {/* Card Container */}
-      <div className="relative bg-gradient-to-br from-purple-900/50 to-pink-900/50 rounded-3xl overflow-hidden border border-purple-500/20 backdrop-blur-sm">
+      <div className="relative bg-gradient-to-br from-purple-900/50 to-pink-900/50 rounded-3xl overflow-hidden border-2 border-purple-400/40 backdrop-blur-sm">
         
         {/* Desktop Navigation Buttons */}
         <DesktopNavigationButtons 
@@ -358,13 +358,6 @@ export default function SwipableTripCard({ onBookingClick, className }: Swipable
         {/* Swipe Hints */}
         <SwipeHints hasNext={hasNext} hasPrevious={hasPrevious} />
 
-        {/* Border Beam Effect */}
-        <BorderBeam
-          colorFrom="#8B5CF6"
-          colorTo="#EC4899"
-          borderWidth={2}
-          duration={6}
-        />
 
         {/* Background Effects */}
         <div className="absolute inset-0 overflow-hidden">
@@ -374,7 +367,7 @@ export default function SwipableTripCard({ onBookingClick, className }: Swipable
         </div>
 
         {/* Animated Card Content */}
-        <div className="relative h-[1000px] sm:h-[950px] md:h-[950px]">
+        <div className="relative h-[550px] sm:h-[600px] md:h-[700px]">
           <AnimatePresence initial={false} custom={direction === 'next' ? 1 : -1}>
             <motion.div
               key={currentTrip.$id}
@@ -396,7 +389,7 @@ export default function SwipableTripCard({ onBookingClick, className }: Swipable
               className="absolute inset-0 cursor-grab active:cursor-grabbing"
             >
               {/* Background Image - More prominent */}
-              <div className="absolute top-0 left-0 right-0 h-72 sm:h-80 md:h-96">
+              <div className="absolute top-0 left-0 right-0 h-60 sm:h-72 md:h-96">
                 <img
                   src={(() => {
                     if (!Array.isArray(currentTrip.gallery) || currentTrip.gallery.length === 0) return '';
@@ -407,6 +400,19 @@ export default function SwipableTripCard({ onBookingClick, className }: Swipable
                   className="w-full h-full object-cover rounded-t-3xl"
                 />
                 <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/30 to-black/80 rounded-t-3xl" />
+                
+                {/* Title and Status Badge - Bottom Right */}
+                <div className="absolute bottom-4 right-4 text-right">
+                  <TripStatusBadge trip={currentTrip} />
+                  <div className="mt-2">
+                    <h3 className="text-lg sm:text-xl font-bold text-white">
+                      <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">
+                        {currentTrip.location.split(',')[0]}
+                      </span>{' '}
+                      <span className="text-white">Experience</span>
+                    </h3>
+                  </div>
+                </div>
               </div>
 
               {/* Content */}
@@ -419,31 +425,28 @@ export default function SwipableTripCard({ onBookingClick, className }: Swipable
                   </div>
                 </div>
 
-                {/* Spacer to push content below image but show status badge */}
-                <div className="h-60 sm:h-72 md:h-80 flex items-end">
-                  <TripStatusBadge trip={currentTrip} />
-                </div>
+                {/* Spacer to push content below image */}
+                <div className="h-64 sm:h-68 md:h-72"></div>
 
                 {/* Main Content Section */}
-                <div className="bg-black/50 backdrop-blur-md rounded-2xl p-4 sm:p-6 md:p-8 mt-4 relative z-20 border border-purple-500/20">
-                  {/* Title */}
+                <div className="bg-black/50 backdrop-blur-md rounded-2xl p-3 sm:p-6 md:p-8 mt-4 relative z-20 border border-purple-500/20">
+                  
+                  {/* Description with Read More */}
                   <motion.div
                     key={currentTrip.title}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.1 }}
-                    className="text-center mb-6"
+                    className="mb-4 sm:mb-6"
                   >
-                    <h3 className="text-2xl sm:text-3xl md:text-4xl font-black text-white mb-3">
-                      <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">
-                        {currentTrip.location.split(',')[0]}
-                      </span>{' '}
-                      <span className="text-white">Experience</span>
-                    </h3>
-                    
-                    <p className="text-gray-300 text-base sm:text-lg leading-relaxed">
-                      An incredible {currentTrip.duration}-day journey through the Mediterranean paradise, 
-                      designed for maximum adventure and unforgettable memories.
+                    <p className="text-gray-300 text-sm sm:text-base leading-relaxed">
+                      An incredible {currentTrip.duration}-day journey through the Mediterranean paradise...
+                      <Link 
+                        href={`/trip/${currentTrip.$id}`}
+                        className="text-purple-400 hover:text-purple-300 transition-colors duration-200 font-medium ml-1"
+                      >
+                        read more
+                      </Link>
                     </p>
                   </motion.div>
 
@@ -452,9 +455,9 @@ export default function SwipableTripCard({ onBookingClick, className }: Swipable
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.2 }}
-                    className="text-center mb-4"
+                    className="mb-4"
                   >
-                    <div className="inline-flex items-center gap-2 text-pink-400">
+                    <div className="flex items-center gap-2 text-pink-400">
                       <Calendar className="w-4 h-4" />
                       <span className="font-semibold text-sm">
                         {new Date(currentTrip.startDate).toLocaleDateString('en-US', { 
@@ -474,76 +477,52 @@ export default function SwipableTripCard({ onBookingClick, className }: Swipable
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.3 }}
-                    className="bg-black/30 backdrop-blur-sm border border-purple-500/20 rounded-xl p-5 mb-6"
+                    className="mb-4 sm:mb-6"
                   >
-                    <div className="grid grid-cols-2 gap-6 text-center">
+                    <div className="flex flex-col gap-3">
                       {/* Location */}
-                      <div className="flex flex-col items-center">
-                        <MapPin className="w-6 h-6 text-purple-400 mb-2" />
-                        <h4 className="text-white font-bold text-sm mb-1">Destination</h4>
-                        <p className="text-purple-300 font-semibold text-sm">{currentTrip.location}</p>
+                      <div className="flex items-center gap-2 text-purple-400">
+                        <MapPin className="w-4 h-4" />
+                        <span className="font-semibold text-sm">{currentTrip.location}</span>
                       </div>
 
                       {/* Availability */}
-                      <div className="flex flex-col items-center">
-                        <Users className="w-6 h-6 text-green-400 mb-2" />
-                        <h4 className="text-white font-bold text-sm mb-1">Spots Left</h4>
-                        <p className="text-green-300 font-semibold text-sm">
-                          <span className="text-xl font-bold">{currentTrip.availability.spotsRemaining}</span> / {currentTrip.availability.totalSpots}
-                        </p>
+                      <div className="flex items-center gap-2 text-green-400">
+                        <Users className="w-4 h-4" />
+                        <span className="font-semibold text-sm">
+                          {currentTrip.availability.spotsRemaining} / {currentTrip.availability.totalSpots}
+                        </span>
                       </div>
                     </div>
                   </motion.div>
 
-                  {/* Key Features - Mobile Optimized */}
-                  <motion.div 
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.4 }}
-                    className="mb-4 sm:mb-6"
-                  >
-                    {/* Mobile: Horizontal scroll, Desktop: 2x2 grid */}
-                    <div className="md:grid md:grid-cols-2 md:gap-3 flex md:flex-none gap-2 sm:gap-3 overflow-x-auto md:overflow-x-visible scrollbar-hide pb-2">
-                      {[
-                        { icon: '🏖️', text: 'Beach Access' },
-                        { icon: '🎉', text: 'VIP Clubs' },
-                        { icon: '🛥️', text: 'Yacht Parties' },
-                        { icon: '🌅', text: 'Sunset Views' }
-                      ].map((feature, index) => (
-                        <div key={index} className="flex md:flex-col items-center gap-1 md:gap-1 text-xs text-gray-300 bg-white/5 rounded-lg p-2 md:p-3 min-w-[100px] md:min-w-0 text-center whitespace-nowrap md:whitespace-normal">
-                          <span className="text-sm md:text-base">{feature.icon}</span>
-                          <span className="font-medium">{feature.text}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </motion.div>
 
                   {/* Pricing */}
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.5 }}
-                    className="text-center mb-6"
+                    transition={{ delay: 0.4 }}
+                    className="mb-4 sm:mb-6"
                   >
-                    <div className="flex items-center justify-center gap-4 mb-3">
-                      <span className="text-3xl font-black text-white">
+                    <div className="flex items-center gap-3">
+                      <span className="text-xl sm:text-2xl font-bold text-white">
                         €{currentTrip.pricing.standard || currentTrip.pricing.premium || 'TBA'}
                       </span>
+                      <span className="text-gray-400 text-sm">per person</span>
                       {currentTrip.pricing.earlyBird && (
-                        <div className="px-3 py-2 bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border border-yellow-500/30 rounded-lg">
-                          <span className="text-yellow-400 text-xs font-bold">EARLY BIRD</span>
+                        <div className="px-2 py-1 bg-gradient-to-r from-yellow-500/15 to-orange-500/15 border border-yellow-500/25 rounded-md">
+                          <span className="text-yellow-400 text-xs font-medium">EARLY BIRD</span>
                         </div>
                       )}
                     </div>
-                    <p className="text-gray-400 text-base">per person</p>
                   </motion.div>
 
                   {/* Action Buttons */}
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.6 }}
-                    className="flex flex-col items-center gap-3"
+                    transition={{ delay: 0.5 }}
+                    className="flex flex-col items-center"
                   >
                     {/* Main CTA Button - Dynamic Based on Trip Status */}
                     {(() => {
@@ -553,9 +532,9 @@ export default function SwipableTripCard({ onBookingClick, className }: Swipable
                         return (
                           <Link href={`/trip/${currentTrip.$id}`}>
                             <motion.button
-                              whileHover={{ scale: 1.05 }}
-                              whileTap={{ scale: 0.95 }}
-                              className="px-8 py-4 bg-gradient-to-r from-gray-600 to-slate-600 rounded-xl font-bold text-lg text-white shadow-lg hover:shadow-xl transition-all duration-300"
+                              whileHover={{ scale: 1.02 }}
+                              whileTap={{ scale: 0.98 }}
+                              className="px-5 py-2.5 bg-gradient-to-r from-gray-600/80 to-slate-600/80 backdrop-blur-sm border border-gray-500/30 rounded-lg font-medium text-sm text-white hover:from-gray-600 hover:to-slate-600 hover:border-gray-400/50 transition-all duration-300"
                             >
                               View Gallery
                             </motion.button>
@@ -565,9 +544,9 @@ export default function SwipableTripCard({ onBookingClick, className }: Swipable
                         return (
                           <Link href={`/book/${currentTrip.$id}`}>
                             <motion.button
-                              whileHover={{ scale: 1.05 }}
-                              whileTap={{ scale: 0.95 }}
-                              className="px-8 py-4 bg-gradient-to-r from-green-600 to-emerald-600 rounded-xl font-bold text-lg text-white shadow-lg hover:shadow-xl transition-all duration-300"
+                              whileHover={{ scale: 1.02 }}
+                              whileTap={{ scale: 0.98 }}
+                              className="px-5 py-2.5 bg-gradient-to-r from-green-600/80 to-emerald-600/80 backdrop-blur-sm border border-green-500/30 rounded-lg font-medium text-sm text-white hover:from-green-600 hover:to-emerald-600 hover:border-green-400/50 transition-all duration-300"
                             >
                               Join Now
                             </motion.button>
@@ -576,14 +555,8 @@ export default function SwipableTripCard({ onBookingClick, className }: Swipable
                       } else {
                         // upcoming
                         return (
-                          <Link href={`/trip/${currentTrip.$id}`}>
-                            <motion.button
-                              whileHover={{ scale: 1.05 }}
-                              whileTap={{ scale: 0.95 }}
-                              className="px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl font-bold text-lg text-white shadow-lg hover:shadow-xl transition-all duration-300"
-                            >
-                              More Details
-                            </motion.button>
+                          <Link href={`/trip/${currentTrip.$id}`} className="text-purple-300 hover:text-purple-200 transition-colors duration-200 text-sm font-medium">
+                            More Details →
                           </Link>
                         );
                       }
